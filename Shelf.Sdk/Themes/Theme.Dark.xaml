@@ -1,0 +1,24 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Темна палітра (історичний default Shelf).
+         Ключі мають бути однакові у Theme.Dark.xaml і Theme.Light.xaml,
+         бо стилі у Theme.xaml резолвлять їх через DynamicResource. -->
+
+    <SolidColorBrush x:Key="BackgroundBrush" Color="#FF1E1E1E"/>
+    <SolidColorBrush x:Key="SurfaceBrush" Color="#FF252526"/>
+    <SolidColorBrush x:Key="ElevatedSurfaceBrush" Color="#FF2D2D30"/>
+    <SolidColorBrush x:Key="BorderBrush" Color="#FF3F3F46"/>
+    <SolidColorBrush x:Key="PrimaryTextBrush" Color="#FFEAEAEA"/>
+    <SolidColorBrush x:Key="SecondaryTextBrush" Color="#FFB0B0B0"/>
+    <SolidColorBrush x:Key="MutedTextBrush" Color="#FF8A8A8A"/>
+    <SolidColorBrush x:Key="AccentBrush" Color="#FF5C5C62"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#FF6E6E76"/>
+    <SolidColorBrush x:Key="HoverBrush" Color="#FF2D2D30"/>
+    <SolidColorBrush x:Key="CheckBoxFillBrush" Color="#FF5C5C62"/>
+    <SolidColorBrush x:Key="CheckBoxFillHoverBrush" Color="#FF6E6E76"/>
+    <SolidColorBrush x:Key="ScrollThumbBrush" Color="#FF4A4A4F"/>
+    <SolidColorBrush x:Key="ScrollThumbHoverBrush" Color="#FF707075"/>
+    <SolidColorBrush x:Key="ScrollThumbDragBrush" Color="#FF8A8A90"/>
+
+</ResourceDictionary>

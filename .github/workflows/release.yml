@@ -1,0 +1,93 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g. v1.0.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Publish & attach artifacts
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Resolve version from tag
+        id: version
+        shell: pwsh
+        run: |
+          $tag = if ('${{ github.event_name }}' -eq 'workflow_dispatch') { '${{ inputs.tag }}' } else { '${{ github.ref_name }}' }
+          if ($tag -notmatch '^v\d+\.\d+\.\d+') {
+            Write-Error "Tag '$tag' is not in vX.Y.Z format"
+            exit 1
+          }
+          $version = $tag.TrimStart('v')
+          Write-Output "tag=$tag"        | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Output "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "Resolved tag=$tag version=$version"
+
+      - name: Restore dependencies
+        run: dotnet restore Shelf.sln
+
+      - name: Publish (self-contained, single-file, win-x64)
+        shell: pwsh
+        run: |
+          dotnet publish Shelf.csproj `
+            -c Release `
+            -r win-x64 `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -p:DebugType=embedded `
+            -p:Version=${{ steps.version.outputs.version }} `
+            -p:FileVersion=${{ steps.version.outputs.version }}.0 `
+            -p:AssemblyVersion=${{ steps.version.outputs.version }}.0 `
+            -o publish\win-x64
+
+      - name: Remove debug symbols from published folder
+        shell: pwsh
+        run: |
+          Get-ChildItem publish\win-x64 -Recurse -Include *.pdb | Remove-Item -Force
+
+      - name: Create release archive
+        shell: pwsh
+        run: |
+          $zipName = "Shelf-${{ steps.version.outputs.tag }}-win-x64.zip"
+          Compress-Archive -Path publish\win-x64\* -DestinationPath $zipName -CompressionLevel Optimal
+          Write-Host "Created archive: $zipName"
+          Get-Item $zipName | Select-Object Name, Length
+
+      - name: Upload artifact (for inspection)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Shelf-${{ steps.version.outputs.tag }}-win-x64
+          path: Shelf-${{ steps.version.outputs.tag }}-win-x64.zip
+          retention-days: 30
+
+      - name: Create / update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: Shelf ${{ steps.version.outputs.tag }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            Shelf-${{ steps.version.outputs.tag }}-win-x64.zip

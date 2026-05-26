@@ -1,0 +1,72 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <RootNamespace>Shelf</RootNamespace>
+    <AssemblyName>Shelf</AssemblyName>
+    <ApplicationIcon>Resources\shelf.ico</ApplicationIcon>
+    <EnableDefaultItems>false</EnableDefaultItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Models\**\*.cs"/>
+    <Compile Include="Services\**\*.cs"/>
+    <Compile Include="Views\**\*.cs" Exclude="Views\**\*.xaml.cs"/>
+    <Compile Include="Views\**\*.xaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\**\*.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\shelf.ico"/>
+    <Resource Include="Resources\shelf.png"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="app.manifest"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="Shelf.Sdk\Shelf.Sdk.csproj"/>
+    <ProjectReference Include="WidgetPlugins\Shelf.Widgets.Clock\Shelf.Widgets.Clock.csproj"/>
+    <ProjectReference Include="WidgetPlugins\Shelf.Widgets.Notes\Shelf.Widgets.Notes.csproj"/>
+    <ProjectReference Include="WidgetPlugins\Shelf.Widgets.Todo\Shelf.Widgets.Todo.csproj"/>
+    <ProjectReference Include="WidgetPlugins\Shelf.Widgets.Photos\Shelf.Widgets.Photos.csproj"/>
+    <ProjectReference Include="WidgetPlugins\Shelf.Widgets.Radio\Shelf.Widgets.Radio.csproj"/>
+    <ProjectReference Include="WidgetPlugins\Shelf.Widgets.Weather\Shelf.Widgets.Weather.csproj"/>
+    <ProjectReference Include="WidgetPlugins\Shelf.Widgets.Timer\Shelf.Widgets.Timer.csproj"/>
+    <ProjectReference Include="WidgetPlugins\Shelf.Widgets.Stopwatch\Shelf.Widgets.Stopwatch.csproj"/>
+    <ProjectReference Include="WidgetPlugins\Shelf.Widgets.Holidays\Shelf.Widgets.Holidays.csproj"/>
+  </ItemGroup>
+
+</Project>

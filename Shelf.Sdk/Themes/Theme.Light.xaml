@@ -1,0 +1,24 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Світла палітра. Підібрана так, щоб ієрархія "сторінка / картка / hover"
+         читалася так само, як у темній: фон ледь сірий, картки білі, hover світло-сірий.
+         AccentBrush у світлій темі - середньо-сірий, видимий на білому як "виділення". -->
+
+    <SolidColorBrush x:Key="BackgroundBrush" Color="#FFF5F5F5"/>
+    <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="ElevatedSurfaceBrush" Color="#FFECECEC"/>
+    <SolidColorBrush x:Key="BorderBrush" Color="#FFD0D0D5"/>
+    <SolidColorBrush x:Key="PrimaryTextBrush" Color="#FF1E1E1E"/>
+    <SolidColorBrush x:Key="SecondaryTextBrush" Color="#FF555555"/>
+    <SolidColorBrush x:Key="MutedTextBrush" Color="#FF888888"/>
+    <SolidColorBrush x:Key="AccentBrush" Color="#FF707075"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#FF5C5C62"/>
+    <SolidColorBrush x:Key="HoverBrush" Color="#FFECECEC"/>
+    <SolidColorBrush x:Key="CheckBoxFillBrush" Color="#FF707075"/>
+    <SolidColorBrush x:Key="CheckBoxFillHoverBrush" Color="#FF5C5C62"/>
+    <SolidColorBrush x:Key="ScrollThumbBrush" Color="#FFB0B0B5"/>
+    <SolidColorBrush x:Key="ScrollThumbHoverBrush" Color="#FF8A8A8F"/>
+    <SolidColorBrush x:Key="ScrollThumbDragBrush" Color="#FF707075"/>
+
+</ResourceDictionary>

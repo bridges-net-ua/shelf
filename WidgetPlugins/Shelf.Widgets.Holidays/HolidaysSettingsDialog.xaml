@@ -1,0 +1,245 @@
+<Window x:Class="Shelf.Widgets.Holidays.HolidaysSettingsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{DynamicResource Holidays_Settings_Title}"
+        Height="620" Width="500"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BackgroundBrush}"
+        FontFamily="{DynamicResource UiFont}"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Foreground="{DynamicResource PrimaryTextBrush}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TabControl Grid.Row="0" Margin="0">
+
+            <!-- =============================== Налаштування =============================== -->
+            <TabItem Header="{DynamicResource Holidays_Settings_Tab_Settings}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="24,20,24,20">
+                        <TextBlock Text="{DynamicResource Holidays_Section_Categories}"
+                                   FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource MutedTextBrush}"
+                                   Margin="0,0,0,10"/>
+
+                        <CheckBox x:Name="CbShowHolidays"
+                                  Content="{DynamicResource Holidays_ShowHolidays}"
+                                  Margin="0,0,0,8"/>
+                        <CheckBox x:Name="CbShowBirthdays"
+                                  Content="{DynamicResource Holidays_ShowBirthdays}"
+                                  Margin="0,0,0,16"/>
+
+                        <Border Height="1"
+                                Background="{DynamicResource BorderBrush}"
+                                Margin="0,0,0,16"/>
+
+                        <TextBlock Text="{DynamicResource Holidays_Section_Display}"
+                                   FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource MutedTextBrush}"
+                                   Margin="0,0,0,10"/>
+
+                        <CheckBox x:Name="CbShowPast"
+                                  Content="{DynamicResource Holidays_ShowPast}"
+                                  Margin="0,0,0,6"
+                                  Click="CbShowPast_Click"/>
+                        <TextBlock Margin="24,0,0,4"
+                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                   FontSize="12">
+                            <Run Text="{DynamicResource Holidays_DaysBefore}"/>
+                            <Run x:Name="DaysBeforeValueRun" Text="1"/>
+                        </TextBlock>
+                        <Slider x:Name="DaysBeforeSlider"
+                                Minimum="1" Maximum="14"
+                                TickFrequency="1"
+                                IsSnapToTickEnabled="True"
+                                Margin="24,0,0,16"
+                                ValueChanged="DaysBeforeSlider_ValueChanged"/>
+
+                        <CheckBox x:Name="CbShowFuture"
+                                  Content="{DynamicResource Holidays_ShowFuture}"
+                                  Margin="0,0,0,6"
+                                  Click="CbShowFuture_Click"/>
+                        <TextBlock Margin="24,0,0,4"
+                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                   FontSize="12">
+                            <Run Text="{DynamicResource Holidays_DaysAfter}"/>
+                            <Run x:Name="DaysAfterValueRun" Text="1"/>
+                        </TextBlock>
+                        <Slider x:Name="DaysAfterSlider"
+                                Minimum="1" Maximum="14"
+                                TickFrequency="1"
+                                IsSnapToTickEnabled="True"
+                                Margin="24,0,0,20"
+                                ValueChanged="DaysAfterSlider_ValueChanged"/>
+
+                        <Border Height="1"
+                                Background="{DynamicResource BorderBrush}"
+                                Margin="0,0,0,16"/>
+
+                        <TextBlock Text="{DynamicResource Holidays_Section_Limit}"
+                                   FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource MutedTextBrush}"
+                                   Margin="0,0,0,10"/>
+
+                        <TextBlock Margin="0,0,0,4"
+                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                   FontSize="12">
+                            <Run Text="{DynamicResource Holidays_MaxPerDay}"/>
+                            <Run x:Name="MaxPerDayValueRun" Text="без обмежень"/>
+                        </TextBlock>
+                        <Slider x:Name="MaxPerDaySlider"
+                                Minimum="0" Maximum="15"
+                                TickFrequency="1"
+                                IsSnapToTickEnabled="True"
+                                Margin="0,0,0,8"
+                                ValueChanged="MaxPerDaySlider_ValueChanged"/>
+                        <TextBlock Text="{DynamicResource Holidays_MaxPerDay_Hint}"
+                                   TextWrapping="Wrap"
+                                   FontSize="11"
+                                   Foreground="{DynamicResource MutedTextBrush}"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- =============================== Свята =============================== -->
+            <TabItem Header="{DynamicResource Holidays_Settings_Tab_Holidays}">
+                <Grid Margin="24,20,24,20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0"
+                               Text="{DynamicResource Holidays_Section_User}"
+                               FontSize="11" FontWeight="SemiBold"
+                               Foreground="{DynamicResource MutedTextBrush}"
+                               Margin="0,0,0,8"/>
+
+                    <ListBox x:Name="HolidayList"
+                             Grid.Row="1"
+                             DisplayMemberPath="Display"
+                             Background="{DynamicResource ElevatedSurfaceBrush}"
+                             BorderBrush="{DynamicResource BorderBrush}"
+                             BorderThickness="1"
+                             SelectionChanged="HolidayList_SelectionChanged"
+                             MouseDoubleClick="HolidayList_MouseDoubleClick"/>
+
+                    <Grid Grid.Row="2" Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Orientation="Horizontal">
+                            <Button Content="{DynamicResource Holidays_Add}"
+                                    Click="AddHoliday_Click"
+                                    MinWidth="80"
+                                    Margin="0,0,8,0"/>
+                            <Button x:Name="EditHolidayButton"
+                                    Content="{DynamicResource Holidays_Edit}"
+                                    Click="EditHoliday_Click"
+                                    MinWidth="80"
+                                    IsEnabled="False"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <Button x:Name="ExportHolidaysButton"
+                                    Content="{DynamicResource Holidays_Export}"
+                                    Click="ExportHolidays_Click"
+                                    MinWidth="90"
+                                    Margin="0,0,8,0"/>
+                            <Button x:Name="ImportButton"
+                                    Content="{DynamicResource Holidays_Import}"
+                                    Click="Import_Click"
+                                    MinWidth="90"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock Grid.Row="3"
+                               Text="{DynamicResource Holidays_User_Hint}"
+                               TextWrapping="Wrap"
+                               Foreground="{DynamicResource MutedTextBrush}"
+                               FontSize="11"
+                               Margin="0,12,0,0"/>
+                </Grid>
+            </TabItem>
+
+            <!-- =============================== Дні народження =============================== -->
+            <TabItem Header="{DynamicResource Holidays_Settings_Tab_Birthdays}">
+                <Grid Margin="24,20,24,20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0"
+                               Text="{DynamicResource Holidays_Section_Birthdays}"
+                               FontSize="11" FontWeight="SemiBold"
+                               Foreground="{DynamicResource MutedTextBrush}"
+                               Margin="0,0,0,8"/>
+
+                    <ListBox x:Name="BirthdayList"
+                             Grid.Row="1"
+                             DisplayMemberPath="Display"
+                             Background="{DynamicResource ElevatedSurfaceBrush}"
+                             BorderBrush="{DynamicResource BorderBrush}"
+                             BorderThickness="1"
+                             SelectionChanged="BirthdayList_SelectionChanged"
+                             MouseDoubleClick="BirthdayList_MouseDoubleClick"/>
+
+                    <Grid Grid.Row="2" Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Orientation="Horizontal">
+                            <Button Content="{DynamicResource Holidays_Add}"
+                                    Click="AddBirthday_Click"
+                                    MinWidth="80"
+                                    Margin="0,0,8,0"/>
+                            <Button x:Name="EditBirthdayButton"
+                                    Content="{DynamicResource Holidays_Edit}"
+                                    Click="EditBirthday_Click"
+                                    MinWidth="80"
+                                    IsEnabled="False"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <Button x:Name="ExportBirthdaysButton"
+                                    Content="{DynamicResource Holidays_Export}"
+                                    Click="ExportBirthdays_Click"
+                                    MinWidth="90"
+                                    Margin="0,0,8,0"/>
+                            <Button x:Name="ImportBirthdaysButton"
+                                    Content="{DynamicResource Holidays_Import}"
+                                    Click="ImportBirthdays_Click"
+                                    MinWidth="90"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="24,12,24,16">
+            <Button Content="{DynamicResource Btn_Cancel}"
+                    Click="Cancel_Click"
+                    MinWidth="90"
+                    Margin="0,0,8,0"/>
+            <Button Content="{DynamicResource Btn_OK}"
+                    Click="Ok_Click"
+                    MinWidth="90"
+                    Background="{DynamicResource AccentBrush}"
+                    BorderBrush="{DynamicResource AccentBrush}"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,332 @@
+<UserControl x:Class="Shelf.Widgets.Radio.RadioWidget"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <Style x:Key="RadioGlassButton" TargetType="Button">
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                SnapsToDevicePixels="True">
+                            <Grid>
+                                <Border x:Name="Highlight"
+                                        Height="10"
+                                        Margin="1"
+                                        VerticalAlignment="Top"
+                                        CornerRadius="4"
+                                        Background="#18FFFFFF"/>
+                                <ContentPresenter HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource HoverBrush}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                                <Setter TargetName="Highlight" Property="Background" Value="#24FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource AccentBrush}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter TargetName="Highlight" Property="Opacity" Value="0.4"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.45"/>
+                                <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="RadioPrimaryButton" TargetType="Button" BasedOn="{StaticResource RadioGlassButton}">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentHoverBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                SnapsToDevicePixels="True">
+                            <Grid>
+                                <Border x:Name="Highlight"
+                                        Height="14"
+                                        VerticalAlignment="Top"
+                                        CornerRadius="4"
+                                        Background="#22FFFFFF"
+                                        Margin="1"/>
+                                <Border x:Name="Glow"
+                                        Width="18"
+                                        Height="18"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        CornerRadius="4"
+                                        Background="#10FFFFFF"/>
+                                <ContentPresenter HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource AccentHoverBrush}"/>
+                                <Setter TargetName="Highlight" Property="Background" Value="#2AFFFFFF"/>
+                                <Setter TargetName="Glow" Property="Background" Value="#18FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource AccentHoverBrush}"/>
+                                <Setter TargetName="Highlight" Property="Opacity" Value="0.45"/>
+                                <Setter TargetName="Glow" Property="Opacity" Value="0.35"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.55"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Border Padding="12,8,12,10"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            BorderThickness="0,0,0,1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Margin="2,0,2,6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0" HorizontalAlignment="Left">
+                    <TextBlock x:Name="TitleText"
+                               Text="{DynamicResource Radio_Name}"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource MutedTextBrush}"
+                               VerticalAlignment="Center"
+                               Background="Transparent"
+                               Cursor="IBeam"
+                               ToolTip="{DynamicResource Tip_Rename}"
+                               MouseLeftButtonDown="TitleText_MouseLeftButtonDown">
+                        <TextBlock.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="{DynamicResource Menu_Rename}" Click="TitleRenameMenuItem_Click">
+                                    <MenuItem.Icon>
+                                        <Viewbox Width="16" Height="16" Margin="0,0,10,0">
+                                            <Path Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"
+                                                  Fill="{DynamicResource PrimaryTextBrush}"/>
+                                        </Viewbox>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+                            </ContextMenu>
+                        </TextBlock.ContextMenu>
+                    </TextBlock>
+                    <TextBox x:Name="TitleEdit"
+                             Visibility="Collapsed"
+                             FontSize="11"
+                             FontWeight="SemiBold"
+                             Background="{DynamicResource ElevatedSurfaceBrush}"
+                             Foreground="{DynamicResource PrimaryTextBrush}"
+                             CaretBrush="{DynamicResource PrimaryTextBrush}"
+                             SelectionBrush="{DynamicResource AccentBrush}"
+                             BorderBrush="{DynamicResource AccentBrush}"
+                             BorderThickness="1"
+                             Padding="4,1"
+                             MinWidth="100"
+                             VerticalAlignment="Center"
+                             HorizontalAlignment="Left"
+                             PreviewKeyDown="TitleEdit_PreviewKeyDown"
+                             LostFocus="TitleEdit_LostFocus"/>
+                </Grid>
+
+                <TextBlock x:Name="StatusText"
+                           Grid.Column="1"
+                           Text="{DynamicResource Radio_Status_Ready}"
+                           FontSize="11"
+                           Foreground="{DynamicResource MutedTextBrush}"
+                           VerticalAlignment="Center"
+                           Margin="8,0,0,0">
+                    <TextBlock.Effect>
+                        <DropShadowEffect Color="#000000"
+                                          BlurRadius="2"
+                                          ShadowDepth="0"
+                                          Opacity="0.35"/>
+                    </TextBlock.Effect>
+                </TextBlock>
+            </Grid>
+
+            <Border Grid.Row="1"
+                    Background="{DynamicResource ElevatedSurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Padding="8"
+                    Margin="0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button x:Name="PrevButton"
+                            Grid.Column="0"
+                            Style="{StaticResource RadioGlassButton}"
+                            Width="26" Height="32"
+                            Click="PrevButton_Click"
+                            ToolTip="{DynamicResource Tip_PrevStation}">
+                        <Viewbox Width="11" Height="11">
+                            <Path Data="M7,2 L3,6 L7,10"
+                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                  StrokeThickness="2"
+                                  StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round"
+                                  StrokeLineJoin="Round"/>
+                        </Viewbox>
+                    </Button>
+
+                    <Grid Grid.Column="1" Margin="5,0,8,0">
+                        <Border IsHitTestVisible="False"
+                                Background="{DynamicResource SurfaceBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4"/>
+                        <ComboBox x:Name="StationCombo"
+                                  MinHeight="32"
+                                  Foreground="Transparent"
+                                  Background="Transparent"
+                                  BorderBrush="Transparent"
+                                  DisplayMemberPath="Name"
+                                  SelectionChanged="StationCombo_SelectionChanged"/>
+                        <Border IsHitTestVisible="False"
+                                Background="{DynamicResource SurfaceBrush}"
+                                CornerRadius="4"
+                                Margin="2"/>
+                        <TextBlock x:Name="StationDisplayText"
+                                   Text="{DynamicResource Radio_ChooseStation}"
+                                   IsHitTestVisible="False"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                   TextAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"
+                                   VerticalAlignment="Center"
+                                   Margin="24,0,28,0"/>
+                    </Grid>
+
+                    <Button x:Name="NextButton"
+                            Grid.Column="2"
+                            Style="{StaticResource RadioGlassButton}"
+                            Width="26" Height="32"
+                            Margin="0,0,8,0"
+                            Click="NextButton_Click"
+                            ToolTip="{DynamicResource Tip_NextStation}">
+                        <Viewbox Width="11" Height="11">
+                            <Path Data="M4,2 L8,6 L4,10"
+                                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                  StrokeThickness="2"
+                                  StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round"
+                                  StrokeLineJoin="Round"/>
+                        </Viewbox>
+                    </Button>
+
+                    <Button x:Name="PlayStopButton"
+                            Grid.Column="3"
+                            Style="{StaticResource RadioPrimaryButton}"
+                            Click="PlayStopButton_Click"
+                            Width="38"
+                            Height="34"
+                            ToolTip="{DynamicResource Tip_PlayStop}"
+                            Padding="0">
+                        <Viewbox Width="14" Height="14">
+                            <Path x:Name="PlayStopIconPath"
+                                  Data="M8,5.14V19.14L19,12.14L8,5.14Z"
+                                  Fill="White"
+                                  Stretch="Uniform"/>
+                        </Viewbox>
+                    </Button>
+
+                    <Grid Grid.Row="1"
+                          Grid.ColumnSpan="4"
+                          Margin="0,7,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button x:Name="MuteButton"
+                                Grid.Column="0"
+                                Style="{StaticResource RadioGlassButton}"
+                                Width="26" Height="24"
+                                Click="MuteButton_Click"
+                                ToolTip="{DynamicResource Tip_Mute}">
+                            <Viewbox Width="13" Height="13">
+                                <Path x:Name="VolumeIconPath"
+                                      Data="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z"
+                                      Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                            </Viewbox>
+                        </Button>
+
+                        <Slider x:Name="VolumeSlider"
+                                Grid.Column="1"
+                                Margin="8,0,8,0"
+                                Minimum="0" Maximum="100"
+                                SmallChange="1" LargeChange="10"
+                                VerticalAlignment="Center"
+                                ValueChanged="VolumeSlider_ValueChanged"/>
+
+                        <TextBlock x:Name="VolumeText"
+                                   Grid.Column="2"
+                                   Text="50%"
+                                   FontSize="11"
+                                   MinWidth="34"
+                                   TextAlignment="Right"
+                                   Foreground="{DynamicResource MutedTextBrush}"
+                                   VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <TextBlock x:Name="ErrorText"
+                               Grid.Row="2"
+                               Grid.ColumnSpan="4"
+                               Visibility="Collapsed"
+                               FontSize="11"
+                               Foreground="{DynamicResource SecondaryTextBrush}"
+                               TextAlignment="Center"
+                               TextWrapping="Wrap"
+                               Margin="0,5,0,0"/>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

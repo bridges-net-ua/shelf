@@ -1,0 +1,13 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Питання та обговорення / Questions & discussions
+    url: https://github.com/bridges-net-ua/shelf/discussions
+    about: |
+      Для загальних питань («як зробити», «чи можна», ідеї) використовуй Discussions.
+      Issues - для конкретних багів і пропозицій змін.
+      For general questions, use Discussions. Issues are for concrete bugs and proposed changes.
+  - name: 📧 Email
+    url: mailto:shelf@bridges.net.ua
+    about: |
+      Для приватних звернень, питань безпеки, або якщо не хочеш писати публічно.
+      For private inquiries, security questions, or if you prefer not to post publicly.

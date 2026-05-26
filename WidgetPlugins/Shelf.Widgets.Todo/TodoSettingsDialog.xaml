@@ -1,0 +1,58 @@
+<Window x:Class="Shelf.Widgets.Todo.TodoSettingsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{DynamicResource Todo_Settings_Title}"
+        Height="240" Width="400"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BackgroundBrush}"
+        FontFamily="{DynamicResource UiFont}"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Foreground="{DynamicResource PrimaryTextBrush}">
+    <Grid Margin="24,20,24,16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0">
+            <TextBlock Margin="0,0,0,6"
+                       Foreground="{DynamicResource SecondaryTextBrush}"
+                       FontSize="13" FontWeight="SemiBold">
+                <Run Text="{DynamicResource Todo_ListHeight}"/>
+                <Run x:Name="HeightValueRun" Text="220"/>
+                <Run Text="{DynamicResource Settings_Px}"/>
+            </TextBlock>
+            <Slider x:Name="HeightSlider"
+                    Minimum="100" Maximum="500"
+                    TickFrequency="10"
+                    IsSnapToTickEnabled="True"
+                    Margin="0,0,0,18"
+                    ValueChanged="Slider_ValueChanged"/>
+
+            <CheckBox x:Name="CbHideCompleted"
+                      Content="{DynamicResource Todo_HideCompleted}"
+                      Margin="0,0,0,4"/>
+            <TextBlock Text="{DynamicResource Todo_HideCompleted_Hint}"
+                       TextWrapping="Wrap"
+                       FontSize="11"
+                       Foreground="{DynamicResource MutedTextBrush}"
+                       Margin="22,0,0,0"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,20,0,0">
+            <Button Content="{DynamicResource Btn_Cancel}"
+                    Click="Cancel_Click"
+                    MinWidth="90"
+                    Margin="0,0,8,0"/>
+            <Button Content="{DynamicResource Btn_OK}"
+                    Click="Ok_Click"
+                    MinWidth="90"
+                    Background="{DynamicResource AccentBrush}"
+                    BorderBrush="{DynamicResource AccentBrush}"/>
+        </StackPanel>
+    </Grid>
+</Window>

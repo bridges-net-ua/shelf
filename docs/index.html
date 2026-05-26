@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Поличка - док-панель з віджетами для Windows</title>
+  <meta name="description" content="Поличка - безкоштовна open-source док-панель для робочого столу Windows. 9 вбудованих віджетів: годинник, замітки, задачі, фото, радіо, погода, таймер, секундомір, свята.">
+  <meta name="author" content="Bridges Community">
+  <meta name="theme-color" content="#1E1E22">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://shelf.bridges.net.ua/">
+  <meta property="og:title" content="Поличка - док-панель з віджетами для Windows">
+  <meta property="og:description" content="Безкоштовна open-source док-панель з 9 віджетами. Лежить на краю екрана, не заважає вікнам, і робить робочий стіл живим.">
+  <meta property="og:image" content="https://shelf.bridges.net.ua/assets/og-image.svg">
+  <meta property="og:locale" content="uk_UA">
+  <meta property="og:locale:alternate" content="en_US">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Поличка - док-панель з віджетами для Windows">
+  <meta name="twitter:description" content="Безкоштовна open-source док-панель з 9 віджетами для робочого столу Windows.">
+  <meta name="twitter:image" content="https://shelf.bridges.net.ua/assets/og-image.svg">
+
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <link rel="alternate" hreflang="uk" href="https://shelf.bridges.net.ua/">
+  <link rel="alternate" hreflang="en" href="https://shelf.bridges.net.ua/en/">
+  <link rel="canonical" href="https://shelf.bridges.net.ua/">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+    <a href="#top" class="brand">
+      <img src="assets/logo.png" alt="" aria-hidden="true">
+      <span>Поличка</span>
+    </a>
+    <nav class="nav-links" aria-label="Основне меню">
+      <a href="#about">Про програму</a>
+      <a href="#widgets">Віджети</a>
+      <a href="#download">Завантажити</a>
+      <a href="#faq">FAQ</a>
+      <a href="en/" class="lang-switch" lang="en">EN ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <img src="assets/logo.png" alt="Логотип Поличка" class="hero-logo">
+      <h1>Поличка</h1>
+      <p class="tagline">Бічна док-панель з віджетами для робочого столу Windows. Безкоштовно, відкритий код, без реклами.</p>
+      <div class="hero-actions">
+        <a href="https://github.com/bridges-net-ua/shelf/releases/latest" class="btn btn-primary">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Завантажити для Windows
+        </a>
+        <a href="https://github.com/bridges-net-ua/shelf" class="btn btn-secondary">
+          <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="about">
+    <div class="container">
+      <h2>Що це</h2>
+      <p class="lead">Поличка - це бічна панель (док-бар), яка живе на правому або лівому краю екрана Windows і тримає набір зручних мініатюрних віджетів.</p>
+      <p>Панель резервує собі місце на екрані через Windows AppBar API. Це значить: коли ти розгортаєш будь-яке вікно на повний екран, воно займає простір <strong>поряд</strong> з Поличкою, а не <strong>під</strong> нею. Жоден браузер, IDE чи Word не загородить твої замітки, годинник чи список задач.</p>
+      <p>Темна і світла теми перемикаються наживо. Українська і англійська мови. Працює на всіх віртуальних столах Windows. Зберігає стан автоматично. Усе налаштовується через зрозумілий інтерфейс.</p>
+    </div>
+  </section>
+
+  <!-- WIDGETS -->
+  <section id="widgets">
+    <div class="container">
+      <h2>9 вбудованих віджетів</h2>
+      <p>Будь-який з них можна додати, видалити, перейменувати, закріпити вгорі або переставити перетягуванням. Кожен зберігає свій стан між запусками.</p>
+
+      <div class="widgets-grid">
+        <div class="widget-card">
+          <svg class="widget-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+          <h3>Годинник</h3>
+          <p>Час і дата у різних форматах з табулярними цифрами.</p>
+        </div>
+
+        <div class="widget-card">
+          <svg class="widget-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <h3>Замітки</h3>
+          <p>Текстовий блокнот з автозбереженням і перейменуванням.</p>
+        </div>
+
+        <div class="widget-card">
+          <svg class="widget-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <h3>Список задач</h3>
+          <p>To-do з мульти-вставкою з буфера, виконані опускаються вниз.</p>
+        </div>
+
+        <div class="widget-card">
+          <svg class="widget-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <h3>Слайд-шоу фото</h3>
+          <p>Фото з папки, ефект Ken Burns, 4 типи переходів.</p>
+        </div>
+
+        <div class="widget-card">
+          <svg class="widget-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+          <h3>Інтернет-радіо</h3>
+          <p>Українські станції з коробки + власні URL потоків.</p>
+        </div>
+
+        <div class="widget-card">
+          <svg class="widget-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+          <h3>Погода</h3>
+          <p>Поточна + завтрашня (Open-Meteo, без API-ключа).</p>
+        </div>
+
+        <div class="widget-card">
+          <svg class="widget-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 14 15"/><path d="M9 2h6M12 21v0"/></svg>
+          <h3>Таймер</h3>
+          <p>Зворотний відлік зі звуковим сигналом і миготінням.</p>
+        </div>
+
+        <div class="widget-card">
+          <svg class="widget-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 15 16"/><line x1="9" y1="2" x2="15" y2="2"/></svg>
+          <h3>Секундомір</h3>
+          <p>Хвилини, секунди, сотки, лапи.</p>
+        </div>
+
+        <div class="widget-card">
+          <svg class="widget-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <h3>Свята</h3>
+          <p>Державні, релігійні і ваші власні - вчора, сьогодні, завтра.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREENSHOTS -->
+  <section id="screenshots">
+    <div class="container">
+      <h2>Як це виглядає</h2>
+      <p>Скріншоти живого додатка. Натисни, щоб збільшити.</p>
+
+      <div class="screenshots">
+        <figure class="screenshot">
+          <img src="assets/screenshot-1.svg" alt="Панель Поличка з кількома віджетами">
+          <figcaption>Панель з годинником, замітками, погодою і списком задач</figcaption>
+        </figure>
+        <figure class="screenshot">
+          <img src="assets/screenshot-2.svg" alt="Вікно налаштувань">
+          <figcaption>Налаштування: позиція, поведінка, тема, мова</figcaption>
+        </figure>
+        <figure class="screenshot">
+          <img src="assets/screenshot-3.svg" alt="Слайд-шоу і свята">
+          <figcaption>Закріплені віджети, слайд-шоу фото і календар свят</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD -->
+  <section id="download">
+    <div class="container">
+      <h2>Завантажити</h2>
+
+      <div class="download-box">
+        <p style="font-size: 1.15rem; color: var(--text); margin-bottom: 18px;">
+          Готовий <code>.exe</code> у zip-архіві (~70 МБ, self-contained — .NET окремо ставити не треба).
+        </p>
+        <a href="https://github.com/bridges-net-ua/shelf/releases/latest" class="btn btn-primary" style="font-size: 1.1rem; padding: 16px 32px;">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Завантажити останню версію
+        </a>
+        <div class="platforms">
+          <span>🪟 Windows 10 (1809+) / Windows 11</span>
+          <span>🖥 Архітектура x64</span>
+          <span>💾 ~150 МБ на диску</span>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 14px;">
+          Після завантаження: розпакуй у будь-яку папку, запусти <code>Shelf.exe</code>.<br>
+          Windows SmartScreen може попередити - це нормально для нових open-source застосунків без комерційного підпису коду. Натисни «Докладніше» → «Виконати все одно».
+        </p>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 14px;">
+          Альтернативно - <a href="https://github.com/bridges-net-ua/shelf#збірка-з-джерел">збери з джерел самостійно</a>, якщо хочеш додати власний віджет.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="container">
+      <h2>Часті запитання</h2>
+
+      <div class="faq">
+        <details>
+          <summary>Скільки коштує Поличка?</summary>
+          <p>Нічого. Програма безкоштовна і має відкритий код під ліцензією MIT. Жодних підписок, реклами, in-app покупок, телеметрії.</p>
+        </details>
+
+        <details>
+          <summary>Чи буде версія для Windows 7 або 8?</summary>
+          <p>Ні. Поличка побудована на .NET 8 і використовує сучасні WPF/Win32 API, які доступні з Windows 10 версії 1809 і пізніших. Підтримка старіших систем не планується.</p>
+        </details>
+
+        <details>
+          <summary>Чи буде вона в Microsoft Store?</summary>
+          <p>У планах. Зараз ми зосереджені на стабільному релізі через GitHub. Публікація в Store потребує додаткової роботи (MSIX-пакування, dev-акаунт, сертифікація) - вона з'явиться в одному з майбутніх релізів.</p>
+        </details>
+
+        <details>
+          <summary>Чому Windows показує попередження при першому запуску?</summary>
+          <p>Це SmartScreen - захист Windows від невідомих застосунків. Він спрацьовує для всіх програм без комерційного підпису коду (Authenticode), який коштує $200-400/рік. Для безкоштовного open-source проекту це поки задорого; ми плануємо додати підпис, коли зможемо. Тим часом - просто натисни «Докладніше» → «Виконати все одно». Код повністю відкритий і доступний для аудиту на GitHub.</p>
+        </details>
+
+        <details>
+          <summary>Як вимкнути автозапуск разом із Windows?</summary>
+          <p>У Поличці: правий клік на панелі → Налаштування → вкладка «Налаштування панелі» → зніми галочку «Запускати разом з Windows».</p>
+        </details>
+
+        <details>
+          <summary>Як видалити Поличку?</summary>
+          <p>Закрий додаток (правий клік → Вийти з програми), видали папку, в яку розпакував zip. Якщо хочеш видалити збережені налаштування - також прибери теку <code>%APPDATA%\Shelf\</code>.</p>
+        </details>
+
+        <details>
+          <summary>Які дані Поличка надсилає в інтернет?</summary>
+          <p>Тільки те, що потрібно віджетам: запити на сервери радіостанцій (якщо граєш радіо), запити на api.open-meteo.com (якщо віджет погоди активний). Жодної телеметрії, аналітики чи персональних даних. Налаштування зберігаються лише локально.</p>
+        </details>
+
+        <details>
+          <summary>Чи можу я додати свій віджет?</summary>
+          <p>Так! Архітектура спеціально для цього. Кожен віджет - окремий C# проект, що компілюється у DLL поруч з основним додатком. Дивись <a href="https://github.com/bridges-net-ua/shelf/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> - там покрокова інструкція.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACTS -->
+  <section id="contacts">
+    <div class="container">
+      <h2>Про автора і контакти</h2>
+      <p>Поличка розроблена <strong>Bridges Community</strong>.</p>
+
+      <div class="contacts">
+        <div class="contact-card">
+          <h3>Сайт</h3>
+          <a href="https://shelf.bridges.net.ua/">shelf.bridges.net.ua</a>
+        </div>
+        <div class="contact-card">
+          <h3>Email</h3>
+          <a href="mailto:shelf@bridges.net.ua">shelf@bridges.net.ua</a>
+        </div>
+        <div class="contact-card">
+          <h3>Код і релізи</h3>
+          <a href="https://github.com/bridges-net-ua/shelf">github.com/bridges-net-ua/shelf</a>
+        </div>
+        <div class="contact-card">
+          <h3>Повідомити про баг</h3>
+          <a href="https://github.com/bridges-net-ua/shelf/issues">GitHub Issues</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>© 2026 Bridges Community · <a href="https://github.com/bridges-net-ua/shelf/blob/main/LICENSE">MIT License</a> · <a href="en/" lang="en">English version</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,26 @@
+<UserControl x:Class="Shelf.Widgets.Clock.ClockWidget"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Border Padding="12,6,12,8"
+            Background="{DynamicResource SurfaceBrush}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            BorderThickness="0,0,0,1">
+        <StackPanel HorizontalAlignment="Center">
+            <TextBlock x:Name="TimeText"
+                       Text="00:00"
+                       FontSize="44"
+                       FontWeight="Light"
+                       LineHeight="48"
+                       LineStackingStrategy="BlockLineHeight"
+                       Typography.NumeralAlignment="Tabular"
+                       Foreground="{DynamicResource PrimaryTextBrush}"
+                       HorizontalAlignment="Center"/>
+            <TextBlock x:Name="DateTimeText"
+                       Text="Понеділок · 1 січня 2026 року"
+                       FontSize="13"
+                       Margin="0,2,0,0"
+                       Foreground="{DynamicResource SecondaryTextBrush}"
+                       HorizontalAlignment="Center"/>
+        </StackPanel>
+    </Border>
+</UserControl>

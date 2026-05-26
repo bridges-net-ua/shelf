@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShelfDesk (Shelf) - widget dock for Windows desktop</title>
+  <meta name="description" content="ShelfDesk is a free, open-source widget dock for the Windows desktop. 9 built-in widgets: clock, notes, todo, photos, radio, weather, timer, stopwatch, holidays.">
+  <meta name="author" content="Bridges Community">
+  <meta name="theme-color" content="#1E1E22">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://shelf.bridges.net.ua/en/">
+  <meta property="og:title" content="ShelfDesk - widget dock for Windows desktop">
+  <meta property="og:description" content="Free open-source widget dock with 9 built-in widgets. Lives on the screen edge, never covered by maximized windows.">
+  <meta property="og:image" content="https://shelf.bridges.net.ua/assets/og-image.svg">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="uk_UA">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ShelfDesk - widget dock for Windows">
+  <meta name="twitter:description" content="Free open-source widget dock with 9 built-in widgets for the Windows desktop.">
+  <meta name="twitter:image" content="https://shelf.bridges.net.ua/assets/og-image.svg">
+
+  <link rel="icon" type="image/x-icon" href="../assets/favicon.ico">
+  <link rel="alternate" hreflang="uk" href="https://shelf.bridges.net.ua/">
+  <link rel="alternate" hreflang="en" href="https://shelf.bridges.net.ua/en/">
+  <link rel="canonical" href="https://shelf.bridges.net.ua/en/">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+    <a href="#top" class="brand">
+      <img src="../assets/logo.png" alt="" aria-hidden="true">
+      <span>ShelfDesk</span>
+    </a>
+    <nav class="nav-links" aria-label="Main menu">
+      <a href="#about">About</a>
+      <a href="#widgets">Widgets</a>
+      <a href="#download">Download</a>
+      <a href="#faq">FAQ</a>
+      <a href="../" class="lang-switch" lang="uk">UA ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <img src="../assets/logo.png" alt="ShelfDesk logo" class="hero-logo">
+      <h1>ShelfDesk</h1>
+      <p class="tagline">A side dock with widgets for your Windows desktop. Free, open-source, no ads.</p>
+      <div class="hero-actions">
+        <a href="https://github.com/bridges-net-ua/shelf/releases/latest" class="btn btn-primary">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download for Windows
+        </a>
+        <a href="https://github.com/bridges-net-ua/shelf" class="btn btn-secondary">
+          <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="about">
+    <div class="container">
+      <h2>What it is</h2>
+      <p class="lead">ShelfDesk is a side dock that lives on the right or left edge of your Windows screen and hosts a set of small, useful widgets.</p>
+      <p>The dock reserves its screen space through the Windows AppBar API. That means: when you maximize any window, it sits <strong>next to</strong> ShelfDesk rather than <strong>underneath</strong> it. No browser, IDE, or Word will ever cover your notes, clock, or todo list.</p>
+      <p>Dark and light themes switch live. Ukrainian and English UI. Works across all Windows virtual desktops. Auto-saves state. Everything is configurable through a clean settings interface.</p>
+    </div>
+  </section>
+
+  <!-- WIDGETS -->
+  <section id="widgets">
+    <div class="container">
+      <h2>9 built-in widgets</h2>
+      <p>Any of them can be added, removed, renamed, pinned to the top, or reordered via drag and drop. Each one persists its state between launches.</p>
+
+      <div class="widgets-grid">
+        <div class="widget-card">
+          <svg class="widget-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+          <h3>Clock</h3>
+          <p>Time and date in multiple formats with tabular numerals.</p>
+        </div>
+
+        <div class="widget-card">
+          <svg class="widget-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <h3>Notes</h3>
+          <p>Plain-text notepad with autosave and inline rename.</p>
+        </div>
+
+        <div class="widget-card">
+          <svg class="widget-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <h3>Todo</h3>
+          <p>Task list with multi-line paste, completed items sink to the bottom.</p>
+        </div>
+
+        <div class="widget-card">
+          <svg class="widget-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <h3>Photo slideshow</h3>
+          <p>Folder browser with Ken Burns effect, 4 transition types.</p>
+        </div>
+
+        <div class="widget-card">
+          <svg class="widget-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+          <h3>Internet radio</h3>
+          <p>Curated stations out of the box + your own stream URLs.</p>
+        </div>
+
+        <div class="widget-card">
+          <svg class="widget-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+          <h3>Weather</h3>
+          <p>Current + tomorrow forecast (Open-Meteo, no API key).</p>
+        </div>
+
+        <div class="widget-card">
+          <svg class="widget-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 14 15"/><path d="M9 2h6M12 21v0"/></svg>
+          <h3>Timer</h3>
+          <p>Countdown with audible alarm and visual flash.</p>
+        </div>
+
+        <div class="widget-card">
+          <svg class="widget-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 15 16"/><line x1="9" y1="2" x2="15" y2="2"/></svg>
+          <h3>Stopwatch</h3>
+          <p>Minutes, seconds, centiseconds, lap times.</p>
+        </div>
+
+        <div class="widget-card">
+          <svg class="widget-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <h3>Holidays</h3>
+          <p>State, religious, and your own holidays - yesterday, today, tomorrow.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREENSHOTS -->
+  <section id="screenshots">
+    <div class="container">
+      <h2>What it looks like</h2>
+      <p>Screenshots of the live app. Click to enlarge.</p>
+
+      <div class="screenshots">
+        <figure class="screenshot">
+          <img src="../assets/screenshot-1.svg" alt="ShelfDesk panel with several widgets">
+          <figcaption>Panel with clock, notes, weather, and todo list</figcaption>
+        </figure>
+        <figure class="screenshot">
+          <img src="../assets/screenshot-2.svg" alt="Settings window">
+          <figcaption>Settings: position, behavior, theme, language</figcaption>
+        </figure>
+        <figure class="screenshot">
+          <img src="../assets/screenshot-3.svg" alt="Slideshow and holidays widget">
+          <figcaption>Pinned widgets, photo slideshow, and holidays calendar</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD -->
+  <section id="download">
+    <div class="container">
+      <h2>Download</h2>
+
+      <div class="download-box">
+        <p style="font-size: 1.15rem; color: var(--text); margin-bottom: 18px;">
+          Ready-to-run <code>.exe</code> in a zip archive (~70 MB, self-contained — no separate .NET install needed).
+        </p>
+        <a href="https://github.com/bridges-net-ua/shelf/releases/latest" class="btn btn-primary" style="font-size: 1.1rem; padding: 16px 32px;">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download latest release
+        </a>
+        <div class="platforms">
+          <span>🪟 Windows 10 (1809+) / Windows 11</span>
+          <span>🖥 x64 architecture</span>
+          <span>💾 ~150 MB disk space</span>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 14px;">
+          After download: extract anywhere, run <code>Shelf.exe</code>.<br>
+          Windows SmartScreen may warn you - this is normal for new open-source apps without a commercial code-signing certificate. Click «More info» → «Run anyway».
+        </p>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 14px;">
+          Alternatively - <a href="https://github.com/bridges-net-ua/shelf#build-from-source">build from source yourself</a>, especially if you want to add your own widget.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="container">
+      <h2>Frequently asked questions</h2>
+
+      <div class="faq">
+        <details>
+          <summary>How much does ShelfDesk cost?</summary>
+          <p>Nothing. The app is free and open-source under the MIT license. No subscriptions, ads, in-app purchases, or telemetry.</p>
+        </details>
+
+        <details>
+          <summary>Will there be a version for Windows 7 or 8?</summary>
+          <p>No. ShelfDesk is built on .NET 8 and uses modern WPF/Win32 APIs available from Windows 10 version 1809 and later. Support for older systems is not planned.</p>
+        </details>
+
+        <details>
+          <summary>Will it be in the Microsoft Store?</summary>
+          <p>Planned. Right now we're focused on a stable release through GitHub. Publishing to the Store requires additional work (MSIX packaging, dev account, certification) - it will arrive in a future release.</p>
+        </details>
+
+        <details>
+          <summary>Why does Windows warn me on first launch?</summary>
+          <p>That's SmartScreen - Windows protection from unknown apps. It triggers for any application without a commercial Authenticode signature, which costs $200-400/year. For a free open-source project this is too expensive right now; we plan to add signing when we can. Until then - just click «More info» → «Run anyway». The full source code is open and available for audit on GitHub.</p>
+        </details>
+
+        <details>
+          <summary>How do I disable autostart with Windows?</summary>
+          <p>In ShelfDesk: right-click the panel → Settings → «Panel settings» tab → uncheck «Start with Windows».</p>
+        </details>
+
+        <details>
+          <summary>How do I uninstall ShelfDesk?</summary>
+          <p>Close the app (right-click → Exit), delete the folder where you extracted the zip. To also remove saved settings - delete the <code>%APPDATA%\Shelf\</code> folder.</p>
+        </details>
+
+        <details>
+          <summary>What data does ShelfDesk send to the internet?</summary>
+          <p>Only what widgets need: requests to radio station servers (if you play radio), requests to api.open-meteo.com (if the weather widget is active). No telemetry, analytics, or personal data. Settings are stored locally only.</p>
+        </details>
+
+        <details>
+          <summary>Can I add my own widget?</summary>
+          <p>Yes! The architecture is built for this. Each widget is a separate C# project that compiles to a DLL alongside the main app. See <a href="https://github.com/bridges-net-ua/shelf/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> for a step-by-step guide.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACTS -->
+  <section id="contacts">
+    <div class="container">
+      <h2>About the author and contacts</h2>
+      <p>ShelfDesk is developed by <strong>Bridges Community</strong>.</p>
+
+      <div class="contacts">
+        <div class="contact-card">
+          <h3>Website</h3>
+          <a href="https://shelf.bridges.net.ua/en/">shelf.bridges.net.ua</a>
+        </div>
+        <div class="contact-card">
+          <h3>Email</h3>
+          <a href="mailto:shelf@bridges.net.ua">shelf@bridges.net.ua</a>
+        </div>
+        <div class="contact-card">
+          <h3>Code and releases</h3>
+          <a href="https://github.com/bridges-net-ua/shelf">github.com/bridges-net-ua/shelf</a>
+        </div>
+        <div class="contact-card">
+          <h3>Report a bug</h3>
+          <a href="https://github.com/bridges-net-ua/shelf/issues">GitHub Issues</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>© 2026 Bridges Community · <a href="https://github.com/bridges-net-ua/shelf/blob/main/LICENSE">MIT License</a> · <a href="../" lang="uk">Українська версія</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

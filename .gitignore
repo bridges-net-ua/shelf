@@ -1,0 +1,93 @@
+# ----- .NET / Visual Studio -----
+bin/
+obj/
+out/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio cache/options
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# Build results
+*.pdb
+*.cache
+*.ilk
+*.meta
+*.obj
+*.pch
+*.response
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# Visual Studio code analysis
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# NuGet
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+
+# JetBrains Rider
+.idea/
+
+# ----- Shelf specifics -----
+# Legacy widget projects (from previous renames: Помічник, Polychka)
+WidgetPlugins/Помічник.Widgets.*/
+WidgetPlugins/Polychka.Widgets.*/
+
+# App runtime artifacts and exports
+artifacts/
+shelf-*.json
+shelf-*.txt
+polychka-*.json
+polychka-*.txt
+birth.txt
+dates.txt
+out.log
+err.log
+logodesk.png
+
+# Backup files
+Resources/shelf.ico.bak
+*.bak
+
+# OS junk
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# ----- Local secrets / config overrides (none expected, but reserve) -----
+*.env
+*.env.local
+appsettings.Local.json
