@@ -12,6 +12,14 @@
     <AssemblyName>Shelf</AssemblyName>
     <ApplicationIcon>Resources\shelf.ico</ApplicationIcon>
     <EnableDefaultItems>false</EnableDefaultItems>
+
+    <Version>1.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <Company>Bridges Community</Company>
+    <Product>Shelf</Product>
+    <Copyright>© 2026 Bridges Community</Copyright>
+    <Description>Customizable widget dock for Windows desktop</Description>
   </PropertyGroup>
 
   <ItemGroup>
