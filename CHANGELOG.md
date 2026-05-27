@@ -12,6 +12,18 @@
 
 ---
 
+## [1.0.1] - 2026-05-27
+
+Hotfix для критичного бага в v1.0.0 - віджети не завантажувалися у скачаному `.exe`.
+
+### Виправлено
+- **Збірка релізу більше не використовує `PublishSingleFile=true`.** У single-file-режимі widget DLL-файли (`Shelf.Widgets.*.dll`) запаковувалися всередину `Shelf.exe`, але `WidgetRegistry.Initialize()` шукає їх через `Directory.EnumerateFiles("Shelf.Widgets.*.dll")` як окремі файли поруч з виконуваним. Результат у v1.0.0: реєстр віджетів порожній, меню «+ Додати віджет» не показувало жодного типу. Тепер `.zip` містить теку з `Shelf.exe` + ~200 DLL поруч (стандартна self-contained .NET 8 збірка). Розмір zip майже не змінився (~64 МБ).
+
+### Примітки для користувачів v1.0.0
+- Завантажте новий `Shelf-v1.0.1-win-x64.zip`, видаліть стару теку, розпакуйте нову, запустіть `Shelf.exe`. Налаштування та додані віджети збережуться (вони в `%APPDATA%\Shelf\`).
+
+---
+
 ## [1.0.0] - 2026-05-26
 
 Перший публічний реліз. Поличка переходить з закритого проекту в open-source під ліцензією MIT.
@@ -48,5 +60,6 @@
 - Унікальний overlay-скролбар головної панелі, який не зменшує ширину віджетів.
 - Static project-reference архітектура віджетів (на відміну від runtime-плагінів), що готує проект до Microsoft Store.
 
-[Unreleased]: https://github.com/bridges-net-ua/shelf/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/bridges-net-ua/shelf/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/bridges-net-ua/shelf/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/bridges-net-ua/shelf/releases/tag/v1.0.0

@@ -45,15 +45,18 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore Shelf.sln
 
-      - name: Publish (self-contained, single-file, win-x64)
+      - name: Publish (self-contained folder, win-x64)
         shell: pwsh
+        # Plain self-contained publish (NO single-file): widget DLLs must sit
+        # next to Shelf.exe as separate files, because WidgetRegistry uses
+        # Directory.EnumerateFiles("Shelf.Widgets.*.dll") to discover them.
+        # Single-file bundling hides those DLLs inside the .exe and the
+        # registry finds zero widget types (the v1.0.0 bug).
         run: |
           dotnet publish Shelf.csproj `
             -c Release `
             -r win-x64 `
             --self-contained true `
-            -p:PublishSingleFile=true `
-            -p:IncludeNativeLibrariesForSelfExtract=true `
             -p:DebugType=embedded `
             -p:Version=${{ steps.version.outputs.version }} `
             -p:FileVersion=${{ steps.version.outputs.version }}.0 `
