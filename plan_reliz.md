@@ -1,7 +1,20 @@
-# План публікації Поличка як Open-Source
+# План публікації Поличка (Shelf) як Open-Source
 
-> Робочий документ. Оновлюємо тут до моменту, коли план буде готовий до виконання.
-> Останнє оновлення: 2026-05-26
+> Робочий журнал релізу. Усі 6 етапів плану виконано, додатково випущено hotfix v1.0.1.
+> Документ далі підтримуємо як список побажань і майбутніх покращень.
+> Останнє оновлення: 2026-05-27
+
+## 🟢 Фінальний стан
+
+| Що | Де |
+|---|---|
+| **Код** | https://github.com/bridges-net-ua/shelf |
+| **Сайт** | https://shelf.bridges.net.ua/ (UA) · [/en/](https://shelf.bridges.net.ua/en/) |
+| **Завантаження** | https://github.com/bridges-net-ua/shelf/releases/latest (v1.0.1) |
+| **Issues / спільнота** | https://github.com/bridges-net-ua/shelf/issues |
+| **CI** | https://github.com/bridges-net-ua/shelf/actions |
+| **Витрати** | **$0** (домен `bridges.net.ua` уже був, усе решта в безкоштовних лімітах GitHub) |
+
 
 ## Мета
 
@@ -16,14 +29,14 @@
 | Дистрибуція `.exe` | GitHub Releases + GitHub Actions автозбірка на тег `v*` |
 | Хостинг сайту | GitHub Pages з теки `/docs` того ж репо |
 | Власний домен сайту | `shelf.bridges.net.ua` (піддомен наявного `bridges.net.ua`) |
-| GitHub-акаунт | Ще не створено, користувач реєструється вручну за інструкцією |
+| GitHub-акаунт | Особистий: `BridgesCom`. Організація: `bridges-net-ua`. |
 | Мова сайту і README | Двомовний: українська (основна) + англійська |
-| Початкова версія | `1.0.0` |
-| Легасі-теки (`WidgetPlugins/Помічник.Widgets.*`, `bin/`, `artifacts/`, `*.log`) | Додати в `.gitignore` без видалення з диска |
-| Скріншоти | Заглушки, користувач додасть реальні файли пізніше |
+| Початкова версія | `1.0.0` → `1.0.1` (hotfix) |
+| Легасі-теки (`WidgetPlugins/Помічник.Widgets.*`, `WidgetPlugins/Polychka.Widgets.*`, `bin/`, `artifacts/`, `*.log`) | Додано в `.gitignore` без видалення з диска |
+| Скріншоти | Заглушки SVG, користувач додасть реальні файли пізніше |
 | Контактний email | `shelf@bridges.net.ua` (вже в `App_About`) |
 | MSIX / Microsoft Store | Пізніше, окремим завданням |
-| Тип збірки `.exe` | Self-contained, win-x64, single-file (~70 МБ, не вимагає окремо встановлювати .NET) |
+| Тип збірки `.exe` | ~~Self-contained single-file~~ → **Self-contained folder**, win-x64 (~64 МБ zip, після розпакування ~200 файлів). Single-file ховав widget DLL всередину `.exe`, через що `WidgetRegistry` не знаходив їх — виправлено в v1.0.1. |
 | Технологія сайту | Чистий HTML + CSS, без фреймворків і build-кроку |
 | Платформа збірки | Тільки win-x64 (Shelf — Windows-only через AppBar API) |
 
@@ -68,9 +81,9 @@
 
 ### Перевірка перед наступним етапом
 
-- [ ] 9 файлів існують у корені.
-- [ ] `README.md` коректно відображається у будь-якому Markdown-переглядачі.
-- [ ] `.gitignore` містить правильні патерни (перевірити вручну на 2-3 файлах).
+- [x] 9 файлів існують у корені.
+- [x] `README.md` коректно відображається у будь-якому Markdown-переглядачі.
+- [x] `.gitignore` містить правильні патерни (перевірено).
 
 ---
 
@@ -90,9 +103,10 @@
 
 ### Перевірка перед наступним етапом
 
-- [ ] 6 файлів існують у `.github/`.
-- [ ] YAML-файли валідні синтаксично (перевіримо через online YAML linter або просто Read).
-- [ ] Логіка release.yml використовує тег як версію у назві артефакту.
+- [x] 6 файлів існують у `.github/`.
+- [x] YAML-файли валідні синтаксично.
+- [x] Логіка release.yml використовує тег як версію у назві артефакту.
+- [x] В hotfix v1.0.1 з release.yml прибрано `-p:PublishSingleFile=true`, щоб widget DLL ішли як окремі файли.
 
 ---
 
@@ -124,10 +138,10 @@
 
 ### Перевірка перед наступним етапом
 
-- [ ] Усі файли існують у `docs/`.
-- [ ] Користувач відкрив `docs/index.html` у браузері локально — сайт виглядає як треба, темна тема працює, логотип на місці.
-- [ ] Кнопка «Завантажити» веде на `github.com/bridges-net-ua/shelf/releases/latest` (поки 404, нормально — реліз буде на етапі 6).
-- [ ] Перемикач мови UA ↔ EN працює локально.
+- [x] Усі файли існують у `docs/`.
+- [x] Сайт виглядає як треба (темна тема, логотип, секції, кнопки, навігація — перевірено наживо на https://shelf.bridges.net.ua/).
+- [x] Кнопка «Завантажити» веде на `github.com/bridges-net-ua/shelf/releases/latest` (тепер працює, v1.0.1).
+- [x] Перемикач мови UA ↔ EN працює (`/en/` версія коректна).
 
 ---
 
@@ -159,9 +173,15 @@
 
 ### Перевірка перед наступним етапом
 
-- [ ] `https://github.com/bridges-net-ua/shelf` відкривається і показує файли проекту.
-- [ ] У вкладці **Actions** видно, що `build.yml` запустився і завершився зеленим ✅.
-- [ ] `README.md` коректно відображається на головній сторінці репо.
+- [x] `https://github.com/bridges-net-ua/shelf` відкривається і показує файли проекту.
+- [x] У вкладці **Actions** видно, що `build.yml` запустився і завершився зеленим ✅ за 59 секунд.
+- [x] `README.md` коректно відображається на головній сторінці репо.
+
+### Як насправді сталося
+
+- Користувач створив особистий акаунт **BridgesCom** (замість запропонованого нікнейму) і організацію `bridges-net-ua` (замість `bridges-community`, бо те ім'я не сподобалось).
+- Репо випадково створив під особистим акаунтом (`BridgesCom/shelf` замість `bridges-net-ua/shelf`); виправили через **Transfer ownership** у Settings → Danger Zone.
+- Перший push у Git Bash з gh CLI: 133 об'єкти, 1.14 MiB, гілка `main`, commit `c1cd086`.
 
 ---
 
@@ -187,14 +207,21 @@
 
 ### Перевірка перед наступним етапом
 
-- [ ] `https://shelf.bridges.net.ua/` відкривається, показує сайт-візитівку.
-- [ ] У браузері поряд з URL — замок (HTTPS, валідний сертифікат).
-- [ ] Версія `/en/` теж відкривається.
-- [ ] Перевірити через [whatsmydns.net](https://whatsmydns.net) що CNAME `shelf.bridges.net.ua` пошириться на більшість регіонів.
+- [x] `https://shelf.bridges.net.ua/` відкривається, показує сайт-візитівку.
+- [x] У браузері замок (HTTPS, валідний Let's Encrypt сертифікат).
+- [x] Версія `/en/` теж відкривається.
+- [x] DNS поширився за лічені хвилини (значно швидше прогнозованих 10-30 хв).
+
+### Як насправді сталося
+
+- Користувач має активний хостинг у Hostiq, тому DNS-записи додавалися через **cPanel Zone Editor** (а не панель реєстратора).
+- CNAME-запис: `shelf` → `bridges-net-ua.github.io.` (з крапкою в кінці, як вимагає cPanel).
+- GitHub автоматично прочитав `docs/CNAME`, підставив домен у Settings → Pages.
+- Let's Encrypt видав сертифікат через ~2 хв; чекбокс **Enforce HTTPS** увімкнено.
 
 ---
 
-## ⬜ Етап 6 — Перший реліз v1.0.0
+## ✅ Етап 6 — Перший реліз v1.0.0 + hotfix v1.0.1
 
 **Хто робить:** користувач створює tag, далі GitHub Actions автоматично.
 **Очікуваний час:** 2 хв роботи + 3-5 хв збірки.
@@ -211,21 +238,92 @@
 
 ### Перевірка перед завершенням
 
-- [ ] На сторінці Releases висить `v1.0.0` з прикріпленим `Shelf-v1.0.0-win-x64.zip` (~70 МБ).
-- [ ] Файл завантажується, розпаковується, `Shelf.exe` запускається на чистій Windows-машині.
-- [ ] Кнопка «Завантажити» на сайті веде сюди і працює.
+- [x] На сторінці Releases висить `v1.0.1` з прикріпленим `Shelf-v1.0.1-win-x64.zip` (~64 МБ).
+- [x] Файл завантажується, розпаковується, `Shelf.exe` запускається.
+- [x] Кнопка «Завантажити» на сайті веде сюди і працює.
+- [x] Віджети завантажуються — реєстр `WidgetRegistry` коректно знаходить 9 типів.
+- [x] Міграція налаштувань з `%APPDATA%\Polychka\` → `%APPDATA%\Shelf\` спрацювала.
 - [ ] (Опційно) Створити issue «Welcome / Зворотний зв'язок» у репо.
+
+### Як насправді сталося — v1.0.0 → v1.0.1
+
+- **v1.0.0** опубліковано через GitHub Web UI, workflow зібрав zip за 1 хв 37 сек, 64.1 МБ.
+- **Виявлений баг**: при запуску `Shelf.exe` меню «+ Додати віджет» було порожнє. Причина — `-p:PublishSingleFile=true` запихав widget DLL всередину `.exe`, а `WidgetRegistry.Initialize()` шукає `Shelf.Widgets.*.dll` як окремі файли на диску.
+- **Hotfix v1.0.1**: прибрав single-file з `release.yml`. Тепер zip — звичайна self-contained тека з `Shelf.exe` + ~200 DLL поруч. Розмір майже не змінився. Реліз v1.0.1 успішно зібраний і перевірений.
 
 ---
 
-## Майбутні етапи (поза цим завданням)
+## Майбутні етапи (опційно, за бажанням)
 
-Після завершення 6 етапів проект буде повноцінним open-source продуктом. Наступне — за потребою:
+Усі 6 базових етапів закрито — проект повноцінно живе. Нижче — список побажань на майбутнє, згрупований за зусиллями і пріоритетом.
 
-- **Етап 7 (опційно)** — MSIX-пакування для Microsoft Store: окремий проект `Shelf.Package`, GitHub Action для збірки `.msix`, реєстрація dev-акаунту ($19), верифікація.
-- **Етап 8 (опційно)** — Code signing: Authenticode-сертифікат (EV або OV) → користувачі не бачитимуть попередження SmartScreen.
-- **Етап 9 (опційно)** — Auto-update mechanism: Squirrel/Velopack/власний механізм. Зараз користувач завантажує нову версію вручну з Releases.
-- **Етап 10 (опційно)** — Розширена локалізація сайту, аналітика (Plausible/Umami), додаткові мови інтерфейсу.
+### 🔮 Невеликі поліпшення сайту (тривіально, ~10-30 хв кожне)
+
+- [ ] **Реальні скріншоти замість SVG-заглушок.** Запусти Поличку, зроби 3 скріншоти: (1) панель з кількома різнотипними віджетами; (2) вікно Налаштувань; (3) приклад зі слайд-шоу+календарем свят. Збережи як `docs/assets/screenshot-1/2/3.png` (та сама пропорція ~16:9). В обох HTML заміни `.svg` на `.png` у тегах `<img>`.
+- [ ] **PNG-версія `og-image.svg` для соцмережевих превʼю.** Facebook/Twitter/LinkedIn не рендерять SVG у Open Graph. Відкрий `docs/assets/og-image.svg` у браузері (Edge/Chrome), зроби скріншот 1200×630, збережи як `docs/assets/og-image.png`. У обох HTML заміни `og:image` content на `.png`-URL. Перевір через [opengraph.xyz](https://opengraph.xyz).
+- [ ] **Реальний логотип у README.** Зараз там посилання на `docs/assets/logo.png`, який бачать лише ті, хто переглядає README на GitHub. Можна додати inline-альтернативу або base64-варіант, щоб логотип був видний навіть у клоні без `docs/`.
+
+### 📢 Поділитися проектом (~10 хв)
+
+- [ ] **GitHub topics.** Settings репо → ⚙ біля «About» → у поле Topics додай: `widgets`, `windows`, `dotnet`, `wpf`, `dock-bar`, `desktop`, `ukrainian`, `open-source`. Це покращить пошук на GitHub.
+- [ ] **Профіль організації `bridges-net-ua`.** Завантаж логотип, додай опис «Open-source software by Bridges Community», лінк на `https://shelf.bridges.net.ua/`.
+- [ ] **Pin репо** у профілі організації як основний проект.
+- [ ] **Увімкнути GitHub Discussions.** Settings репо → секція «Features» → галочка «Discussions». Дасть людям місце для запитів і фідбеку, що не є багами.
+- [ ] **Перший Discussion-пост** «👋 Welcome — фідбек, питання, ідеї» — щоб ентрі-поінт був.
+- [ ] **Анонс у соцмережах** — пост у X/Mastodon/Threads з посиланням на `shelf.bridges.net.ua` і скріншотом. Українська tech-спільнота.
+
+### 🚀 Серйозніші майбутні кроки (години-дні роботи, можуть коштувати)
+
+#### Етап 7 — MSIX-пакування для Microsoft Store
+
+- **Зусилля:** ~1 день розробки + ~3-7 днів Store certification.
+- **Витрати:** $19 одноразово за Microsoft Partner dev-акаунт.
+- **Що зробити:**
+  - Додати в рішення `Windows Application Packaging Project` (`Shelf.Package`).
+  - Створити `Package.appxmanifest` із метаданими (Publisher Identity, Capabilities, Assets).
+  - Розширити `.github/workflows/release.yml`: окремий job, який збирає `.msix` через `MSBuild Shelf.Package.wapproj`.
+  - Скласти Privacy Policy URL (обов'язково для Store, бо Weather widget шле координати в Open-Meteo).
+  - Подати в Microsoft Partner Center, пройти certification.
+
+#### Етап 8 — Code signing (Authenticode)
+
+- **Зусилля:** ~2-3 год налаштування.
+- **Витрати:** ~$200/рік (OV) або ~$300-400/рік + hardware token (EV).
+- **Чому варто:** прибирає попередження SmartScreen «Windows protected your PC» при першому запуску; EV-сертифікат дає миттєву репутацію (OV — за 2-4 тижні після кількох downloads).
+- **Що зробити:**
+  - Купити сертифікат у Sectigo/DigiCert/SSL.com.
+  - Покласти `.pfx` (base64) у GitHub Secrets як `SIGN_CERT_PFX_BASE64`, пароль як `SIGN_CERT_PASSWORD`.
+  - У `release.yml` додати крок з `signtool sign /sha1 ... /fd SHA256 /tr http://timestamp.digicert.com /td SHA256` для кожного `.exe`/`.dll`.
+- Деталі вже задокументовано в `RELEASE.md` (секція «Підпис коду»).
+
+#### Етап 9 — Auto-update mechanism
+
+- **Зусилля:** ~1 день розробки.
+- **Витрати:** $0.
+- **Чому варто:** користувачам не треба вручну заходити в Releases для нової версії; новинки доходять швидше.
+- **Варіанти:**
+  - **[Velopack](https://github.com/velopack/velopack)** — рекомендовано: сучасний, MIT, активно розвивається, з коробки тягне новий `.exe` з GitHub Releases і застосовує оновлення.
+  - **Squirrel.Windows** — старіший, перевірений.
+  - **Власне**: HTTP-запит до `api.github.com/repos/bridges-net-ua/shelf/releases/latest`, порівняти tag з поточною версією, при різниці — відкрити браузер на сторінку Releases.
+
+#### Етап 10 — CI test pipeline
+
+- **Зусилля:** ~2-3 дні.
+- **Витрати:** $0 (хмарні runners безкоштовні для public репо).
+- **Що зробити:**
+  - Юніт-тести через `xUnit` для `SettingsService`, `Loc`, `WidgetRegistry`, міграційного коду.
+  - UI-тести через [WinAppDriver](https://github.com/microsoft/WinAppDriver) або [FlaUI](https://github.com/FlaUI/FlaUI): запустити Shelf, додати віджет, перезавантажити, переконатися, що state збережений.
+  - Інтеграційний smoke test у `release.yml` після `dotnet publish`: розпакувати zip, запустити `Shelf.exe`, дочекатися появи вікна, зробити screenshot, прикріпити як artifact.
+
+### 🛠 Технічний борг і поліпшення коду (не блокують, але корисно)
+
+- [ ] **`logodesk.png` у корені** — невідомий файл; з'ясувати призначення і або задокументувати, або видалити.
+- [ ] **Експорт-файли `polychka-*-2026-05-26.{json,txt}`** у корені — старі експорти з тестування v1.0.0. Видалити локально (вони вже в `.gitignore`, у репо не потрапили).
+- [ ] **Легасі-теки `WidgetPlugins/Помічник.Widgets.*/`** — фізично залишаються на диску, в репо ігноруються. Якщо точно не знадобляться — видалити.
+- [ ] **WFAC010 warning** про DPI manifest — false-positive (`app.manifest` правильно описує PerMonitorV2 для гібридного WPF+WinForms). Можна або задокументувати ще явніше, або переключитись на `ApplicationHighDpiMode`, щоб warning зник.
+- [ ] **`tools/make-ico.ps1`** — скрипт для генерації `.ico`. Перевірити, чи актуальний, додати в `CONTRIBUTING.md` як «як оновити іконку».
+- [ ] **Перейменування фізичної теки `D:\project\Polychka` → `D:\project\Shelf`** на машині розробника, для повної консистентності з технічною назвою (не впливає на репо).
+- [ ] **Видалити з історії плану старі застарілі чек-листи** і консолідувати в один компактний документ — коли проект стане публічним і люди читатимуть `plan_reliz.md`.
 
 ---
 
@@ -237,52 +335,39 @@
 - **2026-05-26 v4** — виконано Етапи 1-3 (локальні файли проекту, GitHub Actions, сайт-візитівка). Готовий до переходу на Етап 4 (реєстрація GitHub + push).
 - **2026-05-26 v5** — користувач створив org `bridges-net-ua` (замість `bridges-community`) і обрав репо `shelf` (замість `polychka`). Усі URL оновлено: 75 згадок `bridges-community` → `bridges-net-ua`, потім 60 згадок `bridges-net-ua/polychka` → `bridges-net-ua/shelf` у 12 файлах.
 - **2026-05-26 v6** — повний рефакторинг технічної назви проекту: `Polychka` → `Shelf` (`polychka` → `shelf` у lowercase). Зачеплено: 10 тек перейменовано, 11 csproj/sln/resource-файлів перейменовано, 93 текстові файли оновлено через sed. «Поличка» (кирилиця) збережена як `App_Name` у `Strings.uk.xaml`. «ShelfDesk» збережено в `Strings.en.xaml`. Додано міграційний код у `SettingsService.cs` (`%APPDATA%\Polychka\` → `%APPDATA%\Shelf\`) і `AutoStartService.cs` (HKCU\\…\\Run\\Polychka → Shelf). Збірка `dotnet build Shelf.sln -c Debug` пройшла з 0 помилок.
+- **2026-05-27 v7** — виконано Етапи 4-6. Створено організацію `bridges-net-ua` на GitHub, репо `shelf`. Перший push (133 об'єкти, 1.14 MiB). DNS CNAME `shelf → bridges-net-ua.github.io` через cPanel Hostiq, GitHub Pages деплоїть `/docs`, SSL від Let's Encrypt автоматично виданий. Сайт живий на `https://shelf.bridges.net.ua/`. Випущено **v1.0.0** (тег → workflow → `Shelf-v1.0.0-win-x64.zip`, 64.1 МБ).
+- **2026-05-27 v8** — hotfix **v1.0.1**. У v1.0.0 виявлено критичний баг: `-p:PublishSingleFile=true` запаковував усі `Shelf.Widgets.*.dll` всередину `Shelf.exe`, а `WidgetRegistry.Initialize()` шукає їх через `Directory.EnumerateFiles` як окремі файли — реєстр був порожній, меню «+ Додати віджет» не показувало жодного типу. Виправлено: прибрано `PublishSingleFile` з `release.yml`, тепер zip містить теку з `Shelf.exe` + ~200 DLL поруч. v1.0.1 опубліковано, перевірено на чистій теці — віджети завантажуються, додаються, працюють.
+- **2026-05-27 v9** — фінальне оновлення плану після завершення всіх етапів. Проставлено чекбокси, оновлено таблицю прийнятих рішень (single-file → folder), переписано розділ статусу як «фінал», структуровано розділ «Майбутні етапи» з конкретними побажаннями: малі поліпшення сайту, action items для просування, серйозніші майбутні етапи 7-10 (MSIX, code signing, auto-update, CI tests), технічний борг.
 
 ## Поточний статус
 
-🟢 **Етапи 1-3 виконано.** Створено:
+🟢 **ФІНАЛ — усі 6 етапів + рефакторинг + hotfix виконано.** Проект живий і доступний у мережі.
 
-- **10 файлів у корені**: `LICENSE`, `.gitignore`, `README.md`, `README.en.md`, `CHANGELOG.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `RELEASE.md`, `SETUP.md`, `plan_reliz.md`.
-- **6 файлів у `.github/`**: `workflows/build.yml`, `workflows/release.yml`, `ISSUE_TEMPLATE/bug_report.md`, `ISSUE_TEMPLATE/feature_request.md`, `ISSUE_TEMPLATE/config.yml`, `PULL_REQUEST_TEMPLATE.md`.
-- **11 файлів у `docs/`**: `index.html` (UA), `en/index.html` (EN), `style.css`, `assets/logo.png`, `assets/favicon.ico`, `assets/og-image.svg`, `assets/screenshot-1/2/3.svg`, `CNAME`, `.nojekyll`.
+### Що зробили (за один день)
 
-### Стан після рефакторингу Polychka → Shelf
+| # | Дія | Хто | Час |
+|---|---|---|---|
+| 1 | Створено 10 файлів у корені (LICENSE, README × 2, CHANGELOG, CONTRIBUTING, CODE_OF_CONDUCT, RELEASE, SETUP, plan_reliz, .gitignore) | Claude | 30 хв |
+| 2 | Створено 6 файлів у `.github/` (build/release workflows + 4 шаблони) | Claude | 10 хв |
+| 3 | Створено 11 файлів у `docs/` (HTML UA+EN, CSS, ассети, CNAME) | Claude | 20 хв |
+| – | **Рефакторинг** `Polychka` → `Shelf` (10 тек, 11 csproj/sln, 93 файли через sed, +міграційний код) | Claude | 30 хв |
+| 4 | Реєстрація GitHub `BridgesCom`, org `bridges-net-ua`, repo `shelf`, перший push (133 об'єкти, 1.14 МБ) | Користувач | 15 хв |
+| 5 | DNS CNAME у cPanel Hostiq, GitHub Pages з `/docs`, SSL Let's Encrypt, Enforce HTTPS | Користувач | 10 хв |
+| 6 | Реліз **v1.0.0** через Web UI + **v1.0.1 hotfix** (виправлено single-file баг з widget DLL) | Користувач + Claude | 15 хв |
 
-- [x] Технічна назва проекту: `Polychka` → `Shelf`.
-- [x] Локальна тека SDK і 9 widget-тек перейменовано.
-- [x] `Polychka.sln` → `Shelf.sln`, усі csproj-файли перейменовано.
-- [x] Resources: `polychka.ico/png` → `shelf.ico/png`.
-- [x] Усі namespaces, using-statements, XAML `clr-namespace`, `RootNamespace`, `AssemblyName` оновлено.
-- [x] Mutex name: `Polychka_SingleInstance_E94F12C7` → `Shelf_SingleInstance_E94F12C7`.
-- [x] Тека налаштувань: `%APPDATA%\Polychka\` → `%APPDATA%\Shelf\`; міграційний код додано.
-- [x] Autostart-ключ реєстру: `HKCU\…\Run\Polychka` → `Shelf`; міграційний код додано.
-- [x] Лог-файли: `Polychka.crash.log`, `Polychka.vd.log` → `Shelf.crash.log`, `Shelf.vd.log`.
-- [x] DLL-фільтр: `Polychka.Widgets.*.dll` → `Shelf.Widgets.*.dll`.
-- [x] app.manifest: assemblyIdentity name `Помічник` → `Shelf`.
-- [x] Export filename defaults в Strings.uk/en.xaml: `polychka-holidays/-birthdays` → `shelf-…`.
-- [x] CHANGELOG, README × 2, CONTRIBUTING, RELEASE, SETUP, плани, CLAUDE.md, AGENTS.md — усі згадки оновлено.
-- [x] GitHub Actions workflows (`build.yml`, `release.yml`) — назви zip і шляхи csproj оновлено.
-- [x] Сайт `docs/index.html` і `docs/en/index.html` — усі code-блоки збірки оновлено.
-- [x] **Збереглося в коді тільки як назва легасі**: `"Polychka"` у списках міграційних шляхів (`SettingsService.LegacyDirs`, `AutoStartService.LegacyValueNames`) — це не активне ім'я, а пошуковий патерн.
-- [x] **Збереглося як видима локалізована назва**: `App_Name` = «Поличка» (uk), «ShelfDesk» (en) — це тільки в `Strings.*.xaml`.
-- [x] `dotnet build Shelf.sln -c Debug` — 0 помилок, 1 warning (відомий WFAC010 false-positive про DPI). `bin/Debug/net8.0-windows/Shelf.exe` створено (256 КБ).
-- [ ] (Опційно, користувач) Перейменувати фізичну теку `D:\project\Polychka` → `D:\project\Shelf` через File Explorer для повної консистентності з новою назвою.
+**Усього:** ~2 год активної роботи Claude + ~40 хв дій користувача + ~30 хв чекання DNS/CI.
 
-### Чек-лист перед Етапом 4
+### Підсумкові артефакти
 
-- [x] Усі 27 файлів створено.
-- [x] Рефакторинг `Polychka` → `Shelf` виконано, проект компілюється.
-- [ ] Користувач відкрив `docs/index.html` у браузері локально — сайт виглядає як треба (темна тема, логотип, секції, кнопки, навігація працює).
-- [ ] Користувач переключився на `docs/en/index.html` — англомовна версія коректна.
-- [ ] Користувач переглянув `SETUP.md` і готовий виконувати Етап 4 (реєстрація на GitHub).
+- **Локальний проект:** 27 нових файлів + рефакторинг ~93 файлів.
+- **GitHub репо:** 4 коміти (`c1cd086` initial → `31be083` version metadata → `a1919de` plan update → `78dade9` hotfix v1.0.1).
+- **GitHub Releases:** v1.0.0 (зі застереженням про баг), v1.0.1 (стабільна).
+- **GitHub Actions:** `build.yml` (трігер push/PR) і `release.yml` (трігер тег `v*`); обидва зелені.
+- **Сайт:** `https://shelf.bridges.net.ua/` + `/en/`, темна тема, HTTPS.
+- **Збірка `.exe`:** self-contained folder для win-x64, ~64 МБ zip, працює на чистій Windows-машині.
 
-🟡 **Очікує** виконання Етапів 4-6 користувачем за інструкцією [SETUP.md](SETUP.md):
+### Відомі обмеження (не блокують реліз, але є в списку побажань)
 
-- **Етап 4** — реєстрація на GitHub, створення org `bridges-net-ua`, репо `shelf`, перший push.
-- **Етап 5** — DNS CNAME-запис + GitHub Pages з власним доменом `shelf.bridges.net.ua`.
-- **Етап 6** — створення першого релізу `v1.0.0` через GitHub Web UI; GitHub Actions автоматично збере `.exe`.
-
-### Відомі обмеження (не блокують реліз)
-
-- **OG-image — SVG**, не PNG. Соцмережі (Facebook, Twitter, LinkedIn) можуть не генерувати превʼю при шерингу, поки SVG не сконвертовано у PNG. Це косметичне обмеження — сайт і завантаження працюють. Виправляється одноразово: відкрити `docs/assets/og-image.svg` у браузері → зробити скріншот 1200×630 → зберегти як `docs/assets/og-image.png` → оновити посилання `og:image` в обох HTML на `.png`.
-- **Скріншоти — SVG-макети**, не реальні скріншоти. Користувач замінить їх після першого використання додатка: переписати файли `docs/assets/screenshot-1/2/3.svg` на `.png`/`.jpg` і поміняти розширення в обох `index.html`.
+- **OG-image — SVG**, не PNG. Соцмережі не генерують прев'ю — виправити одним конвертом SVG → PNG.
+- **Скріншоти — SVG-макети**, не реальні скріни додатка. Замінити після першого використання.
+- **`v1.0.0` реліз має критичний баг** з віджетами (виправлено в v1.0.1). Бажано додати застереження в опис релізу `v1.0.0` через GitHub Web UI (Edit).
