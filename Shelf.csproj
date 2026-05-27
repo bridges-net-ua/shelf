@@ -75,6 +75,7 @@
     <ProjectReference Include="WidgetPlugins\Shelf.Widgets.Timer\Shelf.Widgets.Timer.csproj"/>
     <ProjectReference Include="WidgetPlugins\Shelf.Widgets.Stopwatch\Shelf.Widgets.Stopwatch.csproj"/>
     <ProjectReference Include="WidgetPlugins\Shelf.Widgets.Holidays\Shelf.Widgets.Holidays.csproj"/>
+    <ProjectReference Include="WidgetPlugins\Shelf.Widgets.Nba\Shelf.Widgets.Nba.csproj"/>
   </ItemGroup>
 
 </Project>

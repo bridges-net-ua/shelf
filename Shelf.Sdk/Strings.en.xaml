@@ -293,4 +293,38 @@
     <s:String x:Key="Holidays_Icon_None">No icon</s:String>
     <s:String x:Key="Confirm_DeleteBirthday">Delete birthday «{0}»? Data will be lost.</s:String>
 
+    <!-- ===== Widget: NBA ===== -->
+    <s:String x:Key="Nba_Name">NBA</s:String>
+    <s:String x:Key="Nba_Desc">NBA results, schedule and playoff series.</s:String>
+    <s:String x:Key="Nba_Settings_Title">Settings - NBA</s:String>
+    <s:String x:Key="Nba_Settings_Favorites">Favorite teams</s:String>
+    <s:String x:Key="Nba_Settings_AddTeam">Add</s:String>
+    <s:String x:Key="Nba_Settings_RemoveTeam">Remove</s:String>
+    <s:String x:Key="Nba_Settings_DisplaySection">DISPLAY</s:String>
+    <s:String x:Key="Nba_Settings_LeagueGameCount">League upcoming games: {0}</s:String>
+    <s:String x:Key="Nba_Settings_LeaguePastCount">League past games: {0}</s:String>
+    <s:String x:Key="Nba_Settings_FavoriteNextCount">Upcoming team games: {0}</s:String>
+    <s:String x:Key="Nba_Section_League">NBA GAMES</s:String>
+    <s:String x:Key="Nba_LastGame">Last</s:String>
+    <s:String x:Key="Nba_NextGame">Next</s:String>
+    <s:String x:Key="Nba_TopScorer">Top scorer</s:String>
+    <s:String x:Key="Nba_Live">Live</s:String>
+    <s:String x:Key="Nba_Final">Final</s:String>
+    <s:String x:Key="Nba_Scheduled">Scheduled</s:String>
+    <s:String x:Key="Nba_NoGames">No upcoming games</s:String>
+    <s:String x:Key="Nba_Empty_AddFavorites">Add favorite teams in the widget settings.</s:String>
+    <s:String x:Key="Nba_Empty_NoData">No data. Try refreshing later.</s:String>
+    <s:String x:Key="Nba_Loading">Loading…</s:String>
+    <s:String x:Key="Nba_LastUpdate">Last update</s:String>
+    <s:String x:Key="Nba_Err_Network">No connection to ESPN</s:String>
+    <s:String x:Key="Nba_Status_Playoffs">Playoffs</s:String>
+    <s:String x:Key="Nba_Status_Regular">Regular season</s:String>
+    <s:String x:Key="Nba_Status_OffSeason">Off-season</s:String>
+    <s:String x:Key="Nba_Series_Leads">{0} leads vs {1} {2}</s:String>
+    <s:String x:Key="Nba_Series_Won">{0} won vs {1} {2}</s:String>
+    <s:String x:Key="Nba_Details_Title">Game details</s:String>
+    <s:String x:Key="Nba_Details_Quarter">Q{0}</s:String>
+    <s:String x:Key="Nba_Details_OT">OT</s:String>
+    <s:String x:Key="Nba_Details_OpenInBrowser">Open on ESPN</s:String>
+
 </ResourceDictionary>

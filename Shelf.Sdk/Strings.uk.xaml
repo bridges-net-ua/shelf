@@ -293,4 +293,38 @@
     <s:String x:Key="Holidays_Icon_None">Без іконки</s:String>
     <s:String x:Key="Confirm_DeleteBirthday">Видалити день народження «{0}»? Дані буде втрачено.</s:String>
 
+    <!-- ===== Віджет: NBA ===== -->
+    <s:String x:Key="Nba_Name">NBA</s:String>
+    <s:String x:Key="Nba_Desc">Результати, розклад і плейофф-серії NBA.</s:String>
+    <s:String x:Key="Nba_Settings_Title">Налаштування - NBA</s:String>
+    <s:String x:Key="Nba_Settings_Favorites">Улюблені команди</s:String>
+    <s:String x:Key="Nba_Settings_AddTeam">Додати</s:String>
+    <s:String x:Key="Nba_Settings_RemoveTeam">Видалити</s:String>
+    <s:String x:Key="Nba_Settings_DisplaySection">ВІДОБРАЖЕННЯ</s:String>
+    <s:String x:Key="Nba_Settings_LeagueGameCount">Наступних ігор у лізі: {0}</s:String>
+    <s:String x:Key="Nba_Settings_LeaguePastCount">Минулих ігор у лізі: {0}</s:String>
+    <s:String x:Key="Nba_Settings_FavoriteNextCount">Наступних ігор команд: {0}</s:String>
+    <s:String x:Key="Nba_Section_League">ІГРИ NBA</s:String>
+    <s:String x:Key="Nba_LastGame">Минула</s:String>
+    <s:String x:Key="Nba_NextGame">Наступна</s:String>
+    <s:String x:Key="Nba_TopScorer">Топ-скорер</s:String>
+    <s:String x:Key="Nba_Live">В ефірі</s:String>
+    <s:String x:Key="Nba_Final">Фінал</s:String>
+    <s:String x:Key="Nba_Scheduled">Заплановано</s:String>
+    <s:String x:Key="Nba_NoGames">Немає запланованих ігор</s:String>
+    <s:String x:Key="Nba_Empty_AddFavorites">Додайте улюблені команди у налаштуваннях віджета.</s:String>
+    <s:String x:Key="Nba_Empty_NoData">Немає даних. Спробуйте оновити пізніше.</s:String>
+    <s:String x:Key="Nba_Loading">Завантаження…</s:String>
+    <s:String x:Key="Nba_LastUpdate">Останнє оновлення</s:String>
+    <s:String x:Key="Nba_Err_Network">Немає з'єднання з ESPN</s:String>
+    <s:String x:Key="Nba_Status_Playoffs">Плейофф</s:String>
+    <s:String x:Key="Nba_Status_Regular">Регулярний сезон</s:String>
+    <s:String x:Key="Nba_Status_OffSeason">Сезон завершено</s:String>
+    <s:String x:Key="Nba_Series_Leads">{0} лідирує проти {1} {2}</s:String>
+    <s:String x:Key="Nba_Series_Won">{0} переграла {1} {2}</s:String>
+    <s:String x:Key="Nba_Details_Title">Деталі гри</s:String>
+    <s:String x:Key="Nba_Details_Quarter">Ч{0}</s:String>
+    <s:String x:Key="Nba_Details_OT">ОТ</s:String>
+    <s:String x:Key="Nba_Details_OpenInBrowser">Відкрити на ESPN</s:String>
+
 </ResourceDictionary>
