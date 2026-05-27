@@ -12,6 +12,19 @@
 
 ---
 
+## [1.1.0] - 2026-05-27
+
+### Додано
+- Віджет **NBA**: результати плейофф, розклад майбутніх ігор, налаштування улюблених команд і вікно деталей із поквартальним рахунком, логотипами команд (ч/б у віджеті, кольорові у деталях) та тултипом серій з лідерством або перемогою.
+
+### Виправлено
+- Системний синій focus-border у TextBox замінено на тематичний сірий через глобальний стиль у Theme.xaml - відтепер усі текстові поля (Notes, Todo, Settings, Weather city, Holidays editor тощо) виглядають однорідно з темою.
+
+### Документація
+- Завершення `plan_reliz.md` - підсумок виконаних кроків першого релізу та список майбутніх побажань.
+
+---
+
 ## [1.0.1] - 2026-05-27
 
 Hotfix для критичного бага в v1.0.0 - віджети не завантажувалися у скачаному `.exe`.
@@ -60,6 +73,7 @@ Hotfix для критичного бага в v1.0.0 - віджети не за
 - Унікальний overlay-скролбар головної панелі, який не зменшує ширину віджетів.
 - Static project-reference архітектура віджетів (на відміну від runtime-плагінів), що готує проект до Microsoft Store.
 
-[Unreleased]: https://github.com/bridges-net-ua/shelf/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/bridges-net-ua/shelf/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/bridges-net-ua/shelf/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/bridges-net-ua/shelf/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/bridges-net-ua/shelf/releases/tag/v1.0.0
