@@ -9,11 +9,18 @@ description: Закомітити і відразу запушити локал�
 
 ## Преконтролі
 
-1. **Перевір cwd**: має бути `D:\project\Polychka`. Інше - не запускати.
+1. **Перевір, що ми в правильному проекті**: у поточному cwd мають бути `Shelf.sln` і `Shelf.csproj`. Path-agnostic — назва теки не важлива. Якщо файлів нема — зупинись, скажи «Це не Shelf-проект».
+
+   ```bash
+   if [ ! -f Shelf.sln ] || [ ! -f Shelf.csproj ]; then
+     echo "Not a Shelf project (Shelf.sln/Shelf.csproj missing in $(pwd))"
+     exit 1
+   fi
+   ```
 
 2. **Перевір, чи є що комітити**:
    ```bash
-   cd /d/project/Polychka && git status --short
+   git status --short
    ```
    Якщо чисто (нічого не змінено, нічого untracked) - скажи користувачу: «Немає змін для коміту. `git status` чистий.» і зупинись.
 

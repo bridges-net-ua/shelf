@@ -9,13 +9,30 @@ description: Внести зміни в код проекту Shelf (Полич�
 
 ## Преконтролі (виконати ДО будь-яких дій)
 
-1. **Перевір cwd**: має бути `D:\project\Polychka` (фізичний шлях проекту). Якщо інша - зупинись і скажи користувачу: «Цей skill працює тільки в D:\project\Polychka, поточна тека: <pwd>». Не запускати решту кроків.
+1. **Перевір, що ми в правильному проекті**: у поточному cwd мають бути файли `Shelf.sln` і `Shelf.csproj`. Перевірка path-agnostic — тека може називатись `Shelf`, `Polychka`, чи будь-як. Якщо файлів нема — зупинись і скажи: «Це не Shelf-проект, `Shelf.sln` не знайдено в `<pwd>`». Не запускати решту кроків.
 
-2. **Перевір опис змін**: користувач має дати конкретний опис ПІСЛЯ «ВНЕСТИ ЗМІНИ:» або в наступному реченні. Якщо тригер є, а опис відсутній або занадто розмитий («зроби кращим», «оптимізуй»), спитай уточнень перш ніж робити що-небудь.
-
-3. **Перевір чистоту робочої теки**:
    ```bash
-   cd /d/project/Polychka && git status --short
+   if [ ! -f Shelf.sln ] || [ ! -f Shelf.csproj ]; then
+     echo "Not a Shelf project (Shelf.sln/Shelf.csproj missing in $(pwd))"
+     exit 1
+   fi
+   ```
+
+2. **Прибери stale bin/obj після можливого перейменування теки**: якщо проект щойно перейменували (наприклад `D:\project\Polychka` → `D:\project\Shelf`), у bin/obj можуть залишатись кеші зі старими абсолютними шляхами. Не критично, але чистіше. Робиться один раз на сесію:
+
+   ```bash
+   # Тільки якщо у bin/Debug/net8.0-windows/Shelf.deps.json (або подібний) є посилання на старий шлях — почисти
+   if [ -d bin ] && grep -rq "project[/\\\\]\(Polychka\|Помічник\)" bin/ obj/ 2>/dev/null; then
+     echo "Detected stale build artifacts from old project path; cleaning..."
+     find . -type d \( -name bin -o -name obj \) -not -path "*/Помічник*" 2>/dev/null | while read d; do rm -rf "$d"; done
+   fi
+   ```
+
+3. **Перевір опис змін**: користувач має дати конкретний опис ПІСЛЯ «ВНЕСТИ ЗМІНИ:» або в наступному реченні. Якщо тригер є, а опис відсутній або занадто розмитий («зроби кращим», «оптимізуй»), спитай уточнень перш ніж робити що-небудь.
+
+4. **Перевір чистоту робочої теки**:
+   ```bash
+   git status --short
    ```
    Якщо вже є незакомічені зміни - попередь користувача:
    - Покажи їх
@@ -27,7 +44,6 @@ description: Внести зміни в код проекту Shelf (Полич�
 ### 1. Підтягнути найновіше з GitHub
 
 ```bash
-cd /d/project/Polychka
 git pull --ff-only
 ```
 
@@ -83,7 +99,6 @@ taskkill.exe //F //IM Shelf.exe 2>/dev/null || true
 ### 5. Зібрати і перевірити
 
 ```bash
-cd /d/project/Polychka
 "/c/Program Files/dotnet/dotnet.exe" build Shelf.sln -c Debug 2>&1 | tail -15
 ```
 
