@@ -61,7 +61,13 @@ _ReSharper*/
 .idea/
 
 # ----- Shelf specifics -----
-# Legacy widget projects (from previous renames: Помічник, Polychka)
+# Local-only "maybe-trash" folder for files that aren't used by the app
+# or git but might still be useful (see NoData/README.md).
+NoData/
+
+# Legacy widget projects (from the initial Помічник → Polychka → Shelf rename
+# chain). Patterns kept as a safety net even though the folders themselves
+# were deleted - in case anything similar reappears.
 WidgetPlugins/Помічник.Widgets.*/
 WidgetPlugins/Polychka.Widgets.*/
 
