@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  MSIX manifest for Shelf (Поличка).
+
+  Identity values (Name, Publisher) are SELF-SIGNED PLACEHOLDERS used for local
+  sideload testing during plan_reliz.md Etap 7.3. After Partner Center registration
+  in Etap 7.4 these will be replaced with the real values issued by Microsoft.
+  Until then, make-msix.ps1 -Sign generates a CN=BridgesCommunity self-signed cert
+  whose subject matches the Publisher field here.
+
+  TaskId "ShelfAutoStart" must match Services/AutoStartService.cs StartupTaskId const.
+-->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+  IgnorableNamespaces="uap rescap desktop">
+
+  <Identity
+    Name="BridgesCommunity.Shelf"
+    Publisher="CN=BridgesCommunity"
+    Version="1.1.1.0"
+    ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>Поличка</DisplayName>
+    <PublisherDisplayName>Bridges Community</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+    <Description>Customizable widget dock for the Windows desktop</Description>
+  </Properties>
+
+  <Dependencies>
+    <!-- MinVersion matches Shelf.csproj TargetFramework net8.0-windows10.0.19041.0 (Win10 2004). -->
+    <TargetDeviceFamily Name="Windows.Desktop"
+                        MinVersion="10.0.19041.0"
+                        MaxVersionTested="10.0.22621.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="uk-UA" />
+    <Resource Language="en-US" />
+  </Resources>
+
+  <Applications>
+    <Application Id="App"
+                 Executable="Shelf.exe"
+                 EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="Поличка"
+        Description="Customizable widget dock for the Windows desktop"
+        BackgroundColor="#2A2A30"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile
+          Wide310x150Logo="Assets\Wide310x150Logo.png"
+          ShortName="Поличка" />
+        <uap:SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#2A2A30" />
+      </uap:VisualElements>
+
+      <Extensions>
+        <!-- Autostart on user login. Disabled by default — user opts in via
+             Shelf Settings, which calls Windows.ApplicationModel.StartupTask
+             with this exact TaskId. -->
+        <desktop:Extension Category="windows.startupTask"
+                           Executable="Shelf.exe"
+                           EntryPoint="Windows.FullTrustApplication">
+          <desktop:StartupTask
+            TaskId="ShelfAutoStart"
+            Enabled="false"
+            DisplayName="Поличка" />
+        </desktop:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <!-- runFullTrust is required for WPF+WinForms hybrid apps to use Win32
+         APIs (AppBar, NotifyIcon, registry where still applicable). Available
+         only to Desktop Bridge packages. -->
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+
+</Package>
