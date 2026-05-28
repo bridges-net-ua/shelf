@@ -24,6 +24,13 @@ public partial class MainWindow : Window
     private bool _hidden;
     private const int HiddenTriggerWidthPx = 3;
 
+    // The monitor this window is bound to. Each MainWindow renders the widgets
+    // assigned to its monitor (plus homeless widgets on primary). DeviceName is
+    // the key for looking up the per-monitor panel config in AppSettings.
+    private readonly MonitorInfo _monitor;
+    public string MonitorDeviceName => _monitor.DeviceName;
+    public bool IsPrimary => _monitor.IsPrimary;
+
 
     // Drag state for widget reordering
     private bool _dragArmed;
@@ -127,8 +134,9 @@ public partial class MainWindow : Window
         return null;
     }
 
-    public MainWindow()
+    public MainWindow(MonitorInfo monitor)
     {
+        _monitor = monitor;
         InitializeComponent();
         Sdk.WindowChrome.Apply(this);
         BuildPanelContextMenu();
@@ -293,7 +301,12 @@ public partial class MainWindow : Window
                 Header = type.DisplayName,
                 Icon = MenuIcon(WidgetTypeIconGeometry(typeId))
             };
-            subItem.Click += (_, _) => App.Widgets.AddInstance(typeId);
+            // Primary panel adds widgets with null assignment (so they follow the
+            // primary monitor if it changes). Non-primary panels stamp the current
+            // monitor's DeviceName, so the new widget lands here and stays here
+            // even if this monitor is later disconnected/reconnected.
+            string? targetMonitor = _monitor.IsPrimary ? null : _monitor.DeviceName;
+            subItem.Click += (_, _) => App.Widgets.AddInstance(typeId, targetMonitor);
             addItem.Items.Add(subItem);
         }
         menu.Items.Add(addItem);
@@ -358,9 +371,10 @@ public partial class MainWindow : Window
 
     private void OnSourceInitialized(object? sender, EventArgs e)
     {
+        // ApplySettings / RebuildPanel for all bars are driven from App-level event
+        // wiring (Settings.Changed / Widgets.ActiveWidgetsChanged → ApplyAllBars /
+        // RebuildAllBars). Here we only do the first paint for this window.
         _appBar = new AppBarService(this);
-        App.Settings.Changed += ApplySettings;
-        App.Widgets.ActiveWidgetsChanged += RebuildPanel;
         ApplySettings();
         RebuildPanel();
 
@@ -393,6 +407,8 @@ public partial class MainWindow : Window
         }), DispatcherPriority.ApplicationIdle);
     }
 
+    public void RebuildPanelPublic() => RebuildPanel();
+
     private void RebuildPanel()
     {
         // Abort any in-flight drag — the visual tree is about to be replaced.
@@ -406,7 +422,13 @@ public partial class MainWindow : Window
         PinnedHost.Children.Clear();
         WidgetsHost.Children.Clear();
 
-        foreach (var (entry, widget) in App.Widgets.GetActiveOrderedWithEntries())
+        // Filter widgets to those that belong to this monitor. Primary picks up
+        // widgets with no assignment plus homeless ones (whose stored DeviceName
+        // is currently disconnected). The connected-set is supplied by App so all
+        // bars share a consistent snapshot of topology.
+        var connected = App.GetConnectedDeviceNames();
+        foreach (var (entry, widget) in App.Widgets.GetActiveForMonitor(
+                     _monitor.DeviceName, _monitor.IsPrimary, connected))
         {
             var view = widget.CreateView();
             // Detach view from any prior wrapper (Grid is a Panel too).
@@ -790,6 +812,10 @@ public partial class MainWindow : Window
         _autoScrollTimer.Start();
     }
 
+    // Material Design "monitor" icon — 24×24 viewBox.
+    private const string IconMonitor =
+        "M21,16H3V4H21M21,2H3C1.89,2 1,2.89 1,4V16A2,2 0 0,0 3,18H10V20H8V22H16V20H14V18H21A2,2 0 0,0 23,16V4C23,2.89 22.1,2 21,2Z";
+
     private ContextMenu BuildWidgetContextMenu(
         Shelf.Sdk.IWidget widget,
         Shelf.Models.WidgetEntry entry)
@@ -803,6 +829,35 @@ public partial class MainWindow : Window
         UpdatePinHeader(pinItem, instanceId);
         pinItem.Click += (_, _) => App.Widgets.TogglePin(instanceId);
         menu.Items.Add(pinItem);
+
+        // "Move to monitor ▶" submenu. Shown only when more than one monitor is
+        // connected — single-monitor users would just see a pointless one-item list.
+        var monitors = App.Monitors.Monitors;
+        if (monitors.Count > 1)
+        {
+            var moveItem = new MenuItem
+            {
+                Header = Loc.Get("Menu_MoveToMonitor"),
+                Icon = MenuIcon(IconMonitor)
+            };
+            foreach (var mon in monitors)
+            {
+                bool isCurrentTarget = string.Equals(
+                    entry.MonitorDeviceName ?? App.Monitors.Primary.DeviceName,
+                    mon.DeviceName, StringComparison.OrdinalIgnoreCase);
+                // Primary entry encodes assignment as null (so widget follows the
+                // primary if it changes). Non-primary targets store the explicit
+                // DeviceName.
+                string? assignTo = mon.IsPrimary ? null : mon.DeviceName;
+                var subItem = new MenuItem
+                {
+                    Header = isCurrentTarget ? $"✓ {mon.DisplayName}" : mon.DisplayName
+                };
+                subItem.Click += (_, _) => App.Widgets.MoveToMonitor(instanceId, assignTo);
+                moveItem.Items.Add(subItem);
+            }
+            menu.Items.Add(moveItem);
+        }
 
         if (widget.HasSettings)
         {
@@ -853,15 +908,15 @@ public partial class MainWindow : Window
 
     private void OnBeforeDesktopMove()
     {
-        var s = App.Settings.Current;
-        _appBarWasRegistered = !s.AutoHide;
+        var cfg = App.Settings.GetMonitorConfig(_monitor.DeviceName);
+        _appBarWasRegistered = !cfg.AutoHide;
         if (_appBarWasRegistered) _appBar?.Unregister();
     }
 
     private void OnAfterDesktopMove()
     {
         if (!_appBarWasRegistered) return;
-        var s = App.Settings.Current;
+        var cfg = App.Settings.GetMonitorConfig(_monitor.DeviceName);
 
         // Defer AppBar.Register until WPF finishes restoring composition state after the
         // SW_HIDE/SW_SHOW cycle the virtual-desktop mover does. If we Register synchronously
@@ -870,10 +925,10 @@ public partial class MainWindow : Window
         // the panel ends up offset from the screen edge instead of flush against it.
         Dispatcher.BeginInvoke(new Action(() =>
         {
-            VdLog($"  Before Register: Left={Left:F1} Top={Top:F1} W={Width:F1} H={Height:F1} " +
-                  $"screenW={SystemParameters.PrimaryScreenWidth} dpiX={GetCurrentDpiX():F3}");
-            _appBar?.Register(s.Side, s.Width);
-            VdLog($"  After Register:  Left={Left:F1} Top={Top:F1} W={Width:F1} H={Height:F1}");
+            VdLog($"  [{_monitor.DeviceName}] Before Register: Left={Left:F1} Top={Top:F1} W={Width:F1} H={Height:F1} " +
+                  $"monitorW={_monitor.BoundsPx.Width} dpiX={_monitor.DpiX:F3}");
+            _appBar?.Register(_monitor, cfg.Side, cfg.Width);
+            VdLog($"  [{_monitor.DeviceName}] After Register:  Left={Left:F1} Top={Top:F1} W={Width:F1} H={Height:F1}");
         }), DispatcherPriority.Background);
     }
 
@@ -886,20 +941,8 @@ public partial class MainWindow : Window
         catch { }
     }
 
-    private double GetCurrentDpiX()
-    {
-        try
-        {
-            var src = HwndSource.FromHwnd(new WindowInteropHelper(this).Handle);
-            return src?.CompositionTarget?.TransformToDevice.M11 ?? 1.0;
-        }
-        catch { return 1.0; }
-    }
-
     private void OnClosed(object? sender, EventArgs e)
     {
-        App.Settings.Changed -= ApplySettings;
-        App.Widgets.ActiveWidgetsChanged -= RebuildPanel;
         _virtualDesktopService?.Dispose();
         _appBar?.Unregister();
     }
@@ -909,15 +952,23 @@ public partial class MainWindow : Window
         BeginAnimation(LeftProperty, null);
 
         var s = App.Settings.Current;
+        var cfg = App.Settings.GetMonitorConfig(_monitor.DeviceName);
 
-        if (s.AutoHide)
+        // All coordinates are computed from this monitor's physical bounds, divided
+        // by its per-monitor DPI to land in WPF DIPs. AutoStart toggle is global so
+        // only the primary window applies it (idempotent on subsequent monitors).
+        double dpiY = _monitor.DpiY <= 0 ? 1.0 : _monitor.DpiY;
+        double monitorTop = _monitor.BoundsPx.Top / dpiY;
+        double monitorHeight = _monitor.BoundsPx.Height / dpiY;
+
+        if (cfg.AutoHide)
         {
             _appBar?.Unregister();
 
-            Height = SystemParameters.PrimaryScreenHeight;
-            Top = 0;
-            Width = s.Width;
-            Left = VisibleLeft(s);
+            Height = monitorHeight;
+            Top = monitorTop;
+            Width = cfg.Width;
+            Left = VisibleLeft(cfg, _monitor);
             _hidden = false;
 
             if (!IsMouseOver) ScheduleHide();
@@ -927,37 +978,43 @@ public partial class MainWindow : Window
             // Set all four coords before re-registering the AppBar — assigning Width alone
             // would leave the window briefly at the old Left, visually shifting it.
             // AppBar.SetPosition will then re-confirm (or adjust) these values.
-            Top = 0;
-            Height = SystemParameters.PrimaryScreenHeight;
-            Width = s.Width;
-            Left = VisibleLeft(s);
-            _appBar?.Register(s.Side, s.Width);
+            Top = monitorTop;
+            Height = monitorHeight;
+            Width = cfg.Width;
+            Left = VisibleLeft(cfg, _monitor);
+            _appBar?.Register(_monitor, cfg.Side, cfg.Width);
             _hidden = false;
             CancelHideTimer();
         }
 
-        AutoStartService.Set(s.AutoStart);
+        if (_monitor.IsPrimary) AutoStartService.Set(s.AutoStart);
     }
 
-    private static double VisibleLeft(AppSettings s) =>
-        s.Side == BarSide.Right
-            ? SystemParameters.PrimaryScreenWidth - s.Width
-            : 0;
+    private static double VisibleLeft(MonitorPanelConfig cfg, MonitorInfo monitor)
+    {
+        double dpiX = monitor.DpiX <= 0 ? 1.0 : monitor.DpiX;
+        return cfg.Side == BarSide.Right
+            ? (monitor.BoundsPx.Right / dpiX) - cfg.Width
+            : monitor.BoundsPx.Left / dpiX;
+    }
 
-    private static double HiddenLeft(AppSettings s) =>
-        s.Side == BarSide.Right
-            ? SystemParameters.PrimaryScreenWidth - HiddenTriggerWidthPx
-            : -(s.Width - HiddenTriggerWidthPx);
+    private static double HiddenLeft(MonitorPanelConfig cfg, MonitorInfo monitor)
+    {
+        double dpiX = monitor.DpiX <= 0 ? 1.0 : monitor.DpiX;
+        return cfg.Side == BarSide.Right
+            ? (monitor.BoundsPx.Right / dpiX) - HiddenTriggerWidthPx
+            : (monitor.BoundsPx.Left / dpiX) - (cfg.Width - HiddenTriggerWidthPx);
+    }
 
     private void OnMouseEnter(object sender, MouseEventArgs e)
     {
         CancelHideTimer();
-        if (App.Settings.Current.AutoHide && _hidden) SlideIn();
+        if (App.Settings.GetMonitorConfig(_monitor.DeviceName).AutoHide && _hidden) SlideIn();
     }
 
     private void OnMouseLeave(object sender, MouseEventArgs e)
     {
-        if (App.Settings.Current.AutoHide) ScheduleHide();
+        if (App.Settings.GetMonitorConfig(_monitor.DeviceName).AutoHide) ScheduleHide();
     }
 
     private void ScheduleHide()
@@ -981,13 +1038,13 @@ public partial class MainWindow : Window
     private void SlideIn()
     {
         _hidden = false;
-        AnimateLeft(VisibleLeft(App.Settings.Current));
+        AnimateLeft(VisibleLeft(App.Settings.GetMonitorConfig(_monitor.DeviceName), _monitor));
     }
 
     private void SlideOut()
     {
         _hidden = true;
-        AnimateLeft(HiddenLeft(App.Settings.Current));
+        AnimateLeft(HiddenLeft(App.Settings.GetMonitorConfig(_monitor.DeviceName), _monitor));
     }
 
     private void AnimateLeft(double to)

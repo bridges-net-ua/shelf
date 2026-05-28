@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using Shelf.Sdk;
 using Shelf.Views;
@@ -9,14 +10,12 @@ namespace Shelf.Services;
 public class TrayIconService : IDisposable
 {
     private readonly NotifyIcon _icon;
-    private readonly MainWindow _bar;
     private SettingsWindow? _openSettings;
     private TrayPalette _palette;
     private readonly Action _themeChangedHandler;
 
-    public TrayIconService(MainWindow bar)
+    public TrayIconService()
     {
-        _bar = bar;
         _palette = TrayPalette.For(Theme.Current);
 
         _icon = new NotifyIcon
@@ -98,8 +97,21 @@ public class TrayIconService : IDisposable
 
     private void ToggleBar()
     {
-        if (_bar.IsVisible) _bar.Hide();
-        else _bar.Show();
+        // Show/Hide applies to ALL bars at once. With per-monitor panels there is
+        // no single "the bar" any more — tray toggle hides the whole Shelf
+        // presence across all screens, then brings it all back.
+        var bars = App.Bars.Values.ToList();
+        if (bars.Count == 0) return;
+        bool anyVisible = bars.Any(b => b.IsVisible);
+        foreach (var bar in bars)
+        {
+            try
+            {
+                if (anyVisible) bar.Hide();
+                else bar.Show();
+            }
+            catch { }
+        }
     }
 
     private void OpenSettings()

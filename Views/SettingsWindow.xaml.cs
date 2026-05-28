@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,6 +19,22 @@ public partial class SettingsWindow : Window
     // Theme.Apply during initial population.
     private bool _suppressThemeApply = true;
 
+    // Per-monitor draft state — we don't write directly to Settings.MonitorPanels
+    // until OK is pressed. CbMonitor selection-changed commits the current UI
+    // values into the draft for the previously-selected monitor, then loads the
+    // draft (or a fresh default) for the newly-selected one.
+    private bool _suppressMonitorChange = true;
+    private readonly Dictionary<string, MonitorPanelConfig> _draftPanels =
+        new(StringComparer.OrdinalIgnoreCase);
+    private string _selectedMonitorDeviceName = "";
+
+    private sealed class MonitorListItem
+    {
+        public required string DeviceName { get; init; }
+        public required string DisplayName { get; init; }
+        public override string ToString() => DisplayName;
+    }
+
     public SettingsWindow()
     {
         InitializeComponent();
@@ -25,16 +43,15 @@ public partial class SettingsWindow : Window
         RebuildWidgetsList();
         SetupAbout();
         _suppressThemeApply = false;
+        _suppressMonitorChange = false;
     }
 
     private void SetupAbout()
     {
-        // Версія: тягнемо з Assembly, форматуємо як Major.Minor (наприклад "1.0")
         var version = Assembly.GetExecutingAssembly().GetName().Version;
         var versionString = version == null ? "1.0" : $"{version.Major}.{version.Minor}";
         AboutVersionText.Text = Loc.Format("About_Version", versionString);
 
-        // Рядок "Програма розроблена: Bridges Community" - назва жирним.
         AboutDeveloperText.Inlines.Clear();
         AboutDeveloperText.Inlines.Add(new Run(Loc.Get("About_DevelopedBy")));
         AboutDeveloperText.Inlines.Add(new Run(" "));
@@ -43,7 +60,6 @@ public partial class SettingsWindow : Window
             FontWeight = FontWeights.Bold
         });
 
-        // Рядок "Є питання? Пишіть: email" - email клікабельний як mailto-Hyperlink.
         AboutContactText.Inlines.Clear();
         AboutContactText.Inlines.Add(new Run(Loc.Get("About_ContactPrompt")));
         AboutContactText.Inlines.Add(new Run(" "));
@@ -71,27 +87,101 @@ public partial class SettingsWindow : Window
         }
         catch
         {
-            // Якщо немає mailto-handler - тихо ігноруємо.
+            // No mailto handler installed — silently ignore.
         }
     }
 
     private void LoadCurrent()
     {
         var s = App.Settings.Current;
-        RbLeft.IsChecked = s.Side == BarSide.Left;
-        RbRight.IsChecked = s.Side == BarSide.Right;
-        WidthSlider.Value = s.Width;
+
+        // Populate the monitor selector with all currently connected monitors,
+        // and seed the draft dictionary with their saved configs (or defaults
+        // built from the legacy global fields if there's no saved entry yet).
+        var monitors = App.Monitors.Monitors;
+        var items = new List<MonitorListItem>();
+        foreach (var m in monitors)
+        {
+            _draftPanels[m.DeviceName] = CloneConfig(App.Settings.GetMonitorConfig(m.DeviceName));
+            items.Add(new MonitorListItem
+            {
+                DeviceName = m.DeviceName,
+                DisplayName = m.DisplayName
+            });
+        }
+        CbMonitor.ItemsSource = items;
+
+        // Select primary by default — that's almost always what the user wants to
+        // configure first.
+        var primary = items.FirstOrDefault(
+            i => string.Equals(i.DeviceName, App.Monitors.Primary.DeviceName, StringComparison.OrdinalIgnoreCase));
+        if (primary != null)
+        {
+            CbMonitor.SelectedItem = primary;
+            _selectedMonitorDeviceName = primary.DeviceName;
+        }
+        else if (items.Count > 0)
+        {
+            CbMonitor.SelectedIndex = 0;
+            _selectedMonitorDeviceName = items[0].DeviceName;
+        }
+
+        // Load per-monitor controls from the just-seeded draft of the selected monitor.
+        LoadPerMonitorControls(_selectedMonitorDeviceName);
+
         WidthLabelRun.Text = Loc.Get("Settings_Width");
-        WidthValueRun.Text = s.Width.ToString();
         WidthUnitRun.Text = Loc.Get("Settings_Px");
-        CbAutoHide.IsChecked = s.AutoHide;
+
+        // Global (non-per-monitor) controls.
         CbAutoStart.IsChecked = s.AutoStart;
         CbLockOrder.IsChecked = s.WidgetOrderLocked;
-        // ComboBox порядок: 0 = Dark, 1 = Light.
-        // Якщо в майбутньому додасться нова тема - додай ComboBoxItem у XAML і case тут.
         CbTheme.SelectedIndex = s.Theme == AppTheme.Light ? 1 : 0;
         RbLangUk.IsChecked = s.Language == AppLanguage.Uk;
         RbLangEn.IsChecked = s.Language == AppLanguage.En;
+    }
+
+    private void LoadPerMonitorControls(string deviceName)
+    {
+        if (!_draftPanels.TryGetValue(deviceName, out var cfg))
+            cfg = new MonitorPanelConfig();
+
+        RbLeft.IsChecked = cfg.Side == BarSide.Left;
+        RbRight.IsChecked = cfg.Side == BarSide.Right;
+        WidthSlider.Value = cfg.Width;
+        WidthValueRun.Text = cfg.Width.ToString();
+        CbAutoHide.IsChecked = cfg.AutoHide;
+    }
+
+    // Pulls the currently visible per-monitor field values into a MonitorPanelConfig.
+    // Called before switching monitors and on Ok_Click.
+    private MonitorPanelConfig CaptureCurrentPerMonitorConfig() => new()
+    {
+        Side = RbLeft.IsChecked == true ? BarSide.Left : BarSide.Right,
+        Width = (int)WidthSlider.Value,
+        AutoHide = CbAutoHide.IsChecked == true
+    };
+
+    private static MonitorPanelConfig CloneConfig(MonitorPanelConfig src) => new()
+    {
+        Side = src.Side,
+        Width = src.Width,
+        AutoHide = src.AutoHide
+    };
+
+    private void CbMonitor_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_suppressMonitorChange) return;
+        if (CbMonitor.SelectedItem is not MonitorListItem newItem) return;
+        if (string.Equals(newItem.DeviceName, _selectedMonitorDeviceName, StringComparison.OrdinalIgnoreCase))
+            return;
+
+        // Commit current UI into the draft of the monitor we're leaving, then
+        // load the draft of the new selection.
+        if (!string.IsNullOrEmpty(_selectedMonitorDeviceName))
+            _draftPanels[_selectedMonitorDeviceName] = CaptureCurrentPerMonitorConfig();
+
+        _selectedMonitorDeviceName = newItem.DeviceName;
+        LoadPerMonitorControls(_selectedMonitorDeviceName);
     }
 
     private void CbTheme_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -122,10 +212,17 @@ public partial class SettingsWindow : Window
 
     private void Ok_Click(object sender, RoutedEventArgs e)
     {
+        // Commit the currently visible per-monitor edits into the draft.
+        if (!string.IsNullOrEmpty(_selectedMonitorDeviceName))
+            _draftPanels[_selectedMonitorDeviceName] = CaptureCurrentPerMonitorConfig();
+
+        // Persist every draft monitor config into Settings. Untouched monitors
+        // get their original config written back (the draft was cloned from
+        // settings at LoadCurrent), so this is non-destructive.
         var s = App.Settings.Current;
-        s.Side = RbLeft.IsChecked == true ? BarSide.Left : BarSide.Right;
-        s.Width = (int)WidthSlider.Value;
-        s.AutoHide = CbAutoHide.IsChecked == true;
+        foreach (var kv in _draftPanels)
+            s.MonitorPanels[kv.Key] = kv.Value;
+
         s.AutoStart = CbAutoStart.IsChecked == true;
 
         var oldLang = s.Language;
@@ -180,15 +277,16 @@ public partial class SettingsWindow : Window
     {
         WidgetsListPanel.Children.Clear();
 
+        var connected = App.GetConnectedDeviceNames();
         foreach (var (entry, widget) in App.Widgets.GetAllWithEntries())
         {
-            WidgetsListPanel.Children.Add(BuildRow(entry, widget));
+            WidgetsListPanel.Children.Add(BuildRow(entry, widget, connected));
         }
 
         WidgetsListPanel.Children.Add(BuildAddWidgetButton());
     }
 
-    private UIElement BuildRow(WidgetEntry entry, IWidget widget)
+    private UIElement BuildRow(WidgetEntry entry, IWidget widget, IReadOnlySet<string> connected)
     {
         var row = new Border
         {
@@ -239,6 +337,35 @@ public partial class SettingsWindow : Window
                 Margin = new Thickness(0, 2, 0, 0)
             });
         }
+
+        // Monitor badge — small line under the description showing which monitor
+        // this widget lives on. Skipped only when there's a single connected
+        // monitor (no useful information to convey).
+        if (App.Monitors.Monitors.Count > 1)
+        {
+            string monitorLine;
+            if (string.IsNullOrEmpty(entry.MonitorDeviceName))
+            {
+                monitorLine = Loc.Format("Settings_Widget_OnMonitor", Loc.Get("Monitor_Primary"));
+            }
+            else if (connected.Contains(entry.MonitorDeviceName))
+            {
+                var mon = App.Monitors.FindByDeviceName(entry.MonitorDeviceName);
+                monitorLine = Loc.Format("Settings_Widget_OnMonitor", mon?.DisplayName ?? entry.MonitorDeviceName);
+            }
+            else
+            {
+                monitorLine = Loc.Format("Settings_Widget_OnMonitor_Homeless", entry.MonitorDeviceName);
+            }
+            labelPanel.Children.Add(new TextBlock
+            {
+                Text = monitorLine,
+                FontSize = 11,
+                Foreground = (System.Windows.Media.Brush)FindResource("MutedTextBrush"),
+                Margin = new Thickness(0, 2, 0, 0)
+            });
+        }
+
         Grid.SetColumn(labelPanel, 1);
         grid.Children.Add(labelPanel);
 
@@ -316,6 +443,10 @@ public partial class SettingsWindow : Window
             var item = new MenuItem { Header = type.DisplayName };
             item.Click += (_, _) =>
             {
+                // Settings "Add widget" is monitor-agnostic — new widgets default
+                // to the primary monitor (MonitorDeviceName=null). Users use the
+                // panel's right-click menu to add directly on a non-primary
+                // monitor, then "Move to monitor ▶" if they want to relocate.
                 App.Widgets.AddInstance(typeId);
                 RebuildWidgetsList();
             };

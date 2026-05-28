@@ -93,6 +93,51 @@ public class WidgetManager
         }
     }
 
+    // Returns the widgets that belong to a specific monitor — used by each MainWindow
+    // to render only its share of the full widget list.
+    //
+    // - On primary: include widgets with MonitorDeviceName == null/empty (default),
+    //   widgets explicitly pinned to primary's DeviceName, AND "homeless" widgets
+    //   whose MonitorDeviceName references a currently disconnected monitor. The
+    //   homeless ones are appended at the end so they don't interleave with the
+    //   user's intentional primary widgets.
+    // - On non-primary monitor: only widgets with MonitorDeviceName matching exactly.
+    public IEnumerable<(WidgetEntry Entry, IWidget Widget)> GetActiveForMonitor(
+        string deviceName, bool isPrimary, IReadOnlySet<string> connectedDeviceNames)
+    {
+        var native = new List<(WidgetEntry, IWidget)>();
+        var homeless = new List<(WidgetEntry, IWidget)>();
+
+        foreach (var entry in App.Settings.Current.Widgets)
+        {
+            if (!entry.Enabled) continue;
+            if (!_instances.TryGetValue(entry.InstanceId, out var widget)) continue;
+
+            bool unassigned = string.IsNullOrEmpty(entry.MonitorDeviceName);
+            bool matchesThis = !unassigned
+                && string.Equals(entry.MonitorDeviceName, deviceName, StringComparison.OrdinalIgnoreCase);
+
+            if (matchesThis)
+            {
+                native.Add((entry, widget));
+            }
+            else if (isPrimary)
+            {
+                if (unassigned)
+                {
+                    native.Add((entry, widget));
+                }
+                else if (!connectedDeviceNames.Contains(entry.MonitorDeviceName!))
+                {
+                    homeless.Add((entry, widget));
+                }
+            }
+        }
+
+        foreach (var pair in native) yield return pair;
+        foreach (var pair in homeless) yield return pair;
+    }
+
     public IEnumerable<(WidgetEntry Entry, IWidget Widget)> GetAllWithEntries()
     {
         foreach (var entry in App.Settings.Current.Widgets)
@@ -105,7 +150,11 @@ public class WidgetManager
     public IWidget? GetInstance(string instanceId) =>
         _instances.TryGetValue(instanceId, out var w) ? w : null;
 
-    public string AddInstance(string typeId)
+    // Adds a widget instance. monitorDeviceName==null means "default monitor"
+    // (i.e. primary at runtime). Pass a concrete DeviceName to land it on a
+    // specific monitor right away — e.g. when the user clicks "Add widget" from
+    // the context menu of the non-primary panel.
+    public string AddInstance(string typeId, string? monitorDeviceName = null)
     {
         var typeInfo = WidgetRegistry.FindType(typeId);
         if (typeInfo == null) return "";
@@ -122,7 +171,8 @@ public class WidgetManager
             InstanceId = instanceId,
             TypeId = typeId,
             Enabled = true,
-            State = ""
+            State = "",
+            MonitorDeviceName = monitorDeviceName
         });
         App.Settings.Save();
         ActiveWidgetsChanged?.Invoke();
@@ -222,4 +272,20 @@ public class WidgetManager
 
     public bool IsPinned(string instanceId) =>
         App.Settings.Current.Widgets.FirstOrDefault(e => e.InstanceId == instanceId)?.Pinned ?? false;
+
+    // Changes the monitor assignment of a widget. Pass null (or empty) for "primary".
+    // Triggers an ActiveWidgetsChanged so every MainWindow rebuilds — the source
+    // monitor's panel drops the widget, the target panel picks it up. If the
+    // user moves it to a disconnected monitor (currently impossible through the
+    // UI), the widget will end up homeless on primary — that's expected.
+    public void MoveToMonitor(string instanceId, string? deviceName)
+    {
+        var entry = App.Settings.Current.Widgets.FirstOrDefault(e => e.InstanceId == instanceId);
+        if (entry == null) return;
+        var normalized = string.IsNullOrEmpty(deviceName) ? null : deviceName;
+        if (string.Equals(entry.MonitorDeviceName, normalized, StringComparison.OrdinalIgnoreCase)) return;
+        entry.MonitorDeviceName = normalized;
+        App.Settings.Save();
+        ActiveWidgetsChanged?.Invoke();
+    }
 }

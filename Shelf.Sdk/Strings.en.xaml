@@ -64,8 +64,16 @@
     <s:String x:Key="Menu_Unpin">Unpin</s:String>
     <s:String x:Key="Menu_WidgetSettings">Widget settings…</s:String>
     <s:String x:Key="Menu_DeleteWidget">Delete widget</s:String>
+    <s:String x:Key="Menu_MoveToMonitor">Move to monitor</s:String>
     <s:String x:Key="Widget_Fallback">widget</s:String>
     <s:String x:Key="Confirm_DeleteWidget">Delete the «{0}» widget? Its content will be lost.</s:String>
+    <s:String x:Key="Monitor_Primary">Primary</s:String>
+    <s:String x:Key="Monitor_Display_Format">Display {0}: {1}×{2}</s:String>
+    <s:String x:Key="Monitor_Display_Primary_Format">Display {0}: {1}×{2} (primary)</s:String>
+    <s:String x:Key="Settings_Monitor_Label">Configuring monitor</s:String>
+    <s:String x:Key="Settings_Monitor_Hint">Side, width and auto-hide are configured per monitor. To move a widget to another monitor, right-click it in the panel.</s:String>
+    <s:String x:Key="Settings_Widget_OnMonitor">on monitor: {0}</s:String>
+    <s:String x:Key="Settings_Widget_OnMonitor_Homeless">monitor disconnected: {0}</s:String>
 
     <!-- ===== Tray ===== -->
     <s:String x:Key="Tray_ShowHide">Show / Hide</s:String>

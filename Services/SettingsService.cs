@@ -81,4 +81,51 @@ public class SettingsService
         Save();
         Changed?.Invoke();
     }
+
+    // Returns the per-monitor panel config for the given device, falling back to
+    // the legacy global Side/Width/AutoHide if the monitor has no entry yet.
+    // The legacy fallback is what new monitors inherit on first connection — so
+    // users with a single saved configuration get the same panel on every screen
+    // until they tweak each individually.
+    public MonitorPanelConfig GetMonitorConfig(string deviceName)
+    {
+        if (!string.IsNullOrEmpty(deviceName)
+            && Current.MonitorPanels.TryGetValue(deviceName, out var cfg))
+        {
+            return cfg;
+        }
+        return new MonitorPanelConfig
+        {
+            Side = Current.Side,
+            Width = Current.Width,
+            AutoHide = Current.AutoHide
+        };
+    }
+
+    // Persists a per-monitor config and saves to disk. Does NOT fire Changed —
+    // callers should follow up with NotifyChanged() if the panel layout needs to
+    // react, or just rely on App.ApplyAllBars() for a targeted refresh.
+    public void SetMonitorConfig(string deviceName, MonitorPanelConfig cfg)
+    {
+        if (string.IsNullOrEmpty(deviceName)) return;
+        Current.MonitorPanels[deviceName] = cfg;
+        Save();
+    }
+
+    // One-time migration: if MonitorPanels is empty (which is the case for users
+    // upgrading from a single-monitor settings.json), copy the legacy global
+    // Side/Width/AutoHide into a fresh entry for the current primary monitor.
+    // Idempotent — running it twice has no effect.
+    public void MigrateLegacyPanel(string primaryDeviceName)
+    {
+        if (string.IsNullOrEmpty(primaryDeviceName)) return;
+        if (Current.MonitorPanels.Count > 0) return;
+        Current.MonitorPanels[primaryDeviceName] = new MonitorPanelConfig
+        {
+            Side = Current.Side,
+            Width = Current.Width,
+            AutoHide = Current.AutoHide
+        };
+        Save();
+    }
 }

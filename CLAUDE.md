@@ -149,12 +149,15 @@ Discovery at runtime is reflection-based but trivial: `WidgetRegistry.Initialize
 
 ```
 AppSettings
-├── Side, Width, AutoHide, AutoStart, WidgetOrderLocked, Language, Theme, InitializedWithDefaults
+├── Side, Width, AutoHide       (LEGACY single-monitor fields — migrated on first run into MonitorPanels[primary] by SettingsService.MigrateLegacyPanel. Still present for back-compat deserialization.)
+├── MonitorPanels: Dictionary<string, MonitorPanelConfig>  (per-monitor Side/Width/AutoHide, keyed by Screen.DeviceName)
+├── AutoStart, WidgetOrderLocked, Language, Theme, InitializedWithDefaults  (global)
 └── Widgets: List<WidgetEntry>
     ├── InstanceId  (GUID, unique per instance)
     ├── TypeId      (plugin id, e.g. "clock" / "notes" / "todo" / "photos" / "radio" / "stopwatch")
     ├── Enabled
     ├── Pinned      (bool, default false — see "Pinned widgets" below)
+    ├── MonitorDeviceName  (string?, null = primary; otherwise `\\.\DISPLAYN` of a specific monitor — see "Multi-monitor support")
     ├── State       (JSON blob owned by the widget — opaque to host)
     └── Id          (legacy alias for TypeId, migrated then nulled)
 ```
@@ -170,21 +173,48 @@ For widget-list changes (add/remove/reorder/lock), use `App.Widgets.ActiveWidget
 
 `Views/SettingsWindow.xaml` has a `TabControl` with three tabs:
 
-1. **Налаштування панелі** — Position (Left/Right side + width slider), Behavior (AutoHide, AutoStart, LockOrder), **Theme** (`CbTheme` ComboBox with Dark/Light; live-applied via `Theme.Apply` on `SelectionChanged`; `_suppressThemeApply` flag guards initial population), **Language** (radio buttons — needs restart, prompts via `DarkMessageBox`).
-2. **Віджети** — single section **Екземпляри**: add/enable/reorder/remove widget instances. Adding a widget shows a context menu populated from `WidgetRegistry.Types`. No install/uninstall UI.
+1. **Налаштування панелі** — **Monitor selector** at the top (`CbMonitor` ComboBox of all connected monitors, labelled "Налаштовуєте монітор: ▼") + Position (Left/Right side + width slider), Behavior — AutoHide, AutoStart, LockOrder — note that AutoHide/Side/Width are PER-MONITOR (driven by `CbMonitor` selection), but AutoStart/LockOrder remain global; **Theme** (`CbTheme` ComboBox with Dark/Light; live-applied via `Theme.Apply` on `SelectionChanged`; `_suppressThemeApply` flag guards initial population), **Language** (radio buttons — needs restart, prompts via `DarkMessageBox`). Switching `CbMonitor` commits the currently visible Side/Width/AutoHide into a `_draftPanels` dictionary, then loads the draft (or a config-default) for the newly-selected monitor. `_suppressMonitorChange` flag guards initial population. On OK, every draft entry is written into `App.Settings.Current.MonitorPanels`.
+2. **Віджети** — single section **Екземпляри**: add/enable/reorder/remove widget instances. Adding a widget shows a context menu populated from `WidgetRegistry.Types`. No install/uninstall UI. **When more than one monitor is connected**, each widget row shows a small "на моніторі: X" badge under its description (or "монітор не підключено: \\.\DISPLAYN" for homeless ones).
 3. **Про програму** — vertical layout: app icon (96×96 from `Resources/shelf.png` via pack URI), localized app name (`{DynamicResource App_Name}`, 28 pt SemiBold), version line auto-generated from `Assembly.GetExecutingAssembly().GetName().Version` (`{Major}.{Minor}`), single-line description, then a footer with «Програма розроблена: Bridges Community», a clickable `mailto:`-Hyperlink (current address: `shelf@bridges.net.ua` via `About_Email` key), and «© 2026 Bridges Community». The version `TextBlock` and the developer/contact `Inlines` are populated in `SettingsWindow.xaml.cs SetupAbout()`; do **not** hardcode the version or the email in XAML.
 
 **Restart** (used by the language switcher) = `Process.Start(Environment.ProcessPath)` + `Application.Current.Shutdown()`, with `RestartApp()` defined locally in `SettingsWindow`. The single-instance mutex on the old process must be released first (`OnExit` does this), so there's a brief race window — practically harmless because the new process retries instantly. Theme switching does **not** need a restart.
 
 ### AppBar registration (`Services/AppBarService.cs`)
 
-`SHAppBarMessage(ABM_NEW)` registers the panel HWND as a system AppBar; `ABM_QUERYPOS` then `ABM_SETPOS` reserve a strip on the chosen edge (Left/Right only). Windows then auto-resizes maximized windows around it. AppBar coordinates are physical pixels; WPF uses DIPs — `HwndSource.CompositionTarget.TransformToDevice` does the conversion.
+`SHAppBarMessage(ABM_NEW)` registers the panel HWND as a system AppBar; `ABM_QUERYPOS` then `ABM_SETPOS` reserve a strip on the chosen edge (Left/Right only). Windows then auto-resizes maximized windows around it. AppBar coordinates are physical pixels; WPF uses DIPs — the target monitor's per-monitor DPI (from `MonitorService`) does the conversion.
+
+`AppBarService.Register(MonitorInfo monitor, BarSide side, int widthDip)` takes the target monitor explicitly. Coordinates come from `monitor.BoundsPx` (physical pixels of that monitor); widthPx = `widthDip × monitor.DpiX`; window-side DIPs use the current `HwndSource.CompositionTarget.TransformToDevice` for the same HWND. **Do not use `SystemParameters.PrimaryScreen*`** — those only describe the primary monitor and break secondary-monitor placement. Each MainWindow owns its own `AppBarService` instance bound to its monitor; if the monitor swaps (rare), call `Unregister` + `Register` with the new `MonitorInfo`.
 
 **Auto-hide mode does not register as an AppBar.** Instead the panel slides out to a 3-pixel trigger strip and back via `DoubleAnimation` on `Window.Left` (`MainWindow.SlideIn`/`SlideOut`). `ApplySettings` switches modes by calling `_appBar.Register`/`Unregister` and animating `LeftProperty`.
 
-**Width-change ordering matters.** In non-AutoHide mode, `ApplySettings` must set `Top`/`Height`/`Width`/`Left` **before** calling `_appBar.Register(side, width)` — assigning Width alone would leave the window briefly at the old Left, visually shifting it for one frame. Then `AppBar.SetPosition` re-confirms the coords from `SHAppBarMessage`. Don't optimize this away.
+**Width-change ordering matters.** In non-AutoHide mode, `ApplySettings` must set `Top`/`Height`/`Width`/`Left` **before** calling `_appBar.Register(monitor, side, width)` — assigning Width alone would leave the window briefly at the old Left, visually shifting it for one frame. Then `AppBar.SetPosition` re-confirms the coords from `SHAppBarMessage`. Don't optimize this away.
 
 **Trust our own rect, not `ABM_QUERYPOS`'s response.** `SetPosition` issues `ABM_QUERYPOS` for protocol politeness (so other AppBars see us), but then **overwrites `data.rc` with our own desired coordinates** before `ABM_SETPOS`. Reason: under race conditions (notably right after a virtual-desktop move + Hide/Show cycle), `ABM_QUERYPOS` returns a rect anchored to the **left** edge regardless of the `uEdge` we requested — which used to leave the panel detached from the intended screen edge. Forcing our rect makes this deterministic. `%TEMP%\Shelf.vd.log` records `QUERYPOS returned: ...` and `SETPOS final: ...` for diagnosis.
+
+### Multi-monitor support (`Services/MonitorService.cs`, `App.Bars`)
+
+Each connected monitor can host its own Shelf panel with its own widgets, side, width, and auto-hide. The user assigns each widget instance to a specific monitor via the panel's "Перенести на монітор ▶" context menu; primary picks up unassigned and "homeless" widgets.
+
+- **`MonitorService`** — exposes `Monitors: IReadOnlyList<MonitorInfo>`, `Primary`, `FindByDeviceName`, and a `TopologyChanged` event. Subscribes to `SystemEvents.DisplaySettingsChanged` to track hot-plug. `MonitorInfo.DpiX`/`DpiY` is per-monitor effective DPI from `GetDpiForMonitor` (shcore.dll, PerMonitorV2-aware). `MonitorInfo.DisplayName` is a short label like "Display 2: 2560×1440" used in UI.
+
+- **`App.Bars: Dictionary<string, MainWindow>`** — one entry per active panel, keyed by `Screen.DeviceName` (e.g. `\\.\DISPLAY2`). `App.PrimaryBar` is the convenience accessor used by the tray. `App.EnsureBarsForCurrentTopology()` creates/closes bars to match the current monitor set:
+  - **Primary monitor always gets a bar** (it's the landing pad for homeless widgets and the owner of tray/Settings flows), even when its widget list is empty.
+  - **Non-primary monitors only get a bar when at least one widget is assigned to them.** A monitor with zero assigned widgets shows no panel — no empty strip eating screen edge.
+  - **Disconnect preserves intent.** When a monitor disconnects, its bar is closed but the widgets' `MonitorDeviceName` is **kept** in `settings.json`. The widgets temporarily render at the bottom of the primary bar (as "homeless"). When that monitor reconnects, the widgets are picked up by the new bar automatically.
+
+- **`WidgetEntry.MonitorDeviceName: string?`** — the widget's assignment. `null` means "default monitor" (primary at runtime, so the widget follows primary if it changes). A non-null value is the explicit `DeviceName` of a specific monitor. Set via `WidgetManager.MoveToMonitor(instanceId, deviceName)` from the context menu, or by `AddInstance(typeId, monitorDeviceName)` when "Додати віджет ▶" is clicked from a non-primary panel.
+
+- **`WidgetManager.GetActiveForMonitor(deviceName, isPrimary, connectedSet)`** — replaces `GetActiveOrderedWithEntries()` inside per-window `RebuildPanel`. For primary it yields unassigned widgets first, then explicitly-primary ones, then homeless. For non-primary it yields only widgets whose `MonitorDeviceName` matches exactly. Pinned widgets follow the same filter — a pinned widget assigned to Display 2 only shows in Display 2's `PinnedHost`.
+
+- **Per-monitor panel config** — `AppSettings.MonitorPanels: Dictionary<string, MonitorPanelConfig>` (Side/Width/AutoHide), keyed by DeviceName. Missing entries fall back to defaults built from the legacy global `Side`/`Width`/`AutoHide` fields via `SettingsService.GetMonitorConfig(deviceName)`. `SettingsService.MigrateLegacyPanel(primaryDeviceName)` runs once on startup to copy the legacy single-monitor settings into the new per-monitor map. New monitors connecting later inherit the legacy fallback on first read.
+
+- **Hotplug handling** — `MonitorService.TopologyChanged` is marshalled back to the dispatcher in `App.OnTopologyChanged`, which calls `EnsureBarsForCurrentTopology()`, `RebuildAllBars()`, and `ApplyAllBars()`. No restart needed — the panel set adapts live to monitor connect/disconnect/primary swap/resolution change.
+
+- **Event wiring** — `Settings.Changed` and `Widgets.ActiveWidgetsChanged` are subscribed by `App` (not by each MainWindow) so all bars rebuild/apply in lockstep. Each MainWindow's `OnSourceInitialized` only does its own first paint (`ApplySettings()` + `RebuildPanel()`) and starts its own virtual-desktop pin/mover. Don't re-subscribe to global events from MainWindow — it would double-fire.
+
+- **Add Widget context menu** — when invoked from primary panel, new widgets get `MonitorDeviceName=null` (follow-primary semantics). When invoked from a non-primary panel, new widgets get `MonitorDeviceName = this_panel.DeviceName` so they stick to that monitor even after a reconnect.
+
+- **Move-to-monitor menu** — `BuildWidgetContextMenu` adds a "Перенести на монітор ▶" submenu **only when more than one monitor is connected**. Each entry shows `✓` next to the widget's current monitor. Primary entry stores `null` (follow-primary); non-primary entries store the explicit DeviceName.
 
 ### Virtual desktops: pin-first, mover as fallback
 

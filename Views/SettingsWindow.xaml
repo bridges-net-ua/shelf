@@ -25,6 +25,21 @@
                                    Margin="0,0,0,10"
                                    Foreground="{DynamicResource MutedTextBrush}"/>
 
+                        <TextBlock x:Name="MonitorSelectorLabel"
+                                   Text="{DynamicResource Settings_Monitor_Label}"
+                                   FontSize="13" FontWeight="SemiBold"
+                                   Margin="0,0,0,8"
+                                   Foreground="{DynamicResource SecondaryTextBrush}"/>
+                        <ComboBox x:Name="CbMonitor"
+                                  HorizontalAlignment="Stretch"
+                                  Margin="0,0,0,8"
+                                  SelectionChanged="CbMonitor_SelectionChanged"/>
+                        <TextBlock Text="{DynamicResource Settings_Monitor_Hint}"
+                                   TextWrapping="Wrap"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource MutedTextBrush}"
+                                   Margin="0,0,0,16"/>
+
                         <TextBlock Text="{DynamicResource Settings_ScreenSide}"
                                    FontSize="13" FontWeight="SemiBold"
                                    Margin="0,0,0,8"

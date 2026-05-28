@@ -64,8 +64,16 @@
     <s:String x:Key="Menu_Unpin">Відкріпити</s:String>
     <s:String x:Key="Menu_WidgetSettings">Налаштування віджета…</s:String>
     <s:String x:Key="Menu_DeleteWidget">Видалити віджет</s:String>
+    <s:String x:Key="Menu_MoveToMonitor">Перенести на монітор</s:String>
     <s:String x:Key="Widget_Fallback">віджет</s:String>
     <s:String x:Key="Confirm_DeleteWidget">Видалити віджет «{0}»? Його вміст буде втрачено.</s:String>
+    <s:String x:Key="Monitor_Primary">Головний</s:String>
+    <s:String x:Key="Monitor_Display_Format">Display {0}: {1}×{2}</s:String>
+    <s:String x:Key="Monitor_Display_Primary_Format">Display {0}: {1}×{2} (головний)</s:String>
+    <s:String x:Key="Settings_Monitor_Label">Налаштовуєте монітор</s:String>
+    <s:String x:Key="Settings_Monitor_Hint">Сторона, ширина та автоприховування налаштовуються окремо для кожного монітора. Перенести віджет на інший монітор - правий клік на ньому в панелі.</s:String>
+    <s:String x:Key="Settings_Widget_OnMonitor">на моніторі: {0}</s:String>
+    <s:String x:Key="Settings_Widget_OnMonitor_Homeless">монітор не підключено: {0}</s:String>
 
     <!-- ===== Трей ===== -->
     <s:String x:Key="Tray_ShowHide">Показати / Сховати</s:String>

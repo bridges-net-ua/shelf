@@ -50,18 +50,29 @@ public class AppBarService
     private uint _callbackMessage;
     private bool _registered;
 
+    // The monitor + side + width last passed to Register/SetPosition. The Windows
+    // ABN_POSCHANGED callback uses these to re-apply our preferred layout when
+    // another AppBar's position causes ours to need re-fitting.
+    private MonitorInfo? _lastMonitor;
+    private BarSide _lastSide;
+    private int _lastWidthDip;
+
     public AppBarService(Window window)
     {
         _window = window;
     }
 
-    public void Register(BarSide side, int width)
+    public void Register(MonitorInfo monitor, BarSide side, int widthDip)
     {
         if (_registered) Unregister();
 
         _hwnd = new WindowInteropHelper(_window).Handle;
         if (_hwnd == IntPtr.Zero) return;
 
+        // Unique callback message per HWND would be ideal, but RegisterWindowMessage
+        // returns the same value for the same string app-wide. Windows still routes
+        // notifications back to the specific HWND that registered, so this is fine
+        // even with multiple Shelf MainWindows registering their own AppBars.
         _callbackMessage = RegisterWindowMessage("Shelf_AppBarMessage_E94F");
 
         var data = new APPBARDATA
@@ -76,7 +87,7 @@ public class AppBarService
         src?.AddHook(WndProc);
 
         _registered = true;
-        SetPosition(side, width);
+        SetPosition(monitor, side, widthDip);
     }
 
     public void Unregister()
@@ -96,37 +107,42 @@ public class AppBarService
         _registered = false;
     }
 
-    public void SetPosition(BarSide side, int width)
+    public void SetPosition(MonitorInfo monitor, BarSide side, int widthDip)
     {
         if (!_registered || _hwnd == IntPtr.Zero) return;
 
-        var src = HwndSource.FromHwnd(_hwnd);
-        double dpiX = src?.CompositionTarget?.TransformToDevice.M11 ?? 1.0;
-        double dpiY = src?.CompositionTarget?.TransformToDevice.M22 ?? 1.0;
+        _lastMonitor = monitor;
+        _lastSide = side;
+        _lastWidthDip = widthDip;
 
-        int screenWidthPx = (int)Math.Round(SystemParameters.PrimaryScreenWidth * dpiX);
-        int screenHeightPx = (int)Math.Round(SystemParameters.PrimaryScreenHeight * dpiY);
-        int widthPx = (int)Math.Round(width * dpiX);
+        // The monitor's bounds are already in physical pixels. Widths from settings
+        // are in DIPs (user-visible scale), so they get multiplied by the monitor's
+        // DPI to land in the physical pixel grid the shell API expects.
+        double dpiX = monitor.DpiX;
+        double dpiY = monitor.DpiY;
+        int widthPx = (int)Math.Round(widthDip * dpiX);
 
-        // Compute our desired rect up-front. We do NOT trust ABM_QUERYPOS to come back
-        // with the same coordinates — under some race conditions (notably right after a
-        // virtual-desktop move + Hide/Show cycle) Windows returns a rect anchored at the
-        // left edge regardless of the uEdge we requested, which leaves the panel detached
-        // from the intended screen edge. So we issue QUERYPOS for protocol compliance,
-        // then overwrite rc with our own values before SETPOS.
-        int desiredLeft, desiredTop = 0, desiredRight, desiredBottom = screenHeightPx;
+        // Pre-compute the desired rect. We don't trust ABM_QUERYPOS to come back
+        // with the same coordinates — under some race conditions (notably right
+        // after a virtual-desktop move + Hide/Show cycle) Windows returns a rect
+        // anchored at the left edge regardless of the uEdge we requested, which
+        // leaves the panel detached from the intended screen edge. So we issue
+        // QUERYPOS for protocol compliance, then overwrite rc with our own values
+        // before SETPOS.
+        int desiredLeft, desiredTop = monitor.BoundsPx.Top, desiredRight;
+        int desiredBottom = monitor.BoundsPx.Bottom;
         uint desiredEdge;
         if (side == BarSide.Left)
         {
             desiredEdge = ABE_LEFT;
-            desiredLeft = 0;
-            desiredRight = widthPx;
+            desiredLeft = monitor.BoundsPx.Left;
+            desiredRight = monitor.BoundsPx.Left + widthPx;
         }
         else
         {
             desiredEdge = ABE_RIGHT;
-            desiredLeft = screenWidthPx - widthPx;
-            desiredRight = screenWidthPx;
+            desiredLeft = monitor.BoundsPx.Right - widthPx;
+            desiredRight = monitor.BoundsPx.Right;
         }
 
         var data = new APPBARDATA
@@ -141,7 +157,7 @@ public class AppBarService
         data.rc.bottom = desiredBottom;
 
         SHAppBarMessage(ABM_QUERYPOS, ref data);
-        Log($"    QUERYPOS returned: L={data.rc.left} T={data.rc.top} R={data.rc.right} B={data.rc.bottom} " +
+        Log($"    [{monitor.DeviceName}] QUERYPOS returned: L={data.rc.left} T={data.rc.top} R={data.rc.right} B={data.rc.bottom} " +
             $"(desired L={desiredLeft} R={desiredRight}, side={side}, dpiX={dpiX:F3})");
 
         // Force our own rect — ignore whatever QUERYPOS proposed, keeping only the edge.
@@ -152,13 +168,20 @@ public class AppBarService
         data.rc.bottom = desiredBottom;
 
         SHAppBarMessage(ABM_SETPOS, ref data);
-        Log($"    SETPOS final:     L={data.rc.left} T={data.rc.top} R={data.rc.right} B={data.rc.bottom}");
+        Log($"    [{monitor.DeviceName}] SETPOS final:     L={data.rc.left} T={data.rc.top} R={data.rc.right} B={data.rc.bottom}");
 
-        // Position the WPF window (convert back to DIPs)
-        _window.Left = data.rc.left / dpiX;
-        _window.Top = data.rc.top / dpiY;
-        _window.Width = (data.rc.right - data.rc.left) / dpiX;
-        _window.Height = (data.rc.bottom - data.rc.top) / dpiY;
+        // Position the WPF window. WPF Window.Left/Top are in DIPs of the PRIMARY
+        // monitor's DPI scaling — to translate physical pixels of an arbitrary
+        // monitor into "WPF DIPs", divide by the source HwndSource's transform,
+        // not by the target monitor's DPI. After SourceInitialized the HwndSource
+        // is on whichever monitor the window currently sits, so we use its DPI.
+        var src = HwndSource.FromHwnd(_hwnd);
+        double srcDpiX = src?.CompositionTarget?.TransformToDevice.M11 ?? dpiX;
+        double srcDpiY = src?.CompositionTarget?.TransformToDevice.M22 ?? dpiY;
+        _window.Left = data.rc.left / srcDpiX;
+        _window.Top = data.rc.top / srcDpiY;
+        _window.Width = (data.rc.right - data.rc.left) / srcDpiX;
+        _window.Height = (data.rc.bottom - data.rc.top) / srcDpiY;
     }
 
     private static readonly string LogPath =
@@ -175,10 +198,9 @@ public class AppBarService
         if ((uint)msg == _callbackMessage)
         {
             int notif = wParam.ToInt32();
-            if (notif == ABN_POSCHANGED)
+            if (notif == ABN_POSCHANGED && _lastMonitor != null)
             {
-                var s = App.Settings.Current;
-                SetPosition(s.Side, s.Width);
+                SetPosition(_lastMonitor, _lastSide, _lastWidthDip);
                 handled = true;
             }
         }
