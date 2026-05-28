@@ -83,14 +83,50 @@ jobs:
           path: Shelf-${{ steps.version.outputs.tag }}-win-x64.zip
           retention-days: 30
 
+      - name: Extract release notes from CHANGELOG
+        id: notes
+        shell: pwsh
+        # Pull the section for this version out of CHANGELOG.md and feed it to
+        # the Release body. We commit directly to main (no PR flow), so
+        # generate_release_notes would just emit an empty "What's Changed" block
+        # and a Full Changelog link — the CHANGELOG section is the real source
+        # of truth for what users see on the Releases page.
+        run: |
+          $version = '${{ steps.version.outputs.version }}'
+          $lines = Get-Content CHANGELOG.md
+          $inSection = $false
+          $buffer = New-Object System.Collections.Generic.List[string]
+          foreach ($line in $lines) {
+            if ($line -match "^## \[$([regex]::Escape($version))\]") { $inSection = $true; continue }
+            if ($inSection -and ($line -match "^## \[" -or $line -match "^---\s*$")) { break }
+            if ($inSection) { $buffer.Add($line) }
+          }
+          $notes = ($buffer -join "`n").Trim()
+          if ([string]::IsNullOrWhiteSpace($notes)) {
+            $notes = "See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details."
+          }
+          # Best-effort previous tag for the comparison link — append only if there is one.
+          $prevTag = git describe --tags --abbrev=0 "${{ steps.version.outputs.tag }}^" 2>$null
+          if ($LASTEXITCODE -eq 0 -and $prevTag) {
+            $notes += "`n`n**Full Changelog**: https://github.com/${{ github.repository }}/compare/$prevTag...${{ steps.version.outputs.tag }}"
+          }
+          $delim = "EOF_" + [Guid]::NewGuid().ToString('N')
+          @"
+          notes<<$delim
+          $notes
+          $delim
+          "@.TrimStart() | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          Write-Host "Notes preview:"
+          Write-Host $notes
+
       - name: Create / update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           name: Shelf ${{ steps.version.outputs.tag }}
+          body: ${{ steps.notes.outputs.notes }}
           draft: false
           prerelease: false
-          generate_release_notes: true
           fail_on_unmatched_files: true
           files: |
             Shelf-${{ steps.version.outputs.tag }}-win-x64.zip
