@@ -150,9 +150,9 @@ Write-Host "Built: $MsixPath ($size MB)"
 if ($Sign) {
     Write-Host "Signed with: $($cert.Thumbprint)"
     Write-Host ""
-    Write-Host "Install locally (cert must be trusted first — see message above):"
+    Write-Host "Install locally (cert must be trusted first - see message above):"
     Write-Host "  Add-AppxPackage -Path $MsixPath"
 } else {
     Write-Host "Unsigned. Re-run with -Sign for local install."
-    Write-Host "(Microsoft Store re-signs at publish time anyway — unsigned is fine for upload.)"
+    Write-Host "(Microsoft Store re-signs at publish time anyway - unsigned is fine for upload.)"
 }

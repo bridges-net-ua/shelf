@@ -1,6 +1,6 @@
 # Generates Microsoft Store-required PNG assets from Resources/shelf.png.
 #
-# Pure .NET (System.Drawing) — does NOT require Windows SDK. Run this any time
+# Pure .NET (System.Drawing) - does NOT require Windows SDK. Run this any time
 # the source logo changes:
 #   pwsh tools\make-store-assets.ps1
 #
@@ -67,7 +67,7 @@ Save-Square -Size 44 -FileName "Square44x44Logo.png"
 Save-Square -Size 150 -FileName "Square150x150Logo.png"
 Save-Square -Size 50 -FileName "StoreLogo.png"
 
-# Wide tile and splash screen — non-square canvases with centered square logo.
+# Wide tile and splash screen - non-square canvases with centered square logo.
 # Logo size leaves breathing room at the canvas edges.
 Save-CenteredOnCanvas -CanvasW 310 -CanvasH 150 -LogoSize 130 -FileName "Wide310x150Logo.png"
 Save-CenteredOnCanvas -CanvasW 620 -CanvasH 300 -LogoSize 260 -FileName "SplashScreen.png"
