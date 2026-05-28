@@ -1,11 +1,22 @@
 using System;
+#if !STORE_BUILD
 using System.Diagnostics;
 using Microsoft.Win32;
+#else
+using Windows.ApplicationModel;
+#endif
 
 namespace Shelf.Services;
 
+// Autostart on Windows login. Two implementations behind STORE_BUILD because
+// HKCU\Software\Microsoft\Windows\CurrentVersion\Run is silently virtualised
+// inside MSIX packages — writes succeed but Windows ignores them. Store builds
+// must use the windows.startupTask extension declared in Package.appxmanifest.
 public static class AutoStartService
 {
+#if !STORE_BUILD
+    // ---- Registry-backed autostart (Debug/Release/portable zip) ----
+
     private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private const string ValueName = "Shelf";
 
@@ -82,4 +93,56 @@ public static class AutoStartService
             // ignore registry errors
         }
     }
+#else
+    // ---- MSIX startup task (Store) ----
+    // TaskId must match <desktop:StartupTask TaskId="..."> in Package.appxmanifest.
+
+    private const string StartupTaskId = "ShelfAutoStart";
+
+    public static bool IsEnabled()
+    {
+        try
+        {
+            var task = StartupTask.GetAsync(StartupTaskId).GetAwaiter().GetResult();
+            // Enabled and EnabledByPolicy are the "on" states. DisabledByUser /
+            // DisabledByPolicy block us from re-enabling — surface that as "off" so
+            // the UI checkbox stays unchecked rather than misleading the user.
+            return task.State == StartupTaskState.Enabled
+                || task.State == StartupTaskState.EnabledByPolicy;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public static void Set(bool enabled)
+    {
+        try
+        {
+            var task = StartupTask.GetAsync(StartupTaskId).GetAwaiter().GetResult();
+            if (enabled)
+            {
+                // RequestEnableAsync may show a system prompt on first opt-in. Result
+                // reflects what Windows actually granted (e.g. DisabledByUser if the
+                // user later toggled it off in Settings → Apps → Startup).
+                _ = task.RequestEnableAsync().GetAwaiter().GetResult();
+            }
+            else
+            {
+                task.Disable();
+            }
+        }
+        catch
+        {
+            // ignore — autostart toggle should never crash the app
+        }
+    }
+
+    // No legacy migration in Store builds — registry-based autostart was never
+    // reachable from inside the MSIX sandbox in the first place.
+    public static void MigrateLegacyValue()
+    {
+    }
+#endif
 }

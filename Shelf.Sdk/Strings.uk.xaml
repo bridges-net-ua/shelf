@@ -50,6 +50,7 @@
     <s:String x:Key="About_Developer">Bridges Community</s:String>
     <s:String x:Key="About_ContactPrompt">Є питання? Пишіть:</s:String>
     <s:String x:Key="About_Email">shelf@bridges.net.ua</s:String>
+    <s:String x:Key="About_PrivacyPolicy">Політика конфіденційності</s:String>
     <s:String x:Key="About_Copyright">© 2026 Bridges Community</s:String>
 
     <!-- ===== Меню панелі ===== -->

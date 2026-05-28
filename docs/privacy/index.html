@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Політика конфіденційності - Поличка</title>
+  <meta name="description" content="Політика конфіденційності Поличка - док-панель з віджетами для робочого столу Windows. Жодної телеметрії, жодних персональних даних.">
+  <meta name="author" content="Bridges Community">
+  <meta name="theme-color" content="#1E1E22">
+
+  <link rel="icon" type="image/x-icon" href="../assets/favicon.ico">
+  <link rel="alternate" hreflang="uk" href="https://shelf.bridges.net.ua/privacy/">
+  <link rel="alternate" hreflang="en" href="https://shelf.bridges.net.ua/privacy/en/">
+  <link rel="canonical" href="https://shelf.bridges.net.ua/privacy/">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+    <a href="../" class="brand">
+      <img src="../assets/logo.png" alt="" aria-hidden="true">
+      <span>Поличка</span>
+    </a>
+    <nav class="nav-links" aria-label="Основне меню">
+      <a href="../#about">Про програму</a>
+      <a href="../#widgets">Віджети</a>
+      <a href="../#download">Завантажити</a>
+      <a href="../#faq">FAQ</a>
+      <a href="en/" class="lang-switch" lang="en">EN ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="about">
+    <div class="container">
+      <h1>Політика конфіденційності</h1>
+      <p class="lead">Останнє оновлення: 28 травня 2026</p>
+
+      <p>Поличка (далі - «Програма») розроблена спільнотою Bridges Community. Програма поважає вашу приватність і не збирає телеметрію, аналітику чи персональні дані.</p>
+
+      <h2>Що Поличка не робить</h2>
+      <ul>
+        <li>Не надсилає телеметрію, статистику використання чи crash-репорти на сервери Bridges Community або третіх сторін.</li>
+        <li>Не використовує cookies, fingerprinting, рекламні чи трекерові SDK.</li>
+        <li>Не передає ваші файли, налаштування, історію використання, контакти, фотографії чи будь-які інші особисті дані.</li>
+        <li>Не вимагає реєстрації, акаунту чи входу.</li>
+      </ul>
+
+      <h2>Які мережеві запити робить Поличка</h2>
+      <p>Усі мережеві запити пов'язані виключно з віджетами, які ви самі додали на панель, і йдуть напряму на сервіси третіх сторін - <strong>не на сервери Bridges Community</strong>.</p>
+
+      <h3>Віджет «Погода»</h3>
+      <p>Якщо віджет додано, програма надсилає HTTP-запити до сервісу <a href="https://open-meteo.com/">Open-Meteo</a>:</p>
+      <ul>
+        <li><code>geocoding-api.open-meteo.com/v1/search</code> - геокодинг назви міста, яке ви вказали у налаштуваннях віджета, у координати.</li>
+        <li><code>api.open-meteo.com/v1/forecast</code> - поточна погода та прогноз на завтра за отриманими координатами.</li>
+      </ul>
+      <p>Open-Meteo - безкоштовний сервіс без API-ключа. Жодних особистих ідентифікаторів (ваше ім'я, прив'язана до акаунту IP-адреса, історія запитів) Поличка туди не передає. Координати визначаються з назви міста і не є точними даними про ваше місцезнаходження.</p>
+
+      <h3>Віджет «Інтернет-радіо»</h3>
+      <p>Програма стрімить аудіо з URL радіостанцій, які або входять до стартового списку (українські станції), або додані вами вручну. Усі запити йдуть напряму до серверів станцій (HTTP/HTTPS, MP3/AAC потоки, плейлисти .pls/.m3u). Bridges Community ці запити не бачить і не записує.</p>
+
+      <h3>Віджет «NBA»</h3>
+      <p>Якщо віджет додано, програма надсилає запити до публічного API сайту ESPN для отримання результатів і розкладу ігор NBA. Жодних особистих даних не передається.</p>
+
+      <h2>Які дані зберігаються локально</h2>
+      <p>Усі налаштування і стан Полички зберігаються виключно на вашому комп'ютері у файлі:</p>
+      <p><code>%APPDATA%\Shelf\settings.json</code></p>
+      <p>(Для версії з Microsoft Store - у редиректнутому шляху <code>%LOCALAPPDATA%\Packages\&lt;PackageFamilyName&gt;\LocalCache\Roaming\Shelf\</code>.)</p>
+      <p>Файл містить ваш вибір віджетів, їхній порядок, налаштування кожного (наприклад, місто для погоди, перелік радіостанцій, ваш список задач і нотатки), вибір теми та мови. Жодних даних автентифікації, токенів чи паролів програма не зберігає.</p>
+
+      <h2>Лог-файли</h2>
+      <p>У теці <code>%TEMP%</code> (зазвичай <code>C:\Users\&lt;ваше_ім'я&gt;\AppData\Local\Temp\</code>) можуть з'являтися два діагностичні файли:</p>
+      <ul>
+        <li><code>Shelf.crash.log</code> - повідомлення про необроблені винятки (потрібно для відлагодження).</li>
+        <li><code>Shelf.vd.log</code> - лог переміщень панелі між віртуальними столами Windows.</li>
+      </ul>
+      <p>Ці файли залишаються виключно на вашому комп'ютері - Поличка не передає їх нікуди автоматично. Ви можете видалити їх у будь-який момент.</p>
+
+      <h2>Програма для дорослих</h2>
+      <p>Поличка не призначена для дітей молодше 13 років. Оскільки програма не збирає жодних даних взагалі, спеціальної політики COPPA не потребує.</p>
+
+      <h2>Зміни цієї політики</h2>
+      <p>У разі зміни цієї політики (наприклад, поява нового віджета з мережевими запитами) ми оновимо цей документ і вкажемо нову дату оновлення зверху сторінки. Версіонна історія документа доступна у git-репозиторії проекту.</p>
+
+      <h2>Контакти</h2>
+      <p>Якщо у вас є питання щодо цієї політики - пишіть нам:</p>
+      <ul>
+        <li>Email: <a href="mailto:shelf@bridges.net.ua">shelf@bridges.net.ua</a></li>
+        <li>GitHub Issues: <a href="https://github.com/bridges-net-ua/shelf/issues">github.com/bridges-net-ua/shelf/issues</a></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>© 2026 Bridges Community · <a href="https://github.com/bridges-net-ua/shelf/blob/main/LICENSE">MIT License</a> · <a href="../">Назад на головну</a> · <a href="en/" lang="en">English version</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

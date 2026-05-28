@@ -2,7 +2,10 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <!-- Win10 2004 (10.0.19041) target activates WinRT projection — Windows.ApplicationModel.StartupTask
+         etc. are reachable from C# without extra NuGet packages. Min OS matches our PerMonitorV2 manifest. -->
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <Configurations>Debug;Release;Store</Configurations>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
@@ -20,6 +23,13 @@
     <Product>Shelf</Product>
     <Copyright>© 2026 Bridges Community</Copyright>
     <Description>Customizable widget dock for Windows desktop</Description>
+  </PropertyGroup>
+
+  <!-- STORE_BUILD swaps undocumented IVirtualDesktopPinnedApps for the polling mover
+       (Store Policy 10.2.2 forbids undocumented APIs) and switches AutoStartService
+       from HKCU\Run to windows.startupTask extension (HKCU is virtualized inside MSIX). -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Store'">
+    <DefineConstants>$(DefineConstants);STORE_BUILD</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

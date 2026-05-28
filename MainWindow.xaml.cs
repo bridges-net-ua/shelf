@@ -389,6 +389,7 @@ public partial class MainWindow : Window
         _virtualDesktopService.AfterMove += OnAfterDesktopMove;
         _virtualDesktopService.Start();
 
+#if !STORE_BUILD
         // Pin attempt is deferred to ApplicationIdle priority: at OnSourceInitialized the
         // HWND exists but Windows hasn't yet registered it in the Application View
         // Collection (GetViewForHwnd returns TYPE_E_ELEMENTNOTFOUND otherwise).
@@ -405,6 +406,9 @@ public partial class MainWindow : Window
                 _virtualDesktopService = null;
             }
         }), DispatcherPriority.ApplicationIdle);
+#endif
+        // STORE_BUILD path: undocumented IVirtualDesktopPinnedApps is forbidden by
+        // Microsoft Store Policy 10.2.2. The polling mover stays as the sole strategy.
     }
 
     public void RebuildPanelPublic() => RebuildPanel();

@@ -72,6 +72,17 @@ public partial class SettingsWindow : Window
         };
         emailLink.RequestNavigate += AboutEmailLink_RequestNavigate;
         AboutContactText.Inlines.Add(emailLink);
+
+        // Privacy policy link, sharing the same RequestNavigate handler (Process.Start
+        // with UseShellExecute handles both mailto: and https://).
+        AboutContactText.Inlines.Add(new Run(" · "));
+        var privacyLink = new Hyperlink(new Run(Loc.Get("About_PrivacyPolicy")))
+        {
+            NavigateUri = new Uri("https://shelf.bridges.net.ua/privacy/"),
+            Foreground = (System.Windows.Media.Brush)FindResource("PrimaryTextBrush")
+        };
+        privacyLink.RequestNavigate += AboutEmailLink_RequestNavigate;
+        AboutContactText.Inlines.Add(privacyLink);
     }
 
     private void AboutEmailLink_RequestNavigate(object sender, RequestNavigateEventArgs e)

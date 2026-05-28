@@ -76,6 +76,11 @@ public partial class App : Application
             WidgetServices.Host = new HostAdapter();
 
             Settings = new SettingsService();
+#if STORE_BUILD
+            // First-launch migration of portable settings into the packaged location.
+            // No-op on subsequent launches (marker file blocks repeated copies).
+            Settings.MigratePortableToPackaged();
+#endif
             Settings.Load();
 
             // Load the colour palette BEFORE language and any window, so DynamicResource

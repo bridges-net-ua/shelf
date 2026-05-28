@@ -6,9 +6,9 @@
 ## [Unreleased]
 
 ### Заплановано
-- MSIX-пакування для публікації в Microsoft Store.
-- Підпис коду (Authenticode), щоб усунути попередження SmartScreen.
-- Механізм автооновлення.
+- **Публікація в Microsoft Store через MSIX (Етап 7).** Microsoft автоматично підписує пакет своїм CA - закриває code signing і знімає попередження SmartScreen / Smart App Control. Бонусом - auto-update кожні 8 годин через Store. Детальний план у [plan_reliz.md](plan_reliz.md) (підетапи 7.1-7.7).
+- **Auto-update для portable-збірки з GitHub Releases (Етап 9, нижчий пріоритет).** Проста кнопка "Перевірити оновлення" в About-вкладці або повноцінний Velopack. Store-користувачі вже мають auto-update.
+- **Підпис portable .exe через SignPath Foundation (Етап 8).** Відкладено до ~2026-11-28 - спочатку треба накопичити GitHub reputation (≥50 stars, external contributors, Code Signing Policy сторінка, OpenHub профіль).
 
 ---
 

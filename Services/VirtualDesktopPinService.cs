@@ -1,3 +1,4 @@
+#if !STORE_BUILD
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -224,3 +225,4 @@ public static class VirtualDesktopPinService
         }
     }
 }
+#endif

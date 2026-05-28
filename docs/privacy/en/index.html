@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy - ShelfDesk</title>
+  <meta name="description" content="ShelfDesk privacy policy - widget dock for the Windows desktop. No telemetry, no personal data collection.">
+  <meta name="author" content="Bridges Community">
+  <meta name="theme-color" content="#1E1E22">
+
+  <link rel="icon" type="image/x-icon" href="../../assets/favicon.ico">
+  <link rel="alternate" hreflang="uk" href="https://shelf.bridges.net.ua/privacy/">
+  <link rel="alternate" hreflang="en" href="https://shelf.bridges.net.ua/privacy/en/">
+  <link rel="canonical" href="https://shelf.bridges.net.ua/privacy/en/">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+    <a href="../../en/" class="brand">
+      <img src="../../assets/logo.png" alt="" aria-hidden="true">
+      <span>ShelfDesk</span>
+    </a>
+    <nav class="nav-links" aria-label="Main menu">
+      <a href="../../en/#about">About</a>
+      <a href="../../en/#widgets">Widgets</a>
+      <a href="../../en/#download">Download</a>
+      <a href="../../en/#faq">FAQ</a>
+      <a href="../" class="lang-switch" lang="uk">UA ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="about">
+    <div class="container">
+      <h1>Privacy Policy</h1>
+      <p class="lead">Last updated: 28 May 2026</p>
+
+      <p>ShelfDesk (the "Software") is developed by the Bridges Community. The Software respects your privacy: it does not collect telemetry, analytics, or personal data of any kind.</p>
+
+      <h2>What ShelfDesk does NOT do</h2>
+      <ul>
+        <li>Does not send telemetry, usage statistics or crash reports to Bridges Community or third-party servers.</li>
+        <li>Does not use cookies, fingerprinting, advertising or tracking SDKs.</li>
+        <li>Does not transmit your files, settings, usage history, contacts, photos or any other personal data.</li>
+        <li>Does not require registration, an account or sign-in.</li>
+      </ul>
+
+      <h2>What network requests ShelfDesk makes</h2>
+      <p>All network requests are strictly related to widgets you have explicitly added to the panel, and they go <strong>directly to third-party services - never to Bridges Community servers</strong>.</p>
+
+      <h3>Weather widget</h3>
+      <p>If the widget is added, the Software sends HTTP requests to the <a href="https://open-meteo.com/">Open-Meteo</a> service:</p>
+      <ul>
+        <li><code>geocoding-api.open-meteo.com/v1/search</code> - geocoding of the city name you entered in the widget settings to coordinates.</li>
+        <li><code>api.open-meteo.com/v1/forecast</code> - current weather and tomorrow's forecast for the resolved coordinates.</li>
+      </ul>
+      <p>Open-Meteo is a free service that requires no API key. No personal identifiers (your name, IP-tied account, request history) are sent. The coordinates derive from the city name and are not precise location data.</p>
+
+      <h3>Internet Radio widget</h3>
+      <p>The Software streams audio from the URLs of radio stations that are either in the default seed list (Ukrainian stations) or that you have manually added. All requests go directly to the station servers (HTTP/HTTPS, MP3/AAC streams, .pls/.m3u playlists). Bridges Community does not see or log these requests.</p>
+
+      <h3>NBA widget</h3>
+      <p>If the widget is added, the Software sends requests to the public ESPN API to fetch NBA game scores and schedules. No personal data is sent.</p>
+
+      <h2>What is stored locally</h2>
+      <p>All settings and state of ShelfDesk are stored exclusively on your computer in:</p>
+      <p><code>%APPDATA%\Shelf\settings.json</code></p>
+      <p>(For the Microsoft Store version - in the redirected path <code>%LOCALAPPDATA%\Packages\&lt;PackageFamilyName&gt;\LocalCache\Roaming\Shelf\</code>.)</p>
+      <p>The file contains your selection of widgets, their order, per-widget settings (e.g. city for weather, list of radio stations, your tasks and notes), theme and language choice. No authentication data, tokens or passwords are stored.</p>
+
+      <h2>Log files</h2>
+      <p>Two diagnostic files may appear in your <code>%TEMP%</code> folder (typically <code>C:\Users\&lt;your_name&gt;\AppData\Local\Temp\</code>):</p>
+      <ul>
+        <li><code>Shelf.crash.log</code> - reports of unhandled exceptions (for debugging).</li>
+        <li><code>Shelf.vd.log</code> - log of panel moves between Windows virtual desktops.</li>
+      </ul>
+      <p>These files stay exclusively on your computer - ShelfDesk does not transmit them anywhere automatically. You can delete them at any time.</p>
+
+      <h2>Not for children</h2>
+      <p>ShelfDesk is not directed at children under the age of 13. Because the Software collects no data at all, no special COPPA policy applies.</p>
+
+      <h2>Changes to this policy</h2>
+      <p>If this policy changes (for example, a new widget with network requests is added), we will update this document and bump the "Last updated" date at the top of the page. Version history of the document is available in the project's git repository.</p>
+
+      <h2>Contact</h2>
+      <p>If you have questions about this policy, contact us:</p>
+      <ul>
+        <li>Email: <a href="mailto:shelf@bridges.net.ua">shelf@bridges.net.ua</a></li>
+        <li>GitHub Issues: <a href="https://github.com/bridges-net-ua/shelf/issues">github.com/bridges-net-ua/shelf/issues</a></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>© 2026 Bridges Community · <a href="https://github.com/bridges-net-ua/shelf/blob/main/LICENSE">MIT License</a> · <a href="../../en/">Back to home</a> · <a href="../" lang="uk">Українська версія</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

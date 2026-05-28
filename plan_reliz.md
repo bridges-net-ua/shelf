@@ -272,39 +272,215 @@
 - [ ] **Перший Discussion-пост** «👋 Welcome — фідбек, питання, ідеї» — щоб ентрі-поінт був.
 - [ ] **Анонс у соцмережах** — пост у X/Mastodon/Threads з посиланням на `shelf.bridges.net.ua` і скріншотом. Українська tech-спільнота.
 
-### 🚀 Серйозніші майбутні кроки (години-дні роботи, можуть коштувати)
+### 🚀 Серйозніші майбутні кроки (підетапні плани)
 
-#### Етап 7 — MSIX-пакування для Microsoft Store
+Реліз стабільний на v1.1.1, але є три великі напрямки для розширення. Кожен — окремий етап. Виконуються незалежно, але рекомендований порядок: **7** (Store + автопідпис + auto-update в одному пакеті), потім **9** (auto-update для portable, якщо знадобиться), потім **8** (SignPath для portable, коли репо набере reputation), паралельно — **10** (тести).
 
-- **Зусилля:** ~1 день розробки + ~3-7 днів Store certification.
-- **Витрати:** $19 одноразово за Microsoft Partner dev-акаунт.
-- **Що зробити:**
-  - Додати в рішення `Windows Application Packaging Project` (`Shelf.Package`).
-  - Створити `Package.appxmanifest` із метаданими (Publisher Identity, Capabilities, Assets).
-  - Розширити `.github/workflows/release.yml`: окремий job, який збирає `.msix` через `MSBuild Shelf.Package.wapproj`.
-  - Скласти Privacy Policy URL (обов'язково для Store, бо Weather widget шле координати в Open-Meteo).
-  - Подати в Microsoft Partner Center, пройти certification.
+> **Розвідка проведена 2026-05-28** (SignPath Foundation + Microsoft Partner Center). Microsoft скасував комісію за реєстрацію Partner Center: раніше $19 individual / $99 company → тепер **$0** (новина 7 травня 2026). Це різко змінило баланс на користь Етапу 7 — він тепер закриває code signing і auto-update для Store-користувачів безкоштовно.
 
-#### Етап 8 — Code signing (Authenticode)
+---
 
-- **Зусилля:** ~2-3 год налаштування.
-- **Витрати:** ~$200/рік (OV) або ~$300-400/рік + hardware token (EV).
-- **Чому варто:** прибирає попередження SmartScreen «Windows protected your PC» при першому запуску; EV-сертифікат дає миттєву репутацію (OV — за 2-4 тижні після кількох downloads).
-- **Що зробити:**
-  - Купити сертифікат у Sectigo/DigiCert/SSL.com.
-  - Покласти `.pfx` (base64) у GitHub Secrets як `SIGN_CERT_PFX_BASE64`, пароль як `SIGN_CERT_PASSWORD`.
-  - У `release.yml` додати крок з `signtool sign /sha1 ... /fd SHA256 /tr http://timestamp.digicert.com /td SHA256` для кожного `.exe`/`.dll`.
-- Деталі вже задокументовано в `RELEASE.md` (секція «Підпис коду»).
+#### Етап 7 — Публікація в Microsoft Store через MSIX
 
-#### Етап 9 — Auto-update mechanism
+**Чому варто:** Microsoft автоматично підписує MSIX-пакети своїм CA при публікації — **повністю знімає попередження SmartScreen і розблоковує Smart App Control на Win11** (та сама проблема з [CLAUDE.md](CLAUDE.md), що блокує дебаг-збірки на чистій Win11 24H2+). Бонусом — безкоштовний auto-update через Store кожні 8 годин (закриває Етап 9 для Store-користувачів), офіційний канал розповсюдження, дозволено паралельно з portable zip на GitHub Releases.
 
-- **Зусилля:** ~1 день розробки.
-- **Витрати:** $0.
-- **Чому варто:** користувачам не треба вручну заходити в Releases для нової версії; новинки доходять швидше.
-- **Варіанти:**
-  - **[Velopack](https://github.com/velopack/velopack)** — рекомендовано: сучасний, MIT, активно розвивається, з коробки тягне новий `.exe` з GitHub Releases і застосовує оновлення.
-  - **Squirrel.Windows** — старіший, перевірений.
-  - **Власне**: HTTP-запит до `api.github.com/repos/bridges-net-ua/shelf/releases/latest`, порівняти tag з поточною версією, при різниці — відкрити браузер на сторінку Releases.
+**Витрати:** $0 (Partner Center реєстрація безкоштовна з травня 2026).
+**Зусилля:** ~1-2 дні розробки + ~3 робочі дні Microsoft certification.
+
+##### Червоні прапори (вирішити ПЕРЕД першим submit)
+
+1. **`VirtualDesktopPinService` використовує undocumented COM** (`IVirtualDesktopPinnedApps` через ImmersiveShell). Microsoft Store Policy 10.2.2 явно забороняє undocumented APIs — гарантований reject у Technical Compliance.
+   - **Рішення:** додати compile-time symbol `STORE_BUILD` і вирізати PinService повністю для Store-збірки (`#if !STORE_BUILD`). Store-версія падає на існуючий fallback `VirtualDesktopService` (polling-mover, нічого приватного не викликає, повністю функціональний).
+2. **`AutoStartService` пише в `HKCU\...\Run\Shelf`** — у MSIX цей розділ реєстру редиректиться через registry virtualization, запис ігнорується Windows. Функція автозапуску в Store-збірці тихо не працює.
+   - **Рішення:** замінити на `windows.startupTask` extension у `Package.appxmanifest` + API `Windows.ApplicationModel.StartupTask` для програмного enable/disable. HKCU-шлях лишити через `#if !STORE_BUILD` для portable.
+3. **Міграція `settings.json`** — у Store-збірці шлях редиректиться під `%LOCALAPPDATA%\Packages\<PFN>\LocalCache\Roaming\Shelf\`. Користувач, який переходить з portable на Store-версію, не побачить старі налаштування.
+   - **Рішення:** one-time copy-in при першому запуску Store-збірки — якщо в "реальному" `%APPDATA%\Shelf\settings.json` щось є, скопіювати в редиректнутий шлях і поставити маркер `migrated.flag`.
+
+##### Підетап 7.1 — Підготовка коду
+
+- Додати у `Shelf.csproj` `<Configurations>Debug;Release;Store</Configurations>` і `<DefineConstants Condition="'$(Configuration)' == 'Store'">$(DefineConstants);STORE_BUILD</DefineConstants>` для Store-конфігурації.
+- `Services/VirtualDesktopPinService.cs` — обгорнути весь файл у `#if !STORE_BUILD`. Перевірити, що `MainWindow.OnSourceInitialized` коректно компілюється і працює без PinService (mover з polling).
+- `Services/AutoStartService.cs` — додати окремий бранч під `#if STORE_BUILD` через `Windows.ApplicationModel.StartupTask.GetAsync` + `RequestEnableAsync()` / `Disable()`. Для Debug/Release лишити поточний HKCU-шлях. Knigger: треба підтягнути winmd-reference на `Windows.SDK.NET`.
+- `Services/SettingsService.cs` — додати метод `MigratePortableToPackaged()`, який викликається лише в Store-збірці перед `Load()`. Перевіряє маркер `migrated.flag` у редиректнутому шляху; якщо нема — пробує скопіювати з "реального" `%APPDATA%\Shelf\settings.json` (через `KnownFolders.RoamingAppData` + non-virtualized path).
+- Зібрати в трьох конфігураціях: `dotnet build Shelf.sln -c Debug`, `-c Release`, `-c Store`. Усі три — 0 помилок.
+
+**Перевірка перед наступним підетапом:**
+- [ ] Усі три конфігурації компілюються без помилок.
+- [ ] У Store-збірці немає згадки `IVirtualDesktopPinnedApps` (перевірити decompiler-ом або `dumpbin /imports`).
+- [ ] AutoStart-перемикач у Settings працює і в Debug/Release (HKCU), і в Store (StartupTask) — локальний тест.
+
+##### Підетап 7.2 — Privacy Policy
+
+- Створити `docs/privacy/index.html` (українською) і `docs/privacy/en/index.html` (англійською). Зміст: які дані Shelf шле в мережу — Open-Meteo (геокодинг + поточна погода за координатами міста), стрімінги радіо-станцій (HTTP-запити до сторонніх URL з користувацького списку). Жодних даних на сервери Bridges Community не йде. Не збираємо телеметрію.
+- Контактний email — `shelf@bridges.net.ua`.
+- Додати лінк на Privacy Policy в About-вкладку (`Views/SettingsWindow.xaml.cs` → `SetupAbout`): Hyperlink поряд із наявним email-лінком.
+- Підняти живу сторінку на `https://shelf.bridges.net.ua/privacy/` (GitHub Pages підхопить автоматично після push у `main`).
+
+**Перевірка:**
+- [ ] `https://shelf.bridges.net.ua/privacy/` відкривається.
+- [ ] `/privacy/en/` теж відкривається.
+- [ ] About-вкладка показує клікабельний лінк "Privacy Policy" / "Політика конфіденційності".
+
+##### Підетап 7.3 — Створити Package-проект
+
+- Додати в `Shelf.sln` (зберегти UTF-8 BOM!) новий проект `Shelf.Package` типу **Windows Application Packaging Project** (.wapproj).
+- У `Shelf.Package` додати `<ProjectReference Include="..\Shelf.csproj" />`.
+- Створити `Shelf.Package/Package.appxmanifest`:
+  - `<Identity Name="..." Publisher="CN=..." Version="1.1.1.0" />` — значення Name і Publisher отримуються з Partner Center після резервування імені (підетап 7.4).
+  - `<Properties>` — DisplayName з ресурсів ("Поличка" uk / "ShelfDesk" en), `PublisherDisplayName="Bridges Community"`.
+  - `<Dependencies>` — `MinVersion="10.0.19041.0"` (Windows 10 2004+), `MaxVersionTested` — поточна Win11.
+  - `<Capabilities>` — `<rescap:Capability Name="runFullTrust" />` (обов'язково для WPF+WinForms hybrid).
+  - `<Extensions>` — `<desktop:Extension Category="windows.startupTask" Executable="Shelf.exe" EntryPoint="Windows.FullTrustApplication">` з `<desktop:StartupTask TaskId="ShelfAutoStart" Enabled="false" DisplayName="Поличка" />`.
+  - `<Application>` — `Executable="Shelf.exe"`, `EntryPoint="Windows.FullTrustApplication"`.
+- Підготувати assets з `Resources/shelf.png` у потрібні розміри: `Square44x44Logo`, `Square150x150Logo`, `Wide310x150Logo`, `StoreLogo` (50×50), `SplashScreen` (620×300). Зберегти в `Shelf.Package/Images/`.
+- Зібрати локально: `msbuild Shelf.Package\Shelf.Package.wapproj /p:Configuration=Store /p:Platform=x64 /p:GenerateAppxPackageOnBuild=true`. Результат — `.msix` у `Shelf.Package\AppPackages\`.
+
+**Перевірка:**
+- [ ] `.msix` файл збирається без помилок.
+- [ ] Підписаний test-сертифікатом (Visual Studio згенерує автоматично) і встановлюється через `Add-AppxPackage`.
+- [ ] Після встановлення Shelf запускається з меню Start, працює AppBar, видно іконку в треї, відкривається Settings.
+- [ ] Перемикач автозапуску у Settings керує StartupTask (видно у Settings → Apps → Startup).
+- [ ] У Task Manager → Startup apps стоїть позначка від Microsoft Store, не від реєстру.
+
+##### Підетап 7.4 — Partner Center реєстрація
+
+- Зайти на `partner.microsoft.com/dashboard`, увійти Microsoft-акаунтом, обрати "Microsoft Store program" → "Get started".
+- Account type: **Individual** (безкоштовно, без бізнес-документів). Реєстрація через Entra ID + government-issued ID + selfie з мобільного.
+- Publisher display name: **"Bridges Community"** (бренд; технічно individual account, але name відображається як Bridges Community у Store).
+- Зарезервувати три імені застосунку: `Shelf`, `Поличка`, `ShelfDesk` (одна Identity з трьома aliased назвами для різних локалізацій).
+- Записати в безпечне місце:
+  - **Publisher Identity** (формат `CN=...`)
+  - **Package Identity Name** (формат `BridgesCommunity.Shelf` або подібне — Partner Center видасть)
+  - **Seller ID** (знадобиться для CI: `msstore-cli reconfigure`)
+- Підставити отримані Publisher і Identity в `Package.appxmanifest` (з підетапу 7.3), перезібрати локально.
+
+**Перевірка:**
+- [ ] Акаунт активований (приходить email-підтвердження).
+- [ ] Три імені зарезервовані (видно у Apps and games → Overview).
+- [ ] Зібраний з реальним Publisher Name `.msix` встановлюється без помилок про invalid signature.
+
+> ⚠️ **Account type незмінний:** змінити Individual → Company пізніше неможливо, потрібен новий акаунт. Якщо є хоч мінімальна перспектива зареєструвати "Bridges Community" як юр. особу (ФОП тощо) — варто це зробити ДО створення Partner Center акаунту і реєструватися як Company.
+
+##### Підетап 7.5 — WACK + перший submission
+
+- Завантажити **Windows App Certification Kit** (WACK) з Windows SDK.
+- Запустити `Cert.exe` (графічний WACK) → обрати `.msix` → профіль "Store Validation" → Run.
+- Звіт — XML + HTML. Виправити всі **fail**. Типові warning'и (про non-Store-API-usage у P/Invoke секціях) — допустимі для Desktop Bridge додатка, але ретельно прочитати кожен.
+- У Partner Center: створити новий submission для зарезервованого `Shelf`.
+  - **Properties**: Category = "Productivity > Personalization", Age rating = заповнити IARC анкету (Shelf → "3+ / Everyone").
+  - **Pricing and availability**: Free, доступний у всіх ринках (або обмежити країнами куди можемо легально продавати free apps).
+  - **Properties → Privacy policy URL**: `https://shelf.bridges.net.ua/privacy/`.
+  - **Properties → Support contact info**: `shelf@bridges.net.ua`.
+  - **Packages**: завантажити `.msix` файл (Microsoft re-підпише при публікації).
+  - **Store listings** (uk-UA, en-US): DisplayName, short description, full description, скріншоти (мінімум 1, рекомендовано 3-5 розміром 1366×768 або більше), іконка 300×300.
+- Submit. Чекати certification ~3 робочі дні. Якщо reject — прочитати звіт у Notifications, виправити, re-submit.
+
+**Перевірка:**
+- [ ] WACK passes без fail (warning допустимі).
+- [ ] Submission в Partner Center має статус "In the Store".
+- [ ] Shelf шукається через Store на чистій Win11 (тест на іншій машині).
+- [ ] Встановлення через Store → запуск → працює AppBar, автозапуск, всі віджети.
+- [ ] Видалення через Settings → Apps → Shelf не лишає сміття.
+
+##### Підетап 7.6 — CI publish (опційно, можна відкласти на наступний реліз)
+
+- Налаштувати GitHub Action для автоматичного push нової версії в Store при тегу `v*`.
+- Інструменти: `msstore-cli` (Microsoft Store Developer CLI) + офіційний action `microsoft/microsoft-store-app-publisher@v1.1`.
+- Створити Azure AD app registration → отримати tenantId / clientId / clientSecret для Partner Center API. Покласти у GitHub Secrets як `MS_STORE_TENANT_ID`, `MS_STORE_CLIENT_ID`, `MS_STORE_CLIENT_SECRET`, `MS_STORE_SELLER_ID`.
+- Розширити `.github/workflows/release.yml` додатковим job `publish-store`, що залежить від нового `build-store` job: будує `.msix` через `msbuild`, потім `msstore publish` через action.
+
+**Перевірка:**
+- [ ] Локальний прогон `msstore reconfigure` + `msstore publish` працює.
+- [ ] GitHub Action на тестовому тегу `v1.1.2-test` виконується успішно.
+- [ ] Нова версія з'являється в Store автоматично через ~3 дні після push тега.
+
+##### Підетап 7.7 — Перший Store-реліз
+
+- Bumpнути `<Version>` у `Shelf.csproj` і `<Identity Version>` у manifest узгоджено: наприклад **`v1.2.0`** (minor-bump, бо новий канал розповсюдження).
+- Оновити `CHANGELOG.md` — `[1.2.0]` з пунктом "Публікація в Microsoft Store" і списком red-flag фіксів.
+- Створити тег → GitHub Actions збирає portable zip і паралельно публікує MSIX у Store через job з 7.6.
+- На сайті `shelf.bridges.net.ua` додати кнопку "Завантажити з Microsoft Store" (badge `https://developer.microsoft.com/store/badges/...`) поряд із наявною кнопкою GitHub Releases.
+
+**Перевірка:**
+- [ ] У Store доступна нова версія (через "Library" → "Get updates").
+- [ ] Bump попередньої версії → Store auto-update протягом 8-24 год без участі користувача.
+- [ ] Кнопка з сайту веде в правильний Store-listing (deep link).
+- [ ] Portable zip на GitHub Releases теж випущений (паралельно).
+
+---
+
+#### Етап 8 (відкладено до ~2026-11-28) — Підготовка до SignPath Foundation
+
+**Чому відкладено:** SignPath Foundation Program безкоштовно підписує OSS .exe (OV-сертифікат від Sectigo / GlobalSign / SSL.com через спільний publisher "SignPath Foundation"), але приймає **лише проекти з певною reputation**: 0 stars + 1 місяць існування + один автор — гарантований refusal. Microsoft Store (Етап 7) тимчасово закриває проблему підпису для Store-юзерів. Portable zip з GitHub Releases залишається непідписаним — SmartScreen вимагає "Run anyway", Smart App Control блокує жорстко.
+
+**Що дасть прийняття:** SignPath OV-підпис на `Shelf-vX.Y.Z-win-x64.zip` (вміст: `Shelf.exe`, `Shelf.Sdk.dll`, `Shelf.Widgets.*.dll` — native runtime DLL з self-contained .NET 8 вже підписані Microsoft, не торкати). **Не дає миттєвого Smart App Control bypass** (з 2024 Microsoft зрівняв OV і EV щодо репутації — обом потрібно accumulate downloads). Але SignPath publisher вже накопичив репутацію з підпису десятків відомих OSS-проектів (vim, transmission, тощо) — ми наслідуємо її, стартова репутація вища за нуль.
+
+**Витрати:** $0 (якщо приймуть).
+**Зусилля:** ~1 день на форму + 2-4 тижні очікування review + накопичення reputation за 6 місяців.
+
+##### Що зробити ДО подачі (за наступні 6 місяців: травень-листопад 2026)
+
+- [ ] **Накопичити GitHub reputation** — мінімум **50-100 stars** (SignPath не публікує жорстких цифр, але "verifiable reputation" — обов'язкове). Способи:
+  - Анонс на Reddit (r/Windows10, r/Ukraina, r/opensource), Hacker News (Show HN), X/Mastodon
+  - GitHub Topics (вже в плані: `widgets`, `windows`, `dotnet`, `wpf`, `dock-bar`)
+  - Сторінка проекту в українських tech-ресурсах (DOU, Habr)
+  - Submission в `awesome-windows-apps` репозиторій
+- [ ] **Code Signing Policy сторінка** — обов'язково для SignPath. Створити `docs/code-signing/index.html` з фіксованим текстом: "Free code signing provided by SignPath.io, certificate by SignPath Foundation". Опублікувати на `https://shelf.bridges.net.ua/code-signing/`.
+- [ ] **Privacy Policy** — вже зроблено в Етапі 7.2.
+- [ ] **OpenHub профіль проекту** — створити на `openhub.net`, синхронізувати з GitHub. Один із сигналів legitimacy для SignPath reviewers.
+- [ ] **MFA на всіх членах команди** — і SignPath-акаунті (коли буде), і GitHub. Зараз — увімкнути на основному акаунті.
+- [ ] **External contributors** — хоча б 1-2 merged PR від не-засновника (переклад, документація, мінорний bugfix). Підготувати "good first issue" labeled, привабити через Reddit.
+- [ ] **Зрілість релізів** — мінімум 4-5 версій з активним maintenance, без покинутості. На 2026-11-28 буде ~6-8 версій.
+
+##### Власне подача (приблизно листопад 2026)
+
+- Завантажити OSS Request Form v4 (.xlsx) з `signpath.org/foundation`. Заповнити 9 розділів: project metadata, ліцензія, reputation evidence (stars, downloads, contributors, media), team (3 ролі — Author / Reviewer / Approver), policies.
+- Відправити на `info@signpath.io`. Очікувати: acknowledgment 1-3 дні, initial review 1-2 тижні, follow-up rounds 1-2 тижні, рішення через 2-4 тижні.
+- Після прийняття — налаштувати GitHub Action `signpath/github-action-submit-signing-request@v2`: завантажує zip → SignPath підписує deep (через Artifact Configuration XML з wildcards `Shelf.exe`, `Shelf.Sdk.dll`, `Shelf.Widgets.*.dll`) → повертає підписаний артефакт. Зберегти секрети `SIGNPATH_API_TOKEN`, `SIGNPATH_ORG_ID`.
+- **Manual approval кожного релізу** через SignPath UI (це частина процесу, обійти не можна).
+
+**Перевірка перед подачею (~2026-11-28):**
+- [ ] ≥50 GitHub stars.
+- [ ] `https://shelf.bridges.net.ua/code-signing/` і `/privacy/` обидві живі.
+- [ ] OpenHub профіль існує і не deprecated.
+- [ ] MFA увімкнено.
+- [ ] Хоча б один external PR з'явився.
+
+> 💡 Якщо стане очевидно ще до листопада, що reputation не набирається — варіант B: купити Sectigo OV (~$220/рік) для portable, або взагалі лишити portable непідписаним і покладатися на Store як основний канал.
+
+---
+
+#### Етап 9 (нижчий пріоритет) — Auto-update для portable-збірки
+
+**Чому нижчий пріоритет:** Microsoft Store (Етап 7) дає auto-update автоматично кожні 8 годин для Store-користувачів — а це після виходу 7.7 буде основним каналом для пересічного користувача. Portable zip з GitHub Releases — користувачі технічні, самі стежать. Тому Етап 9 — поліпшення UX, не критична функція.
+
+**Витрати:** $0.
+
+##### Варіант A — проста кнопка «Перевірити оновлення» (рекомендую, ~2-3 год)
+
+- Додати в About-вкладку `SettingsWindow` кнопку "Перевірити оновлення".
+- Виклик: `HttpClient.GetAsync("https://api.github.com/repos/bridges-net-ua/shelf/releases/latest")` → парсити `tag_name` → порівняти з `Assembly.GetExecutingAssembly().GetName().Version`.
+- Якщо є новіша → показати `DarkMessageBox` з посиланням "Завантажити" → `Process.Start(new ProcessStartInfo("https://github.com/bridges-net-ua/shelf/releases/latest") { UseShellExecute = true })`.
+- Якщо актуальна → "У вас остання версія".
+- Опційно: автоматична перевірка раз на тиждень при запуску, з тихим badge у About якщо є оновлення (без notification).
+- Локалізувати рядки в `Strings.uk.xaml` / `Strings.en.xaml`.
+
+**Перевірка:**
+- [ ] Кнопка відображається в About.
+- [ ] Тест на старішій версії → відкриває браузер на Releases.
+- [ ] Тест на актуальній → показує "У вас остання версія".
+- [ ] Network-failure (offline) → graceful error message, без crash.
+
+##### Варіант B — Velopack (повноцінне фонове оновлення, ~1 день)
+
+- Інтегрувати [Velopack](https://github.com/velopack/velopack) — MIT, активно розробляється, з коробки тягне новий exe з GitHub Releases і застосовує оновлення без участі користувача.
+- Замінити portable zip-формат на Velopack `.exe` installer + delta-updates.
+- Перевага: користувач завжди на актуальній версії, як у Store.
+- Недолік: ще одна залежність (~5 МБ), складніша збірка, треба окремі тести.
+
+##### Рекомендація — почати з варіанту A. Якщо Store-канал виявиться домінантним (>80% завантажень) — Варіант B не варто. Якщо багато portable-юзерів просять auto-update — мігрувати на B.
+
+---
 
 #### Етап 10 — CI test pipeline
 
@@ -339,6 +515,7 @@
 - **2026-05-27 v8** — hotfix **v1.0.1**. У v1.0.0 виявлено критичний баг: `-p:PublishSingleFile=true` запаковував усі `Shelf.Widgets.*.dll` всередину `Shelf.exe`, а `WidgetRegistry.Initialize()` шукає їх через `Directory.EnumerateFiles` як окремі файли — реєстр був порожній, меню «+ Додати віджет» не показувало жодного типу. Виправлено: прибрано `PublishSingleFile` з `release.yml`, тепер zip містить теку з `Shelf.exe` + ~200 DLL поруч. v1.0.1 опубліковано, перевірено на чистій теці — віджети завантажуються, додаються, працюють.
 - **2026-05-27 v9** — фінальне оновлення плану після завершення всіх етапів. Проставлено чекбокси, оновлено таблицю прийнятих рішень (single-file → folder), переписано розділ статусу як «фінал», структуровано розділ «Майбутні етапи» з конкретними побажаннями: малі поліпшення сайту, action items для просування, серйозніші майбутні етапи 7-10 (MSIX, code signing, auto-update, CI tests), технічний борг.
 - **2026-05-27 v10** — додано два project-local skill в `.claude/skills/`: `shelf-update` (тригер «ВНЕСТИ ЗМІНИ: ...» → редагує код, збирає, не комітить) і `shelf-commit` (тригер «ЗРОБИ КОМІТ» → формулює conventional commit message, пушить). Skills path-agnostic — перевіряють наявність `Shelf.sln` у cwd замість літерального шляху, тому переживуть перейменування теки `D:\project\Polychka` → `D:\project\Shelf`. Skill `shelf-update` додатково має auto-cleanup stale bin/obj, якщо виявить старі шляхи в кеші.
+- **2026-05-28 v11** — після ґрунтовної розвідки SignPath Foundation і Microsoft Partner Center переосмислено розділ «Майбутні етапи». Microsoft скасував комісію за реєстрацію Partner Center (раніше $19 individual / $99 company → **$0 з травня 2026**), що різко змінило баланс на користь публікації в Store. **Етап 7** повністю переписано як 7 послідовних підетапів (7.1 підготовка коду з conditional compile, 7.2 Privacy Policy, 7.3 .wapproj+manifest, 7.4 Partner Center реєстрація, 7.5 WACK+submit, 7.6 CI publish, 7.7 перший Store-реліз) з чек-листами «Перевірка перед наступним підетапом» і виділеними червоними прапорами (undocumented `IVirtualDesktopPinnedApps`, HKCU autostart, settings migration). **Етап 8** (SignPath Foundation) переформульовано як «відкладено до ~2026-11-28» з конкретним чек-листом підготовки за 6 місяців (накопичити stars, написати Code Signing Policy, OpenHub, MFA, external contributors). **Етап 9** (auto-update) знижено в пріоритеті — Store вирішує проблему для більшості користувачів; для portable додано два варіанти (проста кнопка «Перевірити оновлення» vs Velopack). **Етап 10** без змін. `CHANGELOG.md` `[Unreleased]` синхронізовано. Збережено project-memory про дату повернення до Етапу 8.
 
 ## Поточний статус
 
