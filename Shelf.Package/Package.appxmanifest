@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  MSIX manifest for Shelf (Поличка).
+  MSIX manifest for Shelf (UI brand: "Поличка" uk / "ShelfDesk" en).
 
-  Identity values (Name, Publisher) are SELF-SIGNED PLACEHOLDERS used for local
-  sideload testing during plan_reliz.md Etap 7.3. After Partner Center registration
-  in Etap 7.4 these will be replaced with the real values issued by Microsoft.
-  Until then, make-msix.ps1 -Sign generates a CN=BridgesCommunity self-signed cert
-  whose subject matches the Publisher field here.
+  Identity values (Name, Publisher) are the PRODUCTION values issued by
+  Microsoft Partner Center for the reserved product "ShelfDesk":
+    Store URL: https://apps.microsoft.com/detail/9NFC2DKPQDLJ
+    Store ID:  9NFC2DKPQDLJ
+    PFN:       BridgesCommunity.ShelfDesk_a09jnsmnpx15r
 
-  TaskId "ShelfAutoStart" must match Services/AutoStartService.cs StartupTaskId const.
+  Microsoft Store re-signs uploaded packages with its own CA, so the local
+  make-msix.ps1 pipeline produces UNSIGNED MSIX by default. For local
+  sideload testing, run make-msix.ps1 -Sign which generates a self-signed
+  cert whose Subject must equal the Publisher below - that requires an
+  admin step to trust the cert in LocalMachine\Root.
+
+  DisplayName in this manifest is "ShelfDesk" to match the Store product
+  name (required by certification). The localised display name "Поличка"
+  for uk-UA market is configured separately in Partner Center → Store
+  listings, not here.
+
+  TaskId "ShelfAutoStart" must match Services/AutoStartService.cs StartupTaskId.
 -->
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
@@ -18,13 +29,13 @@
   IgnorableNamespaces="uap rescap desktop">
 
   <Identity
-    Name="BridgesCommunity.Shelf"
-    Publisher="CN=BridgesCommunity"
+    Name="BridgesCommunity.ShelfDesk"
+    Publisher="CN=01B4C228-C24C-45F3-AF31-805FFA0F72FF"
     Version="1.1.1.0"
     ProcessorArchitecture="x64" />
 
   <Properties>
-    <DisplayName>Поличка</DisplayName>
+    <DisplayName>ShelfDesk</DisplayName>
     <PublisherDisplayName>Bridges Community</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
     <Description>Customizable widget dock for the Windows desktop</Description>
@@ -47,14 +58,14 @@
                  Executable="Shelf.exe"
                  EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements
-        DisplayName="Поличка"
+        DisplayName="ShelfDesk"
         Description="Customizable widget dock for the Windows desktop"
         BackgroundColor="#2A2A30"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png">
         <uap:DefaultTile
           Wide310x150Logo="Assets\Wide310x150Logo.png"
-          ShortName="Поличка" />
+          ShortName="ShelfDesk" />
         <uap:SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#2A2A30" />
       </uap:VisualElements>
 
@@ -68,7 +79,7 @@
           <desktop:StartupTask
             TaskId="ShelfAutoStart"
             Enabled="false"
-            DisplayName="Поличка" />
+            DisplayName="ShelfDesk" />
         </desktop:Extension>
       </Extensions>
     </Application>

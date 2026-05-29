@@ -15,7 +15,11 @@
 param(
     [switch]$SkipBuild,
     [switch]$Sign,
-    [string]$CertSubject = "CN=BridgesCommunity"
+    # Must match <Identity Publisher="..."/> in Package.appxmanifest. If you change
+    # the manifest Publisher (e.g. after Partner Center reassignment), change this
+    # default too - signtool fails if the certificate Subject does not match the
+    # manifest Publisher exactly.
+    [string]$CertSubject = "CN=01B4C228-C24C-45F3-AF31-805FFA0F72FF"
 )
 
 $ErrorActionPreference = "Stop"
