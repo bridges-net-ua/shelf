@@ -280,12 +280,26 @@
 
 ---
 
-#### Етап 7 — Публікація в Microsoft Store через MSIX
+#### Етап 7 (🟡 у сертифікації — submission подано 2026-06-01) — Публікація в Microsoft Store через MSIX
 
 **Чому варто:** Microsoft автоматично підписує MSIX-пакети своїм CA при публікації — **повністю знімає попередження SmartScreen і розблоковує Smart App Control на Win11** (та сама проблема з [CLAUDE.md](CLAUDE.md), що блокує дебаг-збірки на чистій Win11 24H2+). Бонусом — безкоштовний auto-update через Store кожні 8 годин (закриває Етап 9 для Store-користувачів), офіційний канал розповсюдження, дозволено паралельно з portable zip на GitHub Releases.
 
 **Витрати:** $0 (Partner Center реєстрація безкоштовна з травня 2026).
 **Зусилля:** ~1-2 дні розробки + ~3 робочі дні Microsoft certification.
+
+##### Фактичні дані (Partner Center, акаунт `bridges@bridges.net.ua`)
+
+| Параметр | Значення |
+|---|---|
+| Зарезервований product name | **ShelfDesk** (+ `Поличка` як additional name для uk-UA) |
+| Package Identity Name | `BridgesCommunity.ShelfDesk` |
+| Publisher ID | `CN=01B4C228-C24C-45F3-AF31-805FFA0F72FF` |
+| Package Family Name (PFN) | `BridgesCommunity.ShelfDesk_a09jnsmnpx15r` |
+| Store ID | `9NFC2DKPQDLJ` |
+| Store URL | `https://apps.microsoft.com/detail/9NFC2DKPQDLJ` |
+| MSA App Id (WNS, поки не використовуємо) | `33599eba-4409-448e-9931-9e65df7ad2bd` |
+| Account type | **Company** (Entra ID tenant `bridges.net.ua` — Microsoft визнав без бізнес-документів) |
+| Submission 1 | подано на certification **2026-06-01**, auto-publish після проходження |
 
 ##### Червоні прапори (вирішити ПЕРЕД першим submit)
 
@@ -305,9 +319,11 @@
 - Зібрати в трьох конфігураціях: `dotnet build Shelf.sln -c Debug`, `-c Release`, `-c Store`. Усі три — 0 помилок.
 
 **Перевірка перед наступним підетапом:**
-- [ ] Усі три конфігурації компілюються без помилок.
-- [ ] У Store-збірці немає згадки `IVirtualDesktopPinnedApps` (перевірити decompiler-ом або `dumpbin /imports`).
-- [ ] AutoStart-перемикач у Settings працює і в Debug/Release (HKCU), і в Store (StartupTask) — локальний тест.
+- [x] Усі три конфігурації компілюються без помилок (commit `1f2e082`).
+- [x] У Store-збірці `VirtualDesktopPinService` під `#if !STORE_BUILD` — не компілюється у Store.
+- [x] AutoStart: HKCU гілка (Debug/Release) + `Windows.ApplicationModel.StartupTask` гілка (Store).
+
+> ✅ **Виконано 2026-06-01.** Замість окремого winmd-reference використано `TargetFramework=net8.0-windows10.0.19041.0` — WinRT-проєкція активується автоматично, StartupTask API доступне без NuGet. Settings-міграція — `SHGetKnownFolderPath` + `KF_FLAG_NO_PACKAGE_REDIRECTION`, маркер `migrated.flag`.
 
 ##### Підетап 7.2 — Privacy Policy
 
@@ -317,9 +333,10 @@
 - Підняти живу сторінку на `https://shelf.bridges.net.ua/privacy/` (GitHub Pages підхопить автоматично після push у `main`).
 
 **Перевірка:**
-- [ ] `https://shelf.bridges.net.ua/privacy/` відкривається.
-- [ ] `/privacy/en/` теж відкривається.
-- [ ] About-вкладка показує клікабельний лінк "Privacy Policy" / "Політика конфіденційності".
+- [x] `docs/privacy/index.html` (uk) + `docs/privacy/en/index.html` (en) створені, на GitHub Pages.
+- [x] About-вкладка: Hyperlink `About_PrivacyPolicy` → `https://shelf.bridges.net.ua/privacy/`.
+
+> ✅ **Виконано 2026-06-01** (commit `1f2e082`).
 
 ##### Підетап 7.3 — Створити Package-проект
 
@@ -336,11 +353,12 @@
 - Зібрати локально: `msbuild Shelf.Package\Shelf.Package.wapproj /p:Configuration=Store /p:Platform=x64 /p:GenerateAppxPackageOnBuild=true`. Результат — `.msix` у `Shelf.Package\AppPackages\`.
 
 **Перевірка:**
-- [ ] `.msix` файл збирається без помилок.
-- [ ] Підписаний test-сертифікатом (Visual Studio згенерує автоматично) і встановлюється через `Add-AppxPackage`.
-- [ ] Після встановлення Shelf запускається з меню Start, працює AppBar, видно іконку в треї, відкривається Settings.
-- [ ] Перемикач автозапуску у Settings керує StartupTask (видно у Settings → Apps → Startup).
-- [ ] У Task Manager → Startup apps стоїть позначка від Microsoft Store, не від реєстру.
+- [x] `.msix` збирається без помилок (`tools/make-msix.ps1`, 75.6 MB).
+- [x] Підписаний self-signed cert (`make-msix.ps1 -Sign`), встановлюється через `Add-AppxPackage`.
+- [x] Після встановлення Shelf запускається з меню Start як «Поличка», працює AppBar, трей, Settings.
+- [x] StartupTask видно у Settings → Apps → Startup (джерело — Microsoft Store, не реєстр).
+
+> ✅ **Виконано 2026-06-01, але інакше ніж планувалось.** Visual Studio на машині немає, тому **без `.wapproj`** — пакет збирається standalone-скриптом `tools/make-msix.ps1` (через `makeappx`/`signtool` з Windows SDK) + `tools/make-store-assets.ps1` для 5 PNG-ассетів у `Shelf.Package/Assets/`. `Shelf.sln` НЕ містить Package-проєкту. Manifest — `Shelf.Package/Package.appxmanifest` (commit `e52e621`).
 
 ##### Підетап 7.4 — Partner Center реєстрація
 
@@ -355,9 +373,11 @@
 - Підставити отримані Publisher і Identity в `Package.appxmanifest` (з підетапу 7.3), перезібрати локально.
 
 **Перевірка:**
-- [ ] Акаунт активований (приходить email-підтвердження).
-- [ ] Три імені зарезервовані (видно у Apps and games → Overview).
-- [ ] Зібраний з реальним Publisher Name `.msix` встановлюється без помилок про invalid signature.
+- [x] Акаунт активований (Company через Entra ID tenant `bridges.net.ua`, $0).
+- [x] `ShelfDesk` зарезервовано (`Shelf` було зайнято) + `Поличка` як additional name.
+- [x] Реальні Publisher/Identity підставлені в manifest (commit `f144328`), MSIX перезібраний.
+
+> ✅ **Виконано 2026-06-01.** Реальні дані — у таблиці «Фактичні дані» вище. Account type вийшов **Company** (не Individual) — Microsoft визнав tenant `bridges.net.ua` без вимоги паперових документів. DisplayName у manifest → `ShelfDesk` (узгоджено з product name); «Поличка» локалізується через uk-UA Store listing.
 
 > ⚠️ **Account type незмінний:** змінити Individual → Company пізніше неможливо, потрібен новий акаунт. Якщо є хоч мінімальна перспектива зареєструвати "Bridges Community" як юр. особу (ФОП тощо) — варто це зробити ДО створення Partner Center акаунту і реєструватися як Company.
 
@@ -376,11 +396,13 @@
 - Submit. Чекати certification ~3 робочі дні. Якщо reject — прочитати звіт у Notifications, виправити, re-submit.
 
 **Перевірка:**
-- [ ] WACK passes без fail (warning допустимі).
-- [ ] Submission в Partner Center має статус "In the Store".
-- [ ] Shelf шукається через Store на чистій Win11 (тест на іншій машині).
-- [ ] Встановлення через Store → запуск → працює AppBar, автозапуск, всі віджети.
-- [ ] Видалення через Settings → Apps → Shelf не лишає сміття.
+- [x] Production unsigned MSIX зібраний (`make-msix.ps1`, Microsoft re-підпише при публікації).
+- [x] Submission 1 поданий — усі 6 секцій Complete, статус **In certification** (2026-06-01).
+- [ ] Certification passed → статус "In the Store" (**чекаємо email ~до 3 робочих днів**).
+- [ ] Shelf шукається через Store на чистій Win11.
+- [ ] Встановлення через Store → AppBar, автозапуск, всі віджети.
+
+> 🟡 **Подано 2026-06-01, чекаємо вердикт.** WACK локально **не запускали** (опційно — пропустили). Store listings заповнені обома мовами з `Shelf.Package/StoreListings/{en-US,uk-UA}.md`, 5 screenshots з `ScreenShots/`. runFullTrust обґрунтовано в Submission Options. Вибрано «Publish as soon as it passes certification».
 
 ##### Підетап 7.6 — CI publish (опційно, можна відкласти на наступний реліз)
 
@@ -515,11 +537,15 @@
 - **2026-05-27 v8** — hotfix **v1.0.1**. У v1.0.0 виявлено критичний баг: `-p:PublishSingleFile=true` запаковував усі `Shelf.Widgets.*.dll` всередину `Shelf.exe`, а `WidgetRegistry.Initialize()` шукає їх через `Directory.EnumerateFiles` як окремі файли — реєстр був порожній, меню «+ Додати віджет» не показувало жодного типу. Виправлено: прибрано `PublishSingleFile` з `release.yml`, тепер zip містить теку з `Shelf.exe` + ~200 DLL поруч. v1.0.1 опубліковано, перевірено на чистій теці — віджети завантажуються, додаються, працюють.
 - **2026-05-27 v9** — фінальне оновлення плану після завершення всіх етапів. Проставлено чекбокси, оновлено таблицю прийнятих рішень (single-file → folder), переписано розділ статусу як «фінал», структуровано розділ «Майбутні етапи» з конкретними побажаннями: малі поліпшення сайту, action items для просування, серйозніші майбутні етапи 7-10 (MSIX, code signing, auto-update, CI tests), технічний борг.
 - **2026-05-27 v10** — додано два project-local skill в `.claude/skills/`: `shelf-update` (тригер «ВНЕСТИ ЗМІНИ: ...» → редагує код, збирає, не комітить) і `shelf-commit` (тригер «ЗРОБИ КОМІТ» → формулює conventional commit message, пушить). Skills path-agnostic — перевіряють наявність `Shelf.sln` у cwd замість літерального шляху, тому переживуть перейменування теки `D:\project\Polychka` → `D:\project\Shelf`. Skill `shelf-update` додатково має auto-cleanup stale bin/obj, якщо виявить старі шляхи в кеші.
+- **2026-06-01 v12** — **виконано Етап 7.1-7.5 за один день, submission подано на certification.** Код: додано конфігурацію `Store` зі `STARTUP_BUILD`-розгалуженням (PinService вирізано, AutoStartService на StartupTask API, settings-міграція через `SHGetKnownFolderPath`), `TargetFramework` піднято до `net8.0-windows10.0.19041.0`; 3 конфігурації білдяться чисто (commit `1f2e082`). Privacy Policy сторінки uk+en на GitHub Pages. **Збірка MSIX без Visual Studio** — Windows SDK 10.0.22621 + standalone `tools/make-msix.ps1` (makeappx/signtool) + `tools/make-store-assets.ps1` (5 PNG); `Shelf.Package/Package.appxmanifest` без `.wapproj` (commits `e52e621`, `041db83`). Partner Center: акаунт `bridges@bridges.net.ua` (вийшов **Company** через Entra ID tenant, $0), зарезервовано **ShelfDesk** (+ «Поличка» additional name), отримано Publisher `CN=01B4C228-...`, Identity `BridgesCommunity.ShelfDesk`, Store ID `9NFC2DKPQDLJ`; manifest оновлено реальними даними (commit `f144328`). Store listings обома мовами + 5 screenshots + IARC рейтинг (3+/Everyone скрізь) + runFullTrust обґрунтування. **Submission 1 → In certification.** Залишилось: дочекатись pass (Етап 7.5 фініш), потім 7.6 CI publish + 7.7 кнопка Store на сайті. Дані збережено в project-memory `store-submission-data.md`.
 - **2026-05-28 v11** — після ґрунтовної розвідки SignPath Foundation і Microsoft Partner Center переосмислено розділ «Майбутні етапи». Microsoft скасував комісію за реєстрацію Partner Center (раніше $19 individual / $99 company → **$0 з травня 2026**), що різко змінило баланс на користь публікації в Store. **Етап 7** повністю переписано як 7 послідовних підетапів (7.1 підготовка коду з conditional compile, 7.2 Privacy Policy, 7.3 .wapproj+manifest, 7.4 Partner Center реєстрація, 7.5 WACK+submit, 7.6 CI publish, 7.7 перший Store-реліз) з чек-листами «Перевірка перед наступним підетапом» і виділеними червоними прапорами (undocumented `IVirtualDesktopPinnedApps`, HKCU autostart, settings migration). **Етап 8** (SignPath Foundation) переформульовано як «відкладено до ~2026-11-28» з конкретним чек-листом підготовки за 6 місяців (накопичити stars, написати Code Signing Policy, OpenHub, MFA, external contributors). **Етап 9** (auto-update) знижено в пріоритеті — Store вирішує проблему для більшості користувачів; для portable додано два варіанти (проста кнопка «Перевірити оновлення» vs Velopack). **Етап 10** без змін. `CHANGELOG.md` `[Unreleased]` синхронізовано. Збережено project-memory про дату повернення до Етапу 8.
 
 ## Поточний статус
 
-🟢 **ФІНАЛ — усі 6 етапів + рефакторинг + hotfix виконано.** Проект живий і доступний у мережі.
+🟢 **Базові 6 етапів + рефакторинг + hotfix виконано** — проект живий у мережі (v1.1.1 на GitHub Releases).
+🟡 **Етап 7 (Microsoft Store) — у сертифікації:** submission 1 подано 2026-06-01, підетапи 7.1-7.5 закрито, чекаємо вердикт Microsoft (~до 3 робочих днів). Далі — 7.6 (CI publish) і 7.7 (кнопка Store на сайті) після проходження. Деталі — у блоці «Фактичні дані» Етапу 7 вище.
+
+Нижче — підсумок початкових 6 етапів (історичний, без Етапу 7).
 
 ### Що зробили (за один день)
 
