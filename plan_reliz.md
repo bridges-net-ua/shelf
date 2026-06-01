@@ -2,7 +2,7 @@
 
 > Робочий журнал релізу. Усі 6 етапів плану виконано, додатково випущено hotfix v1.0.1.
 > Документ далі підтримуємо як список побажань і майбутніх покращень.
-> Останнє оновлення: 2026-05-27
+> Останнє оновлення: 2026-06-01
 
 ## 🟢 Фінальний стан
 
@@ -259,13 +259,13 @@
 
 ### 🔮 Невеликі поліпшення сайту (тривіально, ~10-30 хв кожне)
 
-- [ ] **Реальні скріншоти замість SVG-заглушок.** Запусти Поличку, зроби 3 скріншоти: (1) панель з кількома різнотипними віджетами; (2) вікно Налаштувань; (3) приклад зі слайд-шоу+календарем свят. Збережи як `docs/assets/screenshot-1/2/3.png` (та сама пропорція ~16:9). В обох HTML заміни `.svg` на `.png` у тегах `<img>`.
-- [ ] **PNG-версія `og-image.svg` для соцмережевих превʼю.** Facebook/Twitter/LinkedIn не рендерять SVG у Open Graph. Відкрий `docs/assets/og-image.svg` у браузері (Edge/Chrome), зроби скріншот 1200×630, збережи як `docs/assets/og-image.png`. У обох HTML заміни `og:image` content на `.png`-URL. Перевір через [opengraph.xyz](https://opengraph.xyz).
+- [x] **Реальні скріншоти замість SVG-заглушок.** (2026-06-01) Відібрано 3 справжні скріншоти з `ScreenShots/` (UA-панель з віджетами; вікно Налаштувань із селектором монітора; панель докнута на робочому столі), скомпоновано на однакові темні плитки 1280×800 через `System.Drawing`, збережено як `docs/assets/screenshot-1/2/3.png`. У обох HTML `<img>` переведено з `.svg` на `.png`, підписи оновлено, старі SVG-заглушки видалено.
+- [x] **PNG-версія `og-image.svg` для соцмережевих превʼю.** (2026-06-01) `og-image.svg` відрендерено в `og-image.png` (1200×630) через headless Edge. У обох HTML `og:image` і `twitter:image` переведено на `.png`. Facebook/X/LinkedIn тепер генерують прев'ю. (Варто перевірити наживо через [opengraph.xyz](https://opengraph.xyz) після push.)
 - [ ] **Реальний логотип у README.** Зараз там посилання на `docs/assets/logo.png`, який бачать лише ті, хто переглядає README на GitHub. Можна додати inline-альтернативу або base64-варіант, щоб логотип був видний навіть у клоні без `docs/`.
 
 ### 📢 Поділитися проектом (~10 хв)
 
-- [ ] **GitHub topics.** Settings репо → ⚙ біля «About» → у поле Topics додай: `widgets`, `windows`, `dotnet`, `wpf`, `dock-bar`, `desktop`, `ukrainian`, `open-source`. Це покращить пошук на GitHub.
+- [x] **GitHub topics.** (2026-06-01) Виставлено 8 topics через GitHub REST API: `widgets`, `windows`, `dotnet`, `wpf`, `dock-bar`, `desktop`, `ukrainian`, `open-source`. Покращує пошук на GitHub.
 - [ ] **Профіль організації `bridges-net-ua`.** Завантаж логотип, додай опис «Open-source software by Bridges Community», лінк на `https://shelf.bridges.net.ua/`.
 - [ ] **Pin репо** у профілі організації як основний проект.
 - [ ] **Увімкнути GitHub Discussions.** Settings репо → секція «Features» → галочка «Discussions». Дасть людям місце для запитів і фідбеку, що не є багами.
@@ -515,11 +515,11 @@
 
 ### 🛠 Технічний борг і поліпшення коду (не блокують, але корисно)
 
-- [ ] **`logodesk.png` у корені** — невідомий файл; з'ясувати призначення і або задокументувати, або видалити.
-- [ ] **Експорт-файли `polychka-*-2026-05-26.{json,txt}`** у корені — старі експорти з тестування v1.0.0. Видалити локально (вони вже в `.gitignore`, у репо не потрапили).
-- [ ] **Легасі-теки `WidgetPlugins/Помічник.Widgets.*/`** — фізично залишаються на диску, в репо ігноруються. Якщо точно не знадобляться — видалити.
-- [ ] **WFAC010 warning** про DPI manifest — false-positive (`app.manifest` правильно описує PerMonitorV2 для гібридного WPF+WinForms). Можна або задокументувати ще явніше, або переключитись на `ApplicationHighDpiMode`, щоб warning зник.
-- [ ] **`tools/make-ico.ps1`** — скрипт для генерації `.ico`. Перевірити, чи актуальний, додати в `CONTRIBUTING.md` як «як оновити іконку».
+- [x] **`logodesk.png`** — (2026-06-01) з'ясовано: це логотип проекту - байт-у-байт збігається з `docs/assets/logo.png` (850489 байт, полиця з іконками фото/статистики/годинника). Перенесено в `NoData/` (тека повністю в `.gitignore`, у репо не потрапляє), задокументовано в `NoData/README.md`.
+- [x] **Експорт-файли `polychka-*-2026-05-26.{json,txt}`** — (2026-06-01) перенесено в `NoData/` (старі тестові експорти, префікс до перейменування проекту). У репо їх немає - підтверджено `git status --ignored` (`!! NoData/`).
+- [x] **Легасі-теки `WidgetPlugins/Помічник.Widgets.*/`** — (2026-06-01) фізично видалені (були порожні теки-скелети). У `WidgetPlugins/` лишилось 10 актуальних проектів (включно з `Nba`).
+- [ ] **WFAC010 warning** про DPI manifest — **свідомо НЕ чіпаємо.** Задокументований false-positive (`app.manifest` коректно описує PerMonitorV2 для гібридного WPF+WinForms). Перемикання на `ApplicationHighDpiMode` несе ризик DPI-регресії заради косметичного warning - не варто.
+- [x] **`tools/make-ico.ps1`** — (2026-06-01) перевірено (актуальний: `System.Drawing`, мультирозмір 16-256), задокументовано в `CONTRIBUTING.md` (новий розділ «Інструменти»).
 - [x] **Перейменування фізичної теки `D:\project\Polychka` → `D:\project\Shelf`** на машині розробника заплановано як остання дія сесії; skill-файли і доки вже path-agnostic / використовують новий шлях.
 - [ ] **Видалити з історії плану старі застарілі чек-листи** і консолідувати в один компактний документ — коли проект стане публічним і люди читатимуть `plan_reliz.md`.
 
@@ -539,6 +539,7 @@
 - **2026-05-27 v10** — додано два project-local skill в `.claude/skills/`: `shelf-update` (тригер «ВНЕСТИ ЗМІНИ: ...» → редагує код, збирає, не комітить) і `shelf-commit` (тригер «ЗРОБИ КОМІТ» → формулює conventional commit message, пушить). Skills path-agnostic — перевіряють наявність `Shelf.sln` у cwd замість літерального шляху, тому переживуть перейменування теки `D:\project\Polychka` → `D:\project\Shelf`. Skill `shelf-update` додатково має auto-cleanup stale bin/obj, якщо виявить старі шляхи в кеші.
 - **2026-06-01 v12** — **виконано Етап 7.1-7.5 за один день, submission подано на certification.** Код: додано конфігурацію `Store` зі `STARTUP_BUILD`-розгалуженням (PinService вирізано, AutoStartService на StartupTask API, settings-міграція через `SHGetKnownFolderPath`), `TargetFramework` піднято до `net8.0-windows10.0.19041.0`; 3 конфігурації білдяться чисто (commit `1f2e082`). Privacy Policy сторінки uk+en на GitHub Pages. **Збірка MSIX без Visual Studio** — Windows SDK 10.0.22621 + standalone `tools/make-msix.ps1` (makeappx/signtool) + `tools/make-store-assets.ps1` (5 PNG); `Shelf.Package/Package.appxmanifest` без `.wapproj` (commits `e52e621`, `041db83`). Partner Center: акаунт `bridges@bridges.net.ua` (вийшов **Company** через Entra ID tenant, $0), зарезервовано **ShelfDesk** (+ «Поличка» additional name), отримано Publisher `CN=01B4C228-...`, Identity `BridgesCommunity.ShelfDesk`, Store ID `9NFC2DKPQDLJ`; manifest оновлено реальними даними (commit `f144328`). Store listings обома мовами + 5 screenshots + IARC рейтинг (3+/Everyone скрізь) + runFullTrust обґрунтування. **Submission 1 → In certification.** Залишилось: дочекатись pass (Етап 7.5 фініш), потім 7.6 CI publish + 7.7 кнопка Store на сайті. Дані збережено в project-memory `store-submission-data.md`.
 - **2026-05-28 v11** — після ґрунтовної розвідки SignPath Foundation і Microsoft Partner Center переосмислено розділ «Майбутні етапи». Microsoft скасував комісію за реєстрацію Partner Center (раніше $19 individual / $99 company → **$0 з травня 2026**), що різко змінило баланс на користь публікації в Store. **Етап 7** повністю переписано як 7 послідовних підетапів (7.1 підготовка коду з conditional compile, 7.2 Privacy Policy, 7.3 .wapproj+manifest, 7.4 Partner Center реєстрація, 7.5 WACK+submit, 7.6 CI publish, 7.7 перший Store-реліз) з чек-листами «Перевірка перед наступним підетапом» і виділеними червоними прапорами (undocumented `IVirtualDesktopPinnedApps`, HKCU autostart, settings migration). **Етап 8** (SignPath Foundation) переформульовано як «відкладено до ~2026-11-28» з конкретним чек-листом підготовки за 6 місяців (накопичити stars, написати Code Signing Policy, OpenHub, MFA, external contributors). **Етап 9** (auto-update) знижено в пріоритеті — Store вирішує проблему для більшості користувачів; для portable додано два варіанти (проста кнопка «Перевірити оновлення» vs Velopack). **Етап 10** без змін. `CHANGELOG.md` `[Unreleased]` синхронізовано. Збережено project-memory про дату повернення до Етапу 8.
+- **2026-06-01 v13** — поки Store-сабмішн на сертифікації, закрито дрібні поліпшення сайту і технічний борг (паралельні до Store задачі). **Сайт:** 3 SVG-заглушки скріншотів замінено справжніми (відібрано з `ScreenShots/`, скомпоновано на однакові плитки 1280×800), оновлено підписи, видалено старі SVG; `og-image.svg` → `og-image.png` (1200×630, headless Edge) підставлено в `og:image`/`twitter:image` обох HTML - соцмережі тепер генерують прев'ю. **Технічний борг:** `logodesk.png` з'ясовано (= site logo `docs/assets/logo.png`), разом з `polychka-*` експортами підтверджено в `NoData/` (gitignored, у репо немає); легасі-теки `Помічник.Widgets.*` підтверджено видаленими; `tools/make-ico.ps1` задокументовано в `CONTRIBUTING.md` (+ `Nba` додано в структуру проекту); WFAC010 лишено свідомо (документований false-positive). **Item 1:** `gh` встановлено (winget), але browser-auth не вдався - тому 8 GitHub topics виставлено через REST API з тимчасовим токеном (`public_repo`, потім відкликаний). Лишились pin репо і лого/опис профілю org (лише веб-UI).
 
 ## Поточний статус
 

@@ -61,7 +61,8 @@ Shelf/
     ├── Shelf.Widgets.Weather/
     ├── Shelf.Widgets.Timer/
     ├── Shelf.Widgets.Stopwatch/
-    └── Shelf.Widgets.Holidays/
+    ├── Shelf.Widgets.Holidays/
+    └── Shelf.Widgets.Nba/
 ```
 
 Кожен віджет - окремий WPF class library, що компілюється у `Shelf.Widgets.<Name>.dll` поруч з `Shelf.exe`. Хост статично референсить кожен через `<ProjectReference>`. Архітектура **не** runtime-плагінна.
@@ -120,6 +121,20 @@ WindowChrome.Apply(this);
 
 Більше деталей у [`CLAUDE.md`](CLAUDE.md), розділ «Adding a new widget».
 
+## Інструменти (`tools/`)
+
+Допоміжні PowerShell-скрипти (для звичайної збірки не потрібні):
+
+- **`make-ico.ps1`** - генерує мультирозмірний `Resources/shelf.ico` з PNG-джерела. Запусти після оновлення логотипа:
+
+  ```powershell
+  .\tools\make-ico.ps1 -SourcePng Resources\shelf.png -OutIco Resources\shelf.ico
+  ```
+
+  Розміри за замовчуванням - 16/24/32/48/64/128/256. Працює на `System.Drawing`, ImageMagick не потрібен.
+- **`make-store-assets.ps1`** - генерує PNG-ассети для MSIX (Square44x44, Square150x150, Wide310x150, StoreLogo, SplashScreen) у `Shelf.Package/Assets/`.
+- **`make-msix.ps1`** - збирає `.msix`-пакет для Microsoft Store (потрібен Windows SDK; прапорець `-Sign` робить self-signed підпис для локального тесту).
+
 ## Pull request workflow
 
 1. **Перш ніж починати велику зміну** - відкрий [Issue](https://github.com/bridges-net-ua/shelf/issues) для обговорення підходу.
@@ -159,6 +174,7 @@ Thanks for your interest in contributing! See the Ukrainian section above for fu
 - **Do not reference the host project** from SDK or widget projects - this would break Microsoft Store packaging.
 - **Open an issue first** for large changes.
 - **Update CHANGELOG.md** (`[Unreleased]` section) for user-visible changes.
+- **Regenerate the icon** after updating `Resources/shelf.png`: `.\tools\make-ico.ps1 -SourcePng Resources\shelf.png -OutIco Resources\shelf.ico`.
 
 Architecture details are in [`CLAUDE.md`](CLAUDE.md).
 
