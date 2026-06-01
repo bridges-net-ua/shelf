@@ -266,8 +266,8 @@
 ### 📢 Поділитися проектом (~10 хв)
 
 - [x] **GitHub topics.** (2026-06-01) Виставлено 8 topics через GitHub REST API: `widgets`, `windows`, `dotnet`, `wpf`, `dock-bar`, `desktop`, `ukrainian`, `open-source`. Покращує пошук на GitHub.
-- [ ] **Профіль організації `bridges-net-ua`.** Завантаж логотип, додай опис «Open-source software by Bridges Community», лінк на `https://shelf.bridges.net.ua/`.
-- [ ] **Pin репо** у профілі організації як основний проект.
+- [x] **Профіль організації `bridges-net-ua`.** (2026-06-01) Заповнено: name «Bridges Community», опис «Open-source software by Bridges Community», URL `https://shelf.bridges.net.ua/`, лого (полиця Shelf). Підтверджено через GitHub API.
+- [x] **Pin репо** у профілі організації як основний проект. (2026-06-01) Репо закріплено/показується в профілі org.
 - [ ] **Увімкнути GitHub Discussions.** Settings репо → секція «Features» → галочка «Discussions». Дасть людям місце для запитів і фідбеку, що не є багами.
 - [ ] **Перший Discussion-пост** «👋 Welcome — фідбек, питання, ідеї» — щоб ентрі-поінт був.
 - [ ] **Анонс у соцмережах** — пост у X/Mastodon/Threads з посиланням на `shelf.bridges.net.ua` і скріншотом. Українська tech-спільнота.
