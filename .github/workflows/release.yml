@@ -83,6 +83,17 @@ jobs:
           path: Shelf-${{ steps.version.outputs.tag }}-win-x64.zip
           retention-days: 30
 
+      - name: Build Store MSIX
+        shell: pwsh
+        # Builds the MSIX with the same version as the portable zip (tag drives both
+        # via make-msix.ps1 -Version). Unsigned - the Microsoft Store re-signs at
+        # publish; the file is attached for archival / manual Store upload. Actual
+        # Store publishing is a separate manual workflow (store-publish.yml).
+        run: |
+          ./tools/make-msix.ps1 -Version ${{ steps.version.outputs.version }}
+          Copy-Item bin\Store\Shelf.msix "ShelfDesk-${{ steps.version.outputs.tag }}.msix"
+          Get-Item "ShelfDesk-${{ steps.version.outputs.tag }}.msix" | Select-Object Name, Length
+
       - name: Extract release notes from CHANGELOG
         id: notes
         shell: pwsh
@@ -130,3 +141,4 @@ jobs:
           fail_on_unmatched_files: true
           files: |
             Shelf-${{ steps.version.outputs.tag }}-win-x64.zip
+            ShelfDesk-${{ steps.version.outputs.tag }}.msix

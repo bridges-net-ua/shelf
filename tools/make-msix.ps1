@@ -15,6 +15,10 @@
 param(
     [switch]$SkipBuild,
     [switch]$Sign,
+    # Override the MSIX Identity version (e.g. from CI: -Version 1.2.0). When empty,
+    # the version is read from <Version> in Shelf.csproj. Either way it is normalised
+    # to a 4-part X.Y.Z.0 string for the manifest.
+    [string]$Version = "",
     # Must match <Identity Publisher="..."/> in Package.appxmanifest. If you change
     # the manifest Publisher (e.g. after Partner Center reassignment), change this
     # default too - signtool fails if the certificate Subject does not match the
@@ -48,22 +52,28 @@ function Find-SdkTool {
     return $null
 }
 
-# Reads <Version> from Shelf.csproj and normalises it to a 4-part MSIX version
-# (X.Y.Z.0). The csproj is the SINGLE SOURCE OF TRUTH - the manifest's own Version
-# attribute is overwritten with this value at staging time, so a release only needs
-# to bump <Version> in Shelf.csproj (which shelf-release already does) and both the
-# portable build and the Store MSIX stay in sync. The 4th segment is forced to 0
-# because the Microsoft Store reserves the revision part.
+# Normalises a version string ("1.2", "1.2.3", "v1.2.3") to a 4-part MSIX version
+# X.Y.Z.0. The 4th segment is forced to 0 because the Microsoft Store reserves the
+# revision part.
+function ConvertTo-MsixVersion {
+    param([string]$Raw)
+    $parts = $Raw.Trim().TrimStart('v', 'V').Split('.')
+    $major = [int]$parts[0]
+    $minor = if ($parts.Count -ge 2) { [int]$parts[1] } else { 0 }
+    $build = if ($parts.Count -ge 3) { [int]$parts[2] } else { 0 }
+    return "$major.$minor.$build.0"
+}
+
+# Reads <Version> from Shelf.csproj. The csproj is the SINGLE SOURCE OF TRUTH - the
+# manifest's own Version attribute is overwritten at staging time, so a release only
+# needs to bump <Version> in Shelf.csproj (which shelf-release already does) and both
+# the portable build and the Store MSIX stay in sync. CI may instead pass -Version.
 function Get-MsixVersion {
     param([string]$CsprojPath)
     $xml = [xml](Get-Content $CsprojPath -Raw)
     $raw = $xml.Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
     if (-not $raw) { throw "No <Version> found in $CsprojPath" }
-    $parts = $raw.Trim().Split('.')
-    $major = [int]$parts[0]
-    $minor = if ($parts.Count -ge 2) { [int]$parts[1] } else { 0 }
-    $build = if ($parts.Count -ge 3) { [int]$parts[2] } else { 0 }
-    return "$major.$minor.$build.0"
+    return ConvertTo-MsixVersion $raw
 }
 
 $Makeappx = Find-SdkTool "makeappx.exe"
@@ -124,10 +134,11 @@ Copy-Item (Join-Path $PublishOut "*") $WorkDir -Recurse -Force
 # copy Package.appxmanifest verbatim - we inject the version derived from Shelf.csproj
 # into Identity/@Version so csproj stays the single source of truth. The on-disk
 # Package.appxmanifest is untouched (its Version is only a fallback).
-$Version = Get-MsixVersion $Csproj
-Write-Host "Version from Shelf.csproj -> $Version (MSIX Identity/@Version)"
+$msixVersion = if ($Version) { ConvertTo-MsixVersion $Version } else { Get-MsixVersion $Csproj }
+$verSource   = if ($Version) { "-Version param" } else { "Shelf.csproj" }
+Write-Host "Version from $verSource -> $msixVersion (MSIX Identity/@Version)"
 $manifestXml = [xml](Get-Content $Manifest -Raw)
-$manifestXml.Package.Identity.SetAttribute("Version", $Version)
+$manifestXml.Package.Identity.SetAttribute("Version", $msixVersion)
 $manifestXml.Save((Join-Path $WorkDir "AppxManifest.xml"))
 
 New-Item -ItemType Directory -Force -Path (Join-Path $WorkDir "Assets") | Out-Null
@@ -177,7 +188,7 @@ if ($Sign) {
 # ---- Report ----
 $size = [Math]::Round((Get-Item $MsixPath).Length / 1MB, 1)
 Write-Host ""
-Write-Host "Built: $MsixPath ($size MB), version $Version"
+Write-Host "Built: $MsixPath ($size MB), version $msixVersion"
 if ($Sign) {
     Write-Host "Signed with: $($cert.Thumbprint)"
     Write-Host ""

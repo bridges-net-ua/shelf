@@ -404,17 +404,25 @@
 
 > 🟡 **Подано 2026-06-01, чекаємо вердикт.** WACK локально **не запускали** (опційно — пропустили). Store listings заповнені обома мовами з `Shelf.Package/StoreListings/{en-US,uk-UA}.md`, 5 screenshots з `ScreenShots/`. runFullTrust обґрунтовано в Submission Options. Вибрано «Publish as soon as it passes certification».
 
-##### Підетап 7.6 — CI publish (опційно, можна відкласти на наступний реліз)
+##### Підетап 7.6 (🟡 код готовий, чекає Azure AD secrets) — CI publish у Store
 
-- Налаштувати GitHub Action для автоматичного push нової версії в Store при тегу `v*`.
-- Інструменти: `msstore-cli` (Microsoft Store Developer CLI) + офіційний action `microsoft/microsoft-store-app-publisher@v1.1`.
-- Створити Azure AD app registration → отримати tenantId / clientId / clientSecret для Partner Center API. Покласти у GitHub Secrets як `MS_STORE_TENANT_ID`, `MS_STORE_CLIENT_ID`, `MS_STORE_CLIENT_SECRET`, `MS_STORE_SELLER_ID`.
-- Розширити `.github/workflows/release.yml` додатковим job `publish-store`, що залежить від нового `build-store` job: будує `.msix` через `msbuild`, потім `msstore publish` через action.
+**Код зроблено 2026-06-02.** Архітектура — гібрид (за рішенням користувача):
+- `.github/workflows/store-publish.yml` — **новий**, **ручний** (`workflow_dispatch` з опційним `ref`). Збирає MSIX через `tools/make-msix.ps1` → `microsoft/microsoft-store-apppublisher@v1.3` ставить `msstore` CLI → `msstore reconfigure` (4 secrets) → `msstore publish bin/Store/Shelf.msix -id 9NFC2DKPQDLJ` (одразу на certification). Ручний тригер обрано, щоб уникати pending-submission гонок (Store дозволяє лише одну активну submission на продукт).
+- `.github/workflows/release.yml` — додано крок «Build Store MSIX» (`make-msix.ps1 -Version <tag>`), MSIX прикріпляється до GitHub Release як `ShelfDesk-vX.Y.Z.msix` (unsigned — для архіву / ручного upload).
+- `make-msix.ps1` — додано `-Version` для передачі версії з CI (інакше з csproj).
+
+**Залишилось (ручна частина користувача, одноразово):**
+1. Entra admin center → App registrations → нова реєстрація → записати **Tenant ID** + **Client ID**; Certificates & secrets → new client secret → скопіювати **значення**.
+2. Partner Center → Account settings → User management → **Microsoft Entra applications** → Add → вибрати app → роль **Manager**.
+3. Partner Center → Account settings → Identifiers → скопіювати **Seller ID**.
+4. GitHub repo → Settings → Secrets → додати 4: `AZURE_AD_TENANT_ID`, `AZURE_AD_APPLICATION_CLIENT_ID`, `AZURE_AD_APPLICATION_SECRET`, `SELLER_ID`.
 
 **Перевірка:**
-- [ ] Локальний прогон `msstore reconfigure` + `msstore publish` працює.
-- [ ] GitHub Action на тестовому тегу `v1.1.2-test` виконується успішно.
-- [ ] Нова версія з'являється в Store автоматично через ~3 дні після push тега.
+- [x] `store-publish.yml` + `release.yml` валідні (python yaml), `make-msix.ps1` парситься, `-Version` нормалізується.
+- [ ] Користувач завів Azure AD app + роль Manager + 4 secrets.
+- [ ] Запуск `store-publish` (workflow_dispatch) на тезі — нова submission з'являється в Partner Center і проходить certification.
+
+> ⚠️ **Тільки free apps** через CI (наш free — ок). CLI у статусі preview (інколи зависає на `CommitStarted`). Запускати **лише коли попередня certification завершена**.
 
 ##### Підетап 7.7 — Перший Store-реліз
 

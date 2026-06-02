@@ -1,0 +1,69 @@
+name: Publish to Microsoft Store
+
+# Manual trigger only. Run this AFTER the previous Store submission has finished
+# certification: the Store allows only one active submission per product, so a
+# second publish over a pending one will fail.
+#
+# Requires four repository secrets (Settings -> Secrets and variables -> Actions):
+#   AZURE_AD_TENANT_ID              - Entra tenant ID
+#   AZURE_AD_APPLICATION_CLIENT_ID  - app registration (client/application) ID
+#   AZURE_AD_APPLICATION_SECRET     - client secret value
+#   SELLER_ID                       - Partner Center -> Account settings -> Identifiers
+# The Entra app must be added to Partner Center (User management -> Microsoft Entra
+# applications) with the Manager role.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Tag or branch to build and publish (blank = current branch)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  store-publish:
+    name: Build MSIX and publish to Microsoft Store
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # msstore CLI is a .NET desktop tool. Uncomment if the publisher action
+      # below fails to launch it on the runner ("msstore: command not found" or a
+      # missing-runtime error).
+      # - name: Install .NET 9 Desktop Runtime (fallback for msstore CLI)
+      #   run: winget install --id Microsoft.DotNet.DesktopRuntime.9 --silent --accept-source-agreements --accept-package-agreements
+
+      - name: Build MSIX (unsigned - Store re-signs at publish)
+        shell: pwsh
+        # Version comes from <Version> in Shelf.csproj of the checked-out ref.
+        run: ./tools/make-msix.ps1
+
+      - name: Setup MSStore CLI
+        uses: microsoft/microsoft-store-apppublisher@v1.3
+
+      - name: Configure msstore credentials
+        shell: pwsh
+        run: |
+          msstore reconfigure `
+            --tenantId ${{ secrets.AZURE_AD_TENANT_ID }} `
+            --sellerId ${{ secrets.SELLER_ID }} `
+            --clientId ${{ secrets.AZURE_AD_APPLICATION_CLIENT_ID }} `
+            --clientSecret ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
+
+      - name: Publish to Microsoft Store
+        shell: pwsh
+        # ShelfDesk Store ID. publish creates a new submission and commits it to
+        # certification immediately. Rollout to users happens after it passes.
+        run: msstore publish bin/Store/Shelf.msix -id 9NFC2DKPQDLJ
