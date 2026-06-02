@@ -56,9 +56,13 @@
       <h1>ShelfDesk</h1>
       <p class="tagline">A side dock with widgets for your Windows desktop. Free, open-source, no ads.</p>
       <div class="hero-actions">
-        <a href="https://github.com/bridges-net-ua/shelf/releases/latest" class="btn btn-primary">
+        <a href="https://apps.microsoft.com/detail/9NFC2DKPQDLJ" class="btn btn-primary">
+          <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/></svg>
+          Get from Microsoft Store
+        </a>
+        <a href="https://github.com/bridges-net-ua/shelf/releases/latest" class="btn btn-secondary">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download for Windows
+          Download .zip
         </a>
         <a href="https://github.com/bridges-net-ua/shelf" class="btn btn-secondary">
           <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
@@ -171,12 +175,20 @@
       <h2>Download</h2>
 
       <div class="download-box">
-        <p style="font-size: 1.15rem; color: var(--text); margin-bottom: 18px;">
-          Ready-to-run <code>.exe</code> in a zip archive (~70 MB, self-contained — no separate .NET install needed).
+        <p style="font-size: 1.15rem; color: var(--text); margin-bottom: 10px;">
+          <strong>Recommended:</strong> install from the Microsoft Store - automatic updates, signed by Microsoft, no SmartScreen warning.
         </p>
-        <a href="https://github.com/bridges-net-ua/shelf/releases/latest" class="btn btn-primary" style="font-size: 1.1rem; padding: 16px 32px;">
+        <a href="https://apps.microsoft.com/detail/9NFC2DKPQDLJ" class="btn btn-primary" style="font-size: 1.1rem; padding: 16px 32px;">
+          <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/></svg>
+          Get from Microsoft Store
+        </a>
+
+        <p style="font-size: 1.05rem; color: var(--text); margin: 30px 0 10px;">
+          Or grab the portable <code>.zip</code> (~70 MB, self-contained — no separate .NET install needed):
+        </p>
+        <a href="https://github.com/bridges-net-ua/shelf/releases/latest" class="btn btn-secondary" style="font-size: 1.05rem; padding: 14px 28px;">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download latest release
+          Download .zip from GitHub
         </a>
         <div class="platforms">
           <span>🪟 Windows 10 (1809+) / Windows 11</span>
@@ -184,8 +196,7 @@
           <span>💾 ~150 MB disk space</span>
         </div>
         <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 14px;">
-          After download: extract anywhere, run <code>Shelf.exe</code>.<br>
-          Windows SmartScreen may warn you - this is normal for new open-source apps without a commercial code-signing certificate. Click «More info» → «Run anyway».
+          Portable .zip: extract anywhere, run <code>Shelf.exe</code>. Windows SmartScreen may warn for the unsigned .zip - click «More info» → «Run anyway». The Microsoft Store version is signed and shows no warning.
         </p>
         <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 14px;">
           Alternatively - <a href="https://github.com/bridges-net-ua/shelf#build-from-source">build from source yourself</a>, especially if you want to add your own widget.
@@ -211,13 +222,13 @@
         </details>
 
         <details>
-          <summary>Will it be in the Microsoft Store?</summary>
-          <p>Planned. Right now we're focused on a stable release through GitHub. Publishing to the Store requires additional work (MSIX packaging, dev account, certification) - it will arrive in a future release.</p>
+          <summary>Is it in the Microsoft Store?</summary>
+          <p>Yes - ShelfDesk is available in the Microsoft Store: <a href="https://apps.microsoft.com/detail/9NFC2DKPQDLJ">apps.microsoft.com/detail/9NFC2DKPQDLJ</a>. The Store version is signed by Microsoft, updates automatically, and shows no SmartScreen warning. The portable .zip on GitHub Releases remains available as an alternative.</p>
         </details>
 
         <details>
           <summary>Why does Windows warn me on first launch?</summary>
-          <p>That's SmartScreen - Windows protection from unknown apps. It triggers for any application without a commercial Authenticode signature, which costs $200-400/year. For a free open-source project this is too expensive right now; we plan to add signing when we can. Until then - just click «More info» → «Run anyway». The full source code is open and available for audit on GitHub.</p>
+          <p>Only the portable .zip triggers SmartScreen - Windows protection for apps without a commercial Authenticode signature (which costs $200-400/year). Just click «More info» → «Run anyway», or install from the Microsoft Store instead, where the app is signed by Microsoft and shows no warning. The full source code is open and available for audit on GitHub.</p>
         </details>
 
         <details>

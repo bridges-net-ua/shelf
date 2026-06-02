@@ -280,7 +280,7 @@
 
 ---
 
-#### Етап 7 (🟡 у сертифікації — submission подано 2026-06-01) — Публікація в Microsoft Store через MSIX
+#### Етап 7 (🟢 опубліковано в Store 2026-06-02) — Публікація в Microsoft Store через MSIX
 
 **Чому варто:** Microsoft автоматично підписує MSIX-пакети своїм CA при публікації — **повністю знімає попередження SmartScreen і розблоковує Smart App Control на Win11** (та сама проблема з [CLAUDE.md](CLAUDE.md), що блокує дебаг-збірки на чистій Win11 24H2+). Бонусом — безкоштовний auto-update через Store кожні 8 годин (закриває Етап 9 для Store-користувачів), офіційний канал розповсюдження, дозволено паралельно з portable zip на GitHub Releases.
 
@@ -299,7 +299,7 @@
 | Store URL | `https://apps.microsoft.com/detail/9NFC2DKPQDLJ` |
 | MSA App Id (WNS, поки не використовуємо) | `33599eba-4409-448e-9931-9e65df7ad2bd` |
 | Account type | **Company** (Entra ID tenant `bridges.net.ua` — Microsoft визнав без бізнес-документів) |
-| Submission 1 | подано на certification **2026-06-01**, auto-publish після проходження |
+| Submission 1 | подано **2026-06-01**, **passed certification і опубліковано 2026-06-02** ✅ |
 
 ##### Червоні прапори (вирішити ПЕРЕД першим submit)
 
@@ -424,10 +424,12 @@
 - На сайті `shelf.bridges.net.ua` додати кнопку "Завантажити з Microsoft Store" (badge `https://developer.microsoft.com/store/badges/...`) поряд із наявною кнопкою GitHub Releases.
 
 **Перевірка:**
-- [ ] У Store доступна нова версія (через "Library" → "Get updates").
-- [ ] Bump попередньої версії → Store auto-update протягом 8-24 год без участі користувача.
-- [ ] Кнопка з сайту веде в правильний Store-listing (deep link).
-- [ ] Portable zip на GitHub Releases теж випущений (паралельно).
+- [x] **App вже опублікований у Store** (passed certification 2026-06-02, Store ID `9NFC2DKPQDLJ`) — без version-bump, перша submission.
+- [x] Кнопка «Завантажити з Microsoft Store» додана на сайт (hero + download), uk+en, веде на `apps.microsoft.com/detail/9NFC2DKPQDLJ`. FAQ оновлено (Store доступний; SmartScreen лише для portable .zip).
+- [ ] Наступний version-bump (`v1.2.0`) + tag → Store auto-update протягом 8-24 год (буде при наступному релізі через skill `shelf-release` + ручний upload MSIX або CI з 7.6).
+- [ ] Portable zip на GitHub Releases синхронно з наступним тегом.
+
+> ✅ **Сайтова частина виконана 2026-06-02.** Перша публікація пройшла certification за ~1 день (submit 06-01 → live 06-02). Локалізація назви спрацювала: на uk-Store видно «Поличка», на en-Store — «ShelfDesk». Залишок 7.7 (version-bump + tag для оновлення Store-версії) — окремо при наступному релізі, бо це release-дія (`shelf-release`), не правка сайту.
 
 ---
 
@@ -544,7 +546,7 @@
 ## Поточний статус
 
 🟢 **Базові 6 етапів + рефакторинг + hotfix виконано** — проект живий у мережі (v1.1.1 на GitHub Releases).
-🟡 **Етап 7 (Microsoft Store) — у сертифікації:** submission 1 подано 2026-06-01, підетапи 7.1-7.5 закрито, чекаємо вердикт Microsoft (~до 3 робочих днів). Далі — 7.6 (CI publish) і 7.7 (кнопка Store на сайті) після проходження. Деталі — у блоці «Фактичні дані» Етапу 7 вище.
+🟢 **Етап 7 (Microsoft Store) — ОПУБЛІКОВАНО:** «Поличка» / «ShelfDesk» live у Store з 2026-06-02 (Store ID `9NFC2DKPQDLJ`, passed certification за ~1 день). Підетапи 7.1-7.5 + сайтова частина 7.7 закриті. Залишок: 7.6 (CI auto-publish, опційно) і version-bump-частина 7.7 (при наступному релізі). Деталі — у блоці «Фактичні дані» Етапу 7 вище.
 
 Нижче — підсумок початкових 6 етапів (історичний, без Етапу 7).
 
