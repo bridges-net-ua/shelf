@@ -48,6 +48,24 @@ function Find-SdkTool {
     return $null
 }
 
+# Reads <Version> from Shelf.csproj and normalises it to a 4-part MSIX version
+# (X.Y.Z.0). The csproj is the SINGLE SOURCE OF TRUTH - the manifest's own Version
+# attribute is overwritten with this value at staging time, so a release only needs
+# to bump <Version> in Shelf.csproj (which shelf-release already does) and both the
+# portable build and the Store MSIX stay in sync. The 4th segment is forced to 0
+# because the Microsoft Store reserves the revision part.
+function Get-MsixVersion {
+    param([string]$CsprojPath)
+    $xml = [xml](Get-Content $CsprojPath -Raw)
+    $raw = $xml.Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
+    if (-not $raw) { throw "No <Version> found in $CsprojPath" }
+    $parts = $raw.Trim().Split('.')
+    $major = [int]$parts[0]
+    $minor = if ($parts.Count -ge 2) { [int]$parts[1] } else { 0 }
+    $build = if ($parts.Count -ge 3) { [int]$parts[2] } else { 0 }
+    return "$major.$minor.$build.0"
+}
+
 $Makeappx = Find-SdkTool "makeappx.exe"
 $Signtool = Find-SdkTool "signtool.exe"
 
@@ -101,8 +119,17 @@ New-Item -ItemType Directory -Force -Path $WorkDir | Out-Null
 
 Write-Host "Staging MSIX content in $WorkDir"
 Copy-Item (Join-Path $PublishOut "*") $WorkDir -Recurse -Force
-# Inside an .msix the manifest must be named AppxManifest.xml at the root.
-Copy-Item $Manifest (Join-Path $WorkDir "AppxManifest.xml") -Force
+
+# Inside an .msix the manifest must be named AppxManifest.xml at the root. We do NOT
+# copy Package.appxmanifest verbatim - we inject the version derived from Shelf.csproj
+# into Identity/@Version so csproj stays the single source of truth. The on-disk
+# Package.appxmanifest is untouched (its Version is only a fallback).
+$Version = Get-MsixVersion $Csproj
+Write-Host "Version from Shelf.csproj -> $Version (MSIX Identity/@Version)"
+$manifestXml = [xml](Get-Content $Manifest -Raw)
+$manifestXml.Package.Identity.SetAttribute("Version", $Version)
+$manifestXml.Save((Join-Path $WorkDir "AppxManifest.xml"))
+
 New-Item -ItemType Directory -Force -Path (Join-Path $WorkDir "Assets") | Out-Null
 Copy-Item (Join-Path $Assets "*.png") (Join-Path $WorkDir "Assets") -Force
 
@@ -150,7 +177,7 @@ if ($Sign) {
 # ---- Report ----
 $size = [Math]::Round((Get-Item $MsixPath).Length / 1MB, 1)
 Write-Host ""
-Write-Host "Built: $MsixPath ($size MB)"
+Write-Host "Built: $MsixPath ($size MB), version $Version"
 if ($Sign) {
     Write-Host "Signed with: $($cert.Thumbprint)"
     Write-Host ""
