@@ -1,5 +1,16 @@
 name: Publish to Microsoft Store
 
+# STATUS (2026-06-02): NOT ACTIVE - kept ready for the future.
+# The publishing account (bridges@bridges.net.ua) is a Microsoft Account with NO
+# Entra directory, so an app registration + client secret for the Store submission
+# API cannot be created ("creating applications outside of a directory has been
+# deprecated"). Without those, the secrets below cannot exist and this workflow
+# cannot authenticate. Releases are therefore published SEMI-MANUALLY: release.yml
+# builds the MSIX and attaches it to the GitHub Release; upload it to Partner Center
+# by hand (~2 min). To activate this workflow later, first get an Entra directory
+# (Azure free / M365 Developer Program), then create the app registration and the
+# four secrets described below.
+#
 # Manual trigger only. Run this AFTER the previous Store submission has finished
 # certification: the Store allows only one active submission per product, so a
 # second publish over a pending one will fail.

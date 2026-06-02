@@ -404,25 +404,24 @@
 
 > 🟡 **Подано 2026-06-01, чекаємо вердикт.** WACK локально **не запускали** (опційно — пропустили). Store listings заповнені обома мовами з `Shelf.Package/StoreListings/{en-US,uk-UA}.md`, 5 screenshots з `ScreenShots/`. runFullTrust обґрунтовано в Submission Options. Вибрано «Publish as soon as it passes certification».
 
-##### Підетап 7.6 (🟡 код готовий, чекає Azure AD secrets) — CI publish у Store
+##### Підетап 7.6 (🟢 обрано НАПІВРУЧНИЙ шлях; повна автопублікація заблокована) — CI publish у Store
 
-**Код зроблено 2026-06-02.** Архітектура — гібрид (за рішенням користувача):
-- `.github/workflows/store-publish.yml` — **новий**, **ручний** (`workflow_dispatch` з опційним `ref`). Збирає MSIX через `tools/make-msix.ps1` → `microsoft/microsoft-store-apppublisher@v1.3` ставить `msstore` CLI → `msstore reconfigure` (4 secrets) → `msstore publish bin/Store/Shelf.msix -id 9NFC2DKPQDLJ` (одразу на certification). Ручний тригер обрано, щоб уникати pending-submission гонок (Store дозволяє лише одну активну submission на продукт).
-- `.github/workflows/release.yml` — додано крок «Build Store MSIX» (`make-msix.ps1 -Version <tag>`), MSIX прикріпляється до GitHub Release як `ShelfDesk-vX.Y.Z.msix` (unsigned — для архіву / ручного upload).
-- `make-msix.ps1` — додано `-Version` для передачі версії з CI (інакше з csproj).
+**Рішення 2026-06-02: напівручна публікація.** Повну CI-автопублікацію заблоковано: акаунт `bridges@bridges.net.ua` — це Microsoft Account **без Entra ID directory**, тому Entra admin center **не дає створити app registration** («The ability to create applications outside of a directory has been deprecated»). Без app registration + client secret немає авторизації до Store submission API → `msstore publish` з CI неможливий. Заводити окрему directory (Azure free / M365 Dev Program) заради автоматизації рідких релізів — непропорційно, тому обрано напівручний шлях.
 
-**Залишилось (ручна частина користувача, одноразово):**
-1. Entra admin center → App registrations → нова реєстрація → записати **Tenant ID** + **Client ID**; Certificates & secrets → new client secret → скопіювати **значення**.
-2. Partner Center → Account settings → User management → **Microsoft Entra applications** → Add → вибрати app → роль **Manager**.
-3. Partner Center → Account settings → Identifiers → скопіювати **Seller ID**.
-4. GitHub repo → Settings → Secrets → додати 4: `AZURE_AD_TENANT_ID`, `AZURE_AD_APPLICATION_CLIENT_ID`, `AZURE_AD_APPLICATION_SECRET`, `SELLER_ID`.
+**Як працює напівручний реліз Store-версії:**
+1. `shelf-release` бампає `<Version>` у `Shelf.csproj`, коміт, тег `vX.Y.Z`.
+2. GitHub Actions (`release.yml`) на тег збирає portable zip **і MSIX** (`make-msix.ps1 -Version <tag>`), MSIX прикріпляється до GitHub Release як `ShelfDesk-vX.Y.Z.msix`.
+3. Завантажити цей `.msix` з Release → Partner Center → ShelfDesk → Start update → Packages → Submit (~2 хв вручну). Це той самий шлях, яким опубліковано v1.1.1.
+
+**Що зроблено в коді (готове, незалежно від рішення):**
+- `release.yml` — крок «Build Store MSIX» + прикріплення MSIX до Release.
+- `make-msix.ps1` — параметр `-Version` (версія з тегу) + версія з csproj як джерело правди.
+- `store-publish.yml` — **залишено в репо неактивним** (`workflow_dispatch`, без secrets не запускається). Готовий до використання, **якщо колись з'явиться Entra directory** — тоді треба лише: app registration → client secret → роль Manager у Partner Center → Seller ID → 4 secrets у GitHub (інструкція в шапці `store-publish.yml`).
 
 **Перевірка:**
-- [x] `store-publish.yml` + `release.yml` валідні (python yaml), `make-msix.ps1` парситься, `-Version` нормалізується.
-- [ ] Користувач завів Azure AD app + роль Manager + 4 secrets.
-- [ ] Запуск `store-publish` (workflow_dispatch) на тезі — нова submission з'являється в Partner Center і проходить certification.
-
-> ⚠️ **Тільки free apps** через CI (наш free — ок). CLI у статусі preview (інколи зависає на `CommitStarted`). Запускати **лише коли попередня certification завершена**.
+- [x] `release.yml` збирає й прикріпляє MSIX; `make-msix.ps1 -Version` нормалізується; YAML валідний.
+- [x] Напівручний шлях робочий (v1.1.1 так і опубліковано).
+- [ ] Повна автопублікація — відкладено до появи Entra directory (за потреби).
 
 ##### Підетап 7.7 — Перший Store-реліз
 
