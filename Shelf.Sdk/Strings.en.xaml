@@ -53,6 +53,13 @@
     <s:String x:Key="About_PrivacyPolicy">Privacy policy</s:String>
     <s:String x:Key="About_Copyright">© 2026 Bridges Community</s:String>
 
+    <!-- ===== Update check (portable build) ===== -->
+    <s:String x:Key="Update_Check">Check for updates</s:String>
+    <s:String x:Key="Update_Checking">Checking…</s:String>
+    <s:String x:Key="Update_UpToDate">You have the latest version</s:String>
+    <s:String x:Key="Update_Available">New version available: {0}</s:String>
+    <s:String x:Key="Update_Failed">Couldn't check for updates</s:String>
+
     <!-- ===== Panel menu ===== -->
     <s:String x:Key="Menu_Section_App">ShelfDesk settings</s:String>
     <s:String x:Key="Menu_AddWidget">Add widget</s:String>

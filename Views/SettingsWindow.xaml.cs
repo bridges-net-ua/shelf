@@ -83,7 +83,65 @@ public partial class SettingsWindow : Window
         };
         privacyLink.RequestNavigate += AboutEmailLink_RequestNavigate;
         AboutContactText.Inlines.Add(privacyLink);
+
+#if !STORE_BUILD
+        // Portable builds: reveal the update checker (Store builds leave it collapsed -
+        // Microsoft Store delivers updates). The badge is rendered from the last
+        // persisted daily check, with no network call here.
+        UpdatePanel.Visibility = Visibility.Visible;
+        BtnCheckUpdates.Click += BtnCheckUpdates_Click;
+
+        var current = Assembly.GetExecutingAssembly().GetName().Version ?? new Version(0, 0, 0, 0);
+        var known = App.Settings.Current.LatestKnownVersion;
+        if (UpdateService.IsNewer(known, current))
+        {
+            UpdateStatusText.Text = Loc.Format("Update_Available", known!);
+            UpdateStatusText.Visibility = Visibility.Visible;
+        }
+#endif
     }
+
+#if !STORE_BUILD
+    private async void BtnCheckUpdates_Click(object sender, RoutedEventArgs e)
+    {
+        BtnCheckUpdates.IsEnabled = false;
+        UpdateStatusText.Visibility = Visibility.Visible;
+        UpdateStatusText.Text = Loc.Get("Update_Checking");
+
+        var result = await UpdateService.CheckAsync();
+
+        BtnCheckUpdates.IsEnabled = true;
+
+        if (result == null)
+        {
+            UpdateStatusText.Text = Loc.Get("Update_Failed");
+            return;
+        }
+
+        // Keep the badge and the daily-check throttle in sync with this manual check.
+        App.Settings.Current.LastUpdateCheckUtc = DateTime.UtcNow;
+        App.Settings.Current.LatestKnownVersion = result.LatestVersion;
+        App.Settings.Save();
+
+        if (result.UpdateAvailable)
+        {
+            UpdateStatusText.Text = Loc.Format("Update_Available", result.LatestVersion);
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = result.ReleaseUrl,
+                    UseShellExecute = true
+                });
+            }
+            catch { }
+        }
+        else
+        {
+            UpdateStatusText.Text = Loc.Get("Update_UpToDate");
+        }
+    }
+#endif
 
     private void AboutEmailLink_RequestNavigate(object sender, RequestNavigateEventArgs e)
     {

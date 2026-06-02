@@ -129,6 +129,14 @@ public partial class App : Application
             // a settings save or window reactivation triggered a refresh.
             Widgets.ActiveWidgetsChanged += RebuildAllBars;
             Settings.Changed += ApplyAllBars;
+
+#if !STORE_BUILD
+            // Portable builds: quietly check GitHub for a newer release at most once a
+            // day. Result is persisted so the About-tab badge can show it without a
+            // network call. Fire-and-forget; never blocks startup or surfaces errors.
+            // (Store builds update through Microsoft Store, so this is compiled out.)
+            _ = MaybeCheckForUpdatesAsync();
+#endif
         }
         catch (Exception ex)
         {
@@ -136,6 +144,30 @@ public partial class App : Application
             Shutdown();
         }
     }
+
+#if !STORE_BUILD
+    private static async System.Threading.Tasks.Task MaybeCheckForUpdatesAsync()
+    {
+        try
+        {
+            var s = Settings.Current;
+            if (s.LastUpdateCheckUtc is DateTime last
+                && (DateTime.UtcNow - last) < TimeSpan.FromHours(24))
+                return;
+
+            var result = await UpdateService.CheckAsync();
+            if (result == null) return;
+
+            s.LastUpdateCheckUtc = DateTime.UtcNow;
+            s.LatestKnownVersion = result.LatestVersion;
+            Settings.Save();
+        }
+        catch
+        {
+            // Update check must never affect app startup or runtime.
+        }
+    }
+#endif
 
     private static void EnsureBarsForCurrentTopology()
     {

@@ -53,6 +53,13 @@
     <s:String x:Key="About_PrivacyPolicy">Політика конфіденційності</s:String>
     <s:String x:Key="About_Copyright">© 2026 Bridges Community</s:String>
 
+    <!-- ===== Перевірка оновлень (портативна збірка) ===== -->
+    <s:String x:Key="Update_Check">Перевірити оновлення</s:String>
+    <s:String x:Key="Update_Checking">Перевірка…</s:String>
+    <s:String x:Key="Update_UpToDate">У вас найновіша версія</s:String>
+    <s:String x:Key="Update_Available">Доступна нова версія: {0}</s:String>
+    <s:String x:Key="Update_Failed">Не вдалося перевірити оновлення</s:String>
+
     <!-- ===== Меню панелі ===== -->
     <s:String x:Key="Menu_Section_App">Налаштування Полички</s:String>
     <s:String x:Key="Menu_AddWidget">Додати віджет</s:String>

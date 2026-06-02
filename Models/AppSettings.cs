@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Shelf.Sdk;
@@ -65,6 +66,15 @@ public class AppSettings
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public AppTheme Theme { get; set; } = AppTheme.Dark;
+
+    // ===== Auto-update check (PORTABLE builds only; Store handles its own updates).
+    // Persisted so the About-tab badge can render instantly without a network call.
+    // Written by the once-a-day background check in App.OnStartup.
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public DateTime? LastUpdateCheckUtc { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? LatestKnownVersion { get; set; }
 
     public List<WidgetEntry> Widgets { get; set; } = new();
 }
