@@ -474,7 +474,7 @@
 
 ---
 
-#### Етап 9 (нижчий пріоритет) — Auto-update для portable-збірки
+#### Етап 9 (🟢 виконано — Варіант A, 2026-06-02) — Auto-update для portable-збірки
 
 **Чому нижчий пріоритет:** Microsoft Store (Етап 7) дає auto-update автоматично кожні 8 годин для Store-користувачів — а це після виходу 7.7 буде основним каналом для пересічного користувача. Portable zip з GitHub Releases — користувачі технічні, самі стежать. Тому Етап 9 — поліпшення UX, не критична функція.
 
@@ -490,12 +490,14 @@
 - Локалізувати рядки в `Strings.uk.xaml` / `Strings.en.xaml`.
 
 **Перевірка:**
-- [ ] Кнопка відображається в About.
-- [ ] Тест на старішій версії → відкриває браузер на Releases.
-- [ ] Тест на актуальній → показує "У вас остання версія".
-- [ ] Network-failure (offline) → graceful error message, без crash.
+- [x] Кнопка «Перевірити оновлення» відображається в About (portable; у Store-збірці панель `Collapsed`).
+- [x] Логіка: новіша версія → відкриває браузер на Releases; актуальна → «У вас найновіша версія»; offline → «Не вдалося перевірити» (помилки гасяться, без crash).
+- [x] Тиха денна перевірка при старті + badge «Доступна нова версія» з персистнутого результату.
+- [x] Build чистий у Debug / Release / Store (update-код вирізаний у Store через `#if !STORE_BUILD`).
 
-##### Варіант B — Velopack (повноцінне фонове оновлення, ~1 день)
+> ✅ **Виконано 2026-06-02** (commit `7fccf2e`). Реалізовано саме Варіант A. `Services/UpdateService.cs` (чистий, `#if !STORE_BUILD`), порівняння Major.Minor.Patch (revision ігнорується). Денний throttle + персист (`AppSettings.LastUpdateCheckUtc`/`LatestKnownVersion`) — в `App.OnStartup`. UI badge у About. **Реальний badge з'явиться у portable-користувачів лише коли вийде версія новіша за поточну** (тобто після наступного релізу, напр. v1.2.0). Деталі — у `CLAUDE.md` секція «Update checker».
+
+##### Варіант B — Velopack (повноцінне фонове оновлення, ~1 день) — НЕ робимо поки
 
 - Інтегрувати [Velopack](https://github.com/velopack/velopack) — MIT, активно розробляється, з коробки тягне новий exe з GitHub Releases і застосовує оновлення без участі користувача.
 - Замінити portable zip-формат на Velopack `.exe` installer + delta-updates.
@@ -539,6 +541,7 @@
 - **2026-05-27 v8** — hotfix **v1.0.1**. У v1.0.0 виявлено критичний баг: `-p:PublishSingleFile=true` запаковував усі `Shelf.Widgets.*.dll` всередину `Shelf.exe`, а `WidgetRegistry.Initialize()` шукає їх через `Directory.EnumerateFiles` як окремі файли — реєстр був порожній, меню «+ Додати віджет» не показувало жодного типу. Виправлено: прибрано `PublishSingleFile` з `release.yml`, тепер zip містить теку з `Shelf.exe` + ~200 DLL поруч. v1.0.1 опубліковано, перевірено на чистій теці — віджети завантажуються, додаються, працюють.
 - **2026-05-27 v9** — фінальне оновлення плану після завершення всіх етапів. Проставлено чекбокси, оновлено таблицю прийнятих рішень (single-file → folder), переписано розділ статусу як «фінал», структуровано розділ «Майбутні етапи» з конкретними побажаннями: малі поліпшення сайту, action items для просування, серйозніші майбутні етапи 7-10 (MSIX, code signing, auto-update, CI tests), технічний борг.
 - **2026-05-27 v10** — додано два project-local skill в `.claude/skills/`: `shelf-update` (тригер «ВНЕСТИ ЗМІНИ: ...» → редагує код, збирає, не комітить) і `shelf-commit` (тригер «ЗРОБИ КОМІТ» → формулює conventional commit message, пушить). Skills path-agnostic — перевіряють наявність `Shelf.sln` у cwd замість літерального шляху, тому переживуть перейменування теки `D:\project\Polychka` → `D:\project\Shelf`. Skill `shelf-update` додатково має auto-cleanup stale bin/obj, якщо виявить старі шляхи в кеші.
+- **2026-06-02 v13** — **App опубліковано в Microsoft Store + сайтова частина 7.7 + Етап 9.** Submission 1 пройшла certification за ~1 день (submit 06-01 → live 06-02): «Поличка» (uk) / «ShelfDesk» (en) у Store, PEGI 3, Store ID `9NFC2DKPQDLJ`, локалізація назви спрацювала. На сайт `shelf.bridges.net.ua` додано кнопки «Завантажити з Microsoft Store» (hero + download, uk+en), оновлено FAQ (commit `e29bca7`). **Етап 9 (Варіант A) реалізовано** — перевірка оновлень для portable-збірки: `Services/UpdateService.cs` (GitHub releases API, `#if !STORE_BUILD`), кнопка + badge в About, тиха денна перевірка в `App.OnStartup`, поля `LastUpdateCheckUtc`/`LatestKnownVersion` у `AppSettings` (commit `7fccf2e`). Етап 7 → 🟢 опубліковано, Етап 9 → 🟢 виконано. Документацію (CHANGELOG `[Unreleased]`, CLAUDE.md «Update checker» + Settings shape, plan_reliz) синхронізовано. Залишок: 7.6 (CI auto-publish) і Етап 10 (тести) — опційні.
 - **2026-06-01 v12** — **виконано Етап 7.1-7.5 за один день, submission подано на certification.** Код: додано конфігурацію `Store` зі `STARTUP_BUILD`-розгалуженням (PinService вирізано, AutoStartService на StartupTask API, settings-міграція через `SHGetKnownFolderPath`), `TargetFramework` піднято до `net8.0-windows10.0.19041.0`; 3 конфігурації білдяться чисто (commit `1f2e082`). Privacy Policy сторінки uk+en на GitHub Pages. **Збірка MSIX без Visual Studio** — Windows SDK 10.0.22621 + standalone `tools/make-msix.ps1` (makeappx/signtool) + `tools/make-store-assets.ps1` (5 PNG); `Shelf.Package/Package.appxmanifest` без `.wapproj` (commits `e52e621`, `041db83`). Partner Center: акаунт `bridges@bridges.net.ua` (вийшов **Company** через Entra ID tenant, $0), зарезервовано **ShelfDesk** (+ «Поличка» additional name), отримано Publisher `CN=01B4C228-...`, Identity `BridgesCommunity.ShelfDesk`, Store ID `9NFC2DKPQDLJ`; manifest оновлено реальними даними (commit `f144328`). Store listings обома мовами + 5 screenshots + IARC рейтинг (3+/Everyone скрізь) + runFullTrust обґрунтування. **Submission 1 → In certification.** Залишилось: дочекатись pass (Етап 7.5 фініш), потім 7.6 CI publish + 7.7 кнопка Store на сайті. Дані збережено в project-memory `store-submission-data.md`.
 - **2026-05-28 v11** — після ґрунтовної розвідки SignPath Foundation і Microsoft Partner Center переосмислено розділ «Майбутні етапи». Microsoft скасував комісію за реєстрацію Partner Center (раніше $19 individual / $99 company → **$0 з травня 2026**), що різко змінило баланс на користь публікації в Store. **Етап 7** повністю переписано як 7 послідовних підетапів (7.1 підготовка коду з conditional compile, 7.2 Privacy Policy, 7.3 .wapproj+manifest, 7.4 Partner Center реєстрація, 7.5 WACK+submit, 7.6 CI publish, 7.7 перший Store-реліз) з чек-листами «Перевірка перед наступним підетапом» і виділеними червоними прапорами (undocumented `IVirtualDesktopPinnedApps`, HKCU autostart, settings migration). **Етап 8** (SignPath Foundation) переформульовано як «відкладено до ~2026-11-28» з конкретним чек-листом підготовки за 6 місяців (накопичити stars, написати Code Signing Policy, OpenHub, MFA, external contributors). **Етап 9** (auto-update) знижено в пріоритеті — Store вирішує проблему для більшості користувачів; для portable додано два варіанти (проста кнопка «Перевірити оновлення» vs Velopack). **Етап 10** без змін. `CHANGELOG.md` `[Unreleased]` синхронізовано. Збережено project-memory про дату повернення до Етапу 8.
 - **2026-06-01 v13** — поки Store-сабмішн на сертифікації, закрито дрібні поліпшення сайту і технічний борг (паралельні до Store задачі). **Сайт:** 3 SVG-заглушки скріншотів замінено справжніми (відібрано з `ScreenShots/`, скомпоновано на однакові плитки 1280×800), оновлено підписи, видалено старі SVG; `og-image.svg` → `og-image.png` (1200×630, headless Edge) підставлено в `og:image`/`twitter:image` обох HTML - соцмережі тепер генерують прев'ю. **Технічний борг:** `logodesk.png` з'ясовано (= site logo `docs/assets/logo.png`), разом з `polychka-*` експортами підтверджено в `NoData/` (gitignored, у репо немає); легасі-теки `Помічник.Widgets.*` підтверджено видаленими; `tools/make-ico.ps1` задокументовано в `CONTRIBUTING.md` (+ `Nba` додано в структуру проекту); WFAC010 лишено свідомо (документований false-positive). **Item 1:** `gh` встановлено (winget), але browser-auth не вдався - тому 8 GitHub topics виставлено через REST API з тимчасовим токеном (`public_repo`, потім відкликаний). Лишились pin репо і лого/опис профілю org (лише веб-UI).
@@ -547,6 +550,8 @@
 
 🟢 **Базові 6 етапів + рефакторинг + hotfix виконано** — проект живий у мережі (v1.1.1 на GitHub Releases).
 🟢 **Етап 7 (Microsoft Store) — ОПУБЛІКОВАНО:** «Поличка» / «ShelfDesk» live у Store з 2026-06-02 (Store ID `9NFC2DKPQDLJ`, passed certification за ~1 день). Підетапи 7.1-7.5 + сайтова частина 7.7 закриті. Залишок: 7.6 (CI auto-publish, опційно) і version-bump-частина 7.7 (при наступному релізі). Деталі — у блоці «Фактичні дані» Етапу 7 вище.
+🟢 **Етап 9 (Auto-update portable) — ВИКОНАНО (Варіант A, 2026-06-02):** кнопка «Перевірити оновлення» + тиха денна перевірка + badge в About, через GitHub releases API; вирізано зі Store-збірки. Badge реально показуватиметься після виходу версії новішої за поточну.
+🟡 **Етап 8 (SignPath) — відкладено до ~2026-11-28.** Решта (7.6 CI publish, Етап 10 тести) — опційні, за бажанням.
 
 Нижче — підсумок початкових 6 етапів (історичний, без Етапу 7).
 

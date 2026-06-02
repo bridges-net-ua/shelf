@@ -152,6 +152,7 @@ AppSettings
 ├── Side, Width, AutoHide       (LEGACY single-monitor fields — migrated on first run into MonitorPanels[primary] by SettingsService.MigrateLegacyPanel. Still present for back-compat deserialization.)
 ├── MonitorPanels: Dictionary<string, MonitorPanelConfig>  (per-monitor Side/Width/AutoHide, keyed by Screen.DeviceName)
 ├── AutoStart, WidgetOrderLocked, Language, Theme, InitializedWithDefaults  (global)
+├── LastUpdateCheckUtc, LatestKnownVersion  (PORTABLE-only update checker — JsonIgnore-when-null; see "Update checker" below)
 └── Widgets: List<WidgetEntry>
     ├── InstanceId  (GUID, unique per instance)
     ├── TypeId      (plugin id, e.g. "clock" / "notes" / "todo" / "photos" / "radio" / "stopwatch")
@@ -166,6 +167,10 @@ AppSettings
 `Theme` (`AppTheme`, default `Dark`) — UI theme; see **Themes**.
 
 `SettingsService.Save` writes prettified JSON. `Save()` does not fire `Changed`; `NotifyChanged()` does — call the latter only when **panel** layout (position, side, width, autohide) needs to react, not for widget autosaves.
+
+### Update checker (`Services/UpdateService.cs`, portable builds only)
+
+The whole feature is wrapped in `#if !STORE_BUILD` — compiled out of the Store build, where Microsoft Store delivers updates and steering users elsewhere is discouraged by Store policy. `UpdateService.CheckAsync()` GETs `api.github.com/repos/bridges-net-ua/shelf/releases/latest`, parses `tag_name`, and compares **Major.Minor.Patch** (revision ignored, so `1.1.1` doesn't read as older than the assembly's `1.1.1.0`). It's a pure utility — no `App` reference; the once-a-day throttle and persistence live in `App.OnStartup` (`MaybeCheckForUpdatesAsync`, fire-and-forget, swallows all errors). Results persist to `AppSettings.LastUpdateCheckUtc`/`LatestKnownVersion` so the About-tab badge renders instantly next launch without a network call. The About tab's `UpdatePanel` is `Visibility="Collapsed"` in XAML and revealed only by `SetupAbout()` under `#if !STORE_BUILD`; its `Click` handler is wired **in code, not XAML**, so the Store build (which omits the handler) still compiles. Localized via `Update_*` keys. The manual button checks live and opens the Releases page in a browser when a newer version exists.
 
 For widget-list changes (add/remove/reorder/lock), use `App.Widgets.ActiveWidgetsChanged` event (fired by `WidgetManager`). `MainWindow.RebuildPanel` subscribes to it. `WidgetManager.NotifyOrderLockChanged()` is a no-arg helper that just raises `ActiveWidgetsChanged` so the panel rebuilds.
 

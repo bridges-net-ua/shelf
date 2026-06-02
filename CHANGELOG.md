@@ -5,9 +5,13 @@
 
 ## [Unreleased]
 
+### Додано
+- **Перевірка оновлень для portable-збірки (Етап 9).** В About-вкладці з'явилася кнопка «Перевірити оновлення»: запитує останній реліз через GitHub API, і якщо є новіша версія - відкриває сторінку Releases у браузері. Раз на добу при старті відбувається тиха фонова перевірка, і якщо є оновлення - під номером версії показується ненав'язливий рядок «Доступна нова версія». Жодних фонових інсталяторів і зайвих залежностей. Функція вимкнена у збірці для Microsoft Store (там оновлення доставляє сам Store).
+
+### Інфраструктура
+- **Опубліковано в Microsoft Store (Етап 7).** Поличка / ShelfDesk доступна у Store: https://apps.microsoft.com/detail/9NFC2DKPQDLJ. MSIX-пакет підписується сертифікатом Microsoft - це знімає попередження SmartScreen / Smart App Control і дає безкоштовне auto-update через Store. Portable `.zip` на GitHub Releases лишається паралельним каналом. Деталі складання MSIX - у `tools/make-msix.ps1` і `Shelf.Package/`.
+
 ### Заплановано
-- **Публікація в Microsoft Store через MSIX (Етап 7).** Microsoft автоматично підписує пакет своїм CA - закриває code signing і знімає попередження SmartScreen / Smart App Control. Бонусом - auto-update кожні 8 годин через Store. Детальний план у [plan_reliz.md](plan_reliz.md) (підетапи 7.1-7.7).
-- **Auto-update для portable-збірки з GitHub Releases (Етап 9, нижчий пріоритет).** Проста кнопка "Перевірити оновлення" в About-вкладці або повноцінний Velopack. Store-користувачі вже мають auto-update.
 - **Підпис portable .exe через SignPath Foundation (Етап 8).** Відкладено до ~2026-11-28 - спочатку треба накопичити GitHub reputation (≥50 stars, external contributors, Code Signing Policy сторінка, OpenHub профіль).
 
 ---
