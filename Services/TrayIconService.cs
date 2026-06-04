@@ -13,6 +13,7 @@ public class TrayIconService : IDisposable
     private SettingsWindow? _openSettings;
     private TrayPalette _palette;
     private readonly Action _themeChangedHandler;
+    private readonly Action _langChangedHandler;
 
     public TrayIconService()
     {
@@ -33,6 +34,11 @@ public class TrayIconService : IDisposable
         // dictionary swap, so reads of Theme.Current here see the new value.
         _themeChangedHandler = OnThemeChanged;
         Theme.ThemeChanged += _themeChangedHandler;
+
+        // Live language switch: rebuild the menu (item captions) and the tooltip/fallback
+        // icon (the embedded letter is language-specific) when Loc.Apply fires.
+        _langChangedHandler = OnLanguageChanged;
+        Loc.LanguageChanged += _langChangedHandler;
     }
 
     private void OnThemeChanged()
@@ -43,6 +49,20 @@ public class TrayIconService : IDisposable
         _icon.ContextMenuStrip = BuildContextMenu(_palette);
         try { oldMenu?.Dispose(); } catch { }
 
+        var oldIcon = _icon.Icon;
+        _icon.Icon = CreateIcon(_palette);
+        try { oldIcon?.Dispose(); } catch { }
+    }
+
+    private void OnLanguageChanged()
+    {
+        _icon.Text = Loc.Get("App_Name");
+
+        var oldMenu = _icon.ContextMenuStrip;
+        _icon.ContextMenuStrip = BuildContextMenu(_palette);
+        try { oldMenu?.Dispose(); } catch { }
+
+        // Fallback icon embeds a language-specific letter (П / S) — recreate it too.
         var oldIcon = _icon.Icon;
         _icon.Icon = CreateIcon(_palette);
         try { oldIcon?.Dispose(); } catch { }
@@ -163,6 +183,7 @@ public class TrayIconService : IDisposable
     public void Dispose()
     {
         try { Theme.ThemeChanged -= _themeChangedHandler; } catch { }
+        try { Loc.LanguageChanged -= _langChangedHandler; } catch { }
         try { _icon.Visible = false; } catch { }
         try { _icon.Dispose(); } catch { }
     }

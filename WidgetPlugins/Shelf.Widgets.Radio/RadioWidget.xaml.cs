@@ -149,15 +149,13 @@ public partial class RadioWidget : UserControl, IWidget
 
     // ===== State / UI sync =====
 
+    // Live language switch: re-read the title, station combo and play-state labels.
+    public void OnLanguageChanged() => ApplyState();
+
     private void ApplyState()
     {
-        if (!_state.Initialized)
-        {
-            _state.Stations = DefaultStations();
-            _state.SelectedStationId = _state.Stations.FirstOrDefault()?.Id ?? "";
-            _state.Initialized = true;
-            WidgetServices.RequestSaveStates();
-        }
+        // No built-in stations - the list starts empty; the user adds their own via the
+        // settings dialog. (The Initialized flag is kept only for older saved state.)
 
         TitleText.Text = InstanceLabel;
         RebuildStationCombo();
@@ -170,17 +168,6 @@ public partial class RadioWidget : UserControl, IWidget
 
         UpdatePlayState();
     }
-
-    private static List<RadioStation> DefaultStations() => new()
-    {
-        new() { Name = "Hit FM",        Url = "http://online.hitfm.ua/HitFM" },
-        new() { Name = "Радіо ROKS",    Url = "http://online.radioroks.ua/RadioROKS" },
-        new() { Name = "KISS FM",       Url = "http://online.kissfm.ua/KissFM" },
-        new() { Name = "Наше Радіо",    Url = "http://online.nasheradio.ua/NasheRadio" },
-        new() { Name = "Люкс FM",       Url = "http://online.luxfm.ua/LuxFM" },
-        new() { Name = "Радіо Relax",   Url = "http://online.radiorelax.ua/RadioRelax" },
-        new() { Name = "Радіо Мелодія", Url = "http://online.radiomelodia.ua/RadioMelodia" },
-    };
 
     private RadioStation? CurrentStation() =>
         _state.Stations.FirstOrDefault(s => s.Id == _state.SelectedStationId);

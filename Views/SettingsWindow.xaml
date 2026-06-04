@@ -3,10 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="{DynamicResource Settings_Title}"
         Height="540" Width="500"
+        MinHeight="480" MinWidth="500"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource BackgroundBrush}"
         FontFamily="{StaticResource UiFont}"
-        ResizeMode="NoResize"
+        ResizeMode="CanResize"
         ShowInTaskbar="True"
         Foreground="{DynamicResource PrimaryTextBrush}">
     <Grid>
@@ -143,14 +144,56 @@
                                    Margin="0,0,0,8"
                                    Foreground="{DynamicResource SecondaryTextBrush}"/>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                            <RadioButton x:Name="RbLangUk" Content="Українська" Margin="0,0,24,0" GroupName="Language"/>
-                            <RadioButton x:Name="RbLangEn" Content="English" GroupName="Language"/>
+                            <RadioButton x:Name="RbLangUk" Content="Українська" Margin="0,0,24,0" GroupName="Language" Click="RbLang_Click"/>
+                            <RadioButton x:Name="RbLangEn" Content="English" GroupName="Language" Click="RbLang_Click"/>
                         </StackPanel>
                         <TextBlock Text="{DynamicResource Settings_Language_Hint}"
                                    TextWrapping="Wrap"
                                    FontSize="12"
                                    Foreground="{DynamicResource MutedTextBrush}"
                                    Margin="0,0,0,0"/>
+
+                        <Border Height="1"
+                                Background="{DynamicResource BorderBrush}"
+                                Margin="0,20,0,20"/>
+
+                        <TextBlock Text="{DynamicResource Settings_Section_Backup}"
+                                   FontSize="11" FontWeight="SemiBold"
+                                   Margin="0,0,0,10"
+                                   Foreground="{DynamicResource MutedTextBrush}"/>
+                        <TextBlock Text="{DynamicResource Settings_Backup_Hint}"
+                                   TextWrapping="Wrap"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource MutedTextBrush}"
+                                   Margin="0,0,0,10"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="BtnExportSettings"
+                                    Padding="14,6" Margin="0,0,8,0"
+                                    Click="BtnExportSettings_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Width="15" Height="15" Margin="0,0,8,0"
+                                          Stretch="Uniform"
+                                          VerticalAlignment="Center"
+                                          Fill="{DynamicResource PrimaryTextBrush}"
+                                          Data="M23,12L19,8V11H10V13H19V16M1,18V6C1,4.89 1.9,4 3,4H15A2,2 0 0,1 17,6V9H15V6H3V18H15V15H17V18A2,2 0 0,1 15,20H3A2,2 0 0,1 1,18Z"/>
+                                    <TextBlock Text="{DynamicResource Settings_Backup_Export}"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button x:Name="BtnImportSettings"
+                                    Padding="14,6"
+                                    Click="BtnImportSettings_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Width="15" Height="15" Margin="0,0,8,0"
+                                          Stretch="Uniform"
+                                          VerticalAlignment="Center"
+                                          Fill="{DynamicResource PrimaryTextBrush}"
+                                          Data="M14,12L10,8V11H1V13H10V16M20,18V6C20,4.89 19.1,4 18,4H6A2,2 0 0,0 4,6V9H6V6H18V18H6V15H4V18A2,2 0 0,0 6,20H18A2,2 0 0,0 20,18Z"/>
+                                    <TextBlock Text="{DynamicResource Settings_Backup_Import}"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

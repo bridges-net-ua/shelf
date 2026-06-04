@@ -12,6 +12,8 @@
     <s:String x:Key="Title_Confirm">Підтвердження</s:String>
     <s:String x:Key="Title_Error">Помилка</s:String>
     <s:String x:Key="Title_RestartNeeded">Потрібен перезапуск</s:String>
+    <s:String x:Key="Chrome_Maximize">Розгорнути</s:String>
+    <s:String x:Key="Chrome_Restore">Відновити</s:String>
 
     <!-- ===== Вікно налаштувань ===== -->
     <s:String x:Key="Settings_Title">Налаштування - Поличка</s:String>
@@ -33,7 +35,19 @@
     <s:String x:Key="Settings_LockOrder">Заблокувати порядок віджетів</s:String>
     <s:String x:Key="Settings_LockOrder_Hint">Перетягування мишкою та стрілки впорядкування вимикаються. Додавати, видаляти і налаштовувати віджети можна як раніше.</s:String>
     <s:String x:Key="Settings_Language_Label">Мова інтерфейсу</s:String>
-    <s:String x:Key="Settings_Language_Hint">Зміна мови застосується після перезапуску програми.</s:String>
+    <s:String x:Key="Settings_Language_Hint">Мова інтерфейсу змінюється одразу, без перезапуску.</s:String>
+    <s:String x:Key="Settings_Section_Backup">РЕЗЕРВНЕ КОПІЮВАННЯ</s:String>
+    <s:String x:Key="Settings_Backup_Hint">Збережіть усі налаштування у файл або завантажте їх з іншого компʼютера. Імпорт замінює поточні налаштування та перезапускає програму.</s:String>
+    <s:String x:Key="Settings_Backup_Export">Експорт</s:String>
+    <s:String x:Key="Settings_Backup_Import">Імпорт</s:String>
+    <s:String x:Key="Settings_Backup_ExportTitle">Експортувати налаштування</s:String>
+    <s:String x:Key="Settings_Backup_ImportTitle">Імпортувати налаштування</s:String>
+    <s:String x:Key="Settings_Backup_Filter">Налаштування Shelf (*.json)|*.json|Усі файли (*.*)|*.*</s:String>
+    <s:String x:Key="Settings_Backup_ExportOk">Налаштування збережено у файл.</s:String>
+    <s:String x:Key="Settings_Backup_ExportFail">Не вдалося зберегти файл налаштувань.</s:String>
+    <s:String x:Key="Settings_Backup_ImportConfirm">Імпортувати налаштування з файлу? Усі поточні налаштування, віджети та їхній вміст буде замінено, а програму перезапущено.</s:String>
+    <s:String x:Key="Settings_Backup_ImportOk">Налаштування імпортовано. Програму буде перезапущено.</s:String>
+    <s:String x:Key="Settings_Backup_ImportFail">Не вдалося імпортувати файл. Переконайтеся, що це файл налаштувань Shelf.</s:String>
     <s:String x:Key="Settings_Section_Theme">ТЕМА</s:String>
     <s:String x:Key="Settings_Theme_Label">Тема оформлення</s:String>
     <s:String x:Key="Settings_Theme_Dark">Темна</s:String>
@@ -72,6 +86,7 @@
     <s:String x:Key="Menu_Unpin">Відкріпити</s:String>
     <s:String x:Key="Menu_WidgetSettings">Налаштування віджета…</s:String>
     <s:String x:Key="Menu_DeleteWidget">Видалити віджет</s:String>
+    <s:String x:Key="Menu_HideWidget">Сховати віджет</s:String>
     <s:String x:Key="Menu_MoveToMonitor">Перенести на монітор</s:String>
     <s:String x:Key="Widget_Fallback">віджет</s:String>
     <s:String x:Key="Confirm_DeleteWidget">Видалити віджет «{0}»? Його вміст буде втрачено.</s:String>
@@ -256,7 +271,7 @@
     <s:String x:Key="Holidays_Month_Label">Місяць</s:String>
     <s:String x:Key="Holidays_Day_Label">День</s:String>
     <s:String x:Key="Holidays_Name_Label">Назва</s:String>
-    <s:String x:Key="Holidays_User_Hint">Власні дати (дні народження, річниці) показуються разом із вбудованими святами.</s:String>
+    <s:String x:Key="Holidays_User_Hint">Власні дати (дні народження, річниці) показуються у віджеті.</s:String>
     <s:String x:Key="Holidays_NewHoliday">Нова дата</s:String>
     <s:String x:Key="Holidays_NoName">Без назви</s:String>
     <s:String x:Key="Holidays_Import">Імпорт…</s:String>

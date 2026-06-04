@@ -26,15 +26,16 @@ public class WidgetManager
             entry.Id = null; // drop legacy field after migration
         }
 
-        // First-time defaults: one instance of every registered widget type
+        // First-time defaults: only a single Clock widget, enabled. Every other widget
+        // starts absent — the user adds them manually via the panel's "Add widget" menu.
         if (list.Count == 0 && !App.Settings.Current.InitializedWithDefaults)
         {
-            foreach (var type in WidgetRegistry.Types)
+            if (WidgetRegistry.FindType("clock") is { } clockType)
             {
                 list.Add(new WidgetEntry
                 {
                     InstanceId = Guid.NewGuid().ToString("N"),
-                    TypeId = type.TypeId,
+                    TypeId = clockType.TypeId,
                     Enabled = true,
                     State = ""
                 });

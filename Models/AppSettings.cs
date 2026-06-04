@@ -38,7 +38,7 @@ public class WidgetEntry
 // side / width / auto-hide configuration.
 public class MonitorPanelConfig
 {
-    public BarSide Side { get; set; } = BarSide.Right;
+    public BarSide Side { get; set; } = BarSide.Left;
     public int Width { get; set; } = 300;
     public bool AutoHide { get; set; } = false;
 }
@@ -48,7 +48,7 @@ public class AppSettings
     // ===== Legacy single-monitor fields (pre-v1.2).
     // Kept here so older settings.json deserializes; migrated into MonitorPanels[primary]
     // by SettingsService on first run after upgrade, then ignored at runtime.
-    public BarSide Side { get; set; } = BarSide.Right;
+    public BarSide Side { get; set; } = BarSide.Left;
     public int Width { get; set; } = 300;
     public bool AutoHide { get; set; } = false;
 

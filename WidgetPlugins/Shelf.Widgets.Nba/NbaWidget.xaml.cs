@@ -159,6 +159,10 @@ public partial class NbaWidget : UserControl, IWidget
 
     // ===== Lifecycle =====
 
+    // Live language switch: re-render the cached snapshot in the new language (status
+    // lines, schedule dates) without a network fetch.
+    public void OnLanguageChanged() => TryRenderCache();
+
     private void ApplyState()
     {
         TitleText.Text = InstanceLabel;

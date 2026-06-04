@@ -12,6 +12,8 @@
     <s:String x:Key="Title_Confirm">Confirmation</s:String>
     <s:String x:Key="Title_Error">Error</s:String>
     <s:String x:Key="Title_RestartNeeded">Restart required</s:String>
+    <s:String x:Key="Chrome_Maximize">Maximize</s:String>
+    <s:String x:Key="Chrome_Restore">Restore</s:String>
 
     <!-- ===== Settings window ===== -->
     <s:String x:Key="Settings_Title">Settings - ShelfDesk</s:String>
@@ -33,7 +35,19 @@
     <s:String x:Key="Settings_LockOrder">Lock widget order</s:String>
     <s:String x:Key="Settings_LockOrder_Hint">Mouse dragging and the reorder arrows are disabled. You can still add, remove and configure widgets as before.</s:String>
     <s:String x:Key="Settings_Language_Label">Interface language</s:String>
-    <s:String x:Key="Settings_Language_Hint">The language change takes effect after restarting the app.</s:String>
+    <s:String x:Key="Settings_Language_Hint">The interface language changes instantly, no restart needed.</s:String>
+    <s:String x:Key="Settings_Section_Backup">BACKUP</s:String>
+    <s:String x:Key="Settings_Backup_Hint">Save all settings to a file, or load them from another computer. Import replaces the current settings and restarts the app.</s:String>
+    <s:String x:Key="Settings_Backup_Export">Export</s:String>
+    <s:String x:Key="Settings_Backup_Import">Import</s:String>
+    <s:String x:Key="Settings_Backup_ExportTitle">Export settings</s:String>
+    <s:String x:Key="Settings_Backup_ImportTitle">Import settings</s:String>
+    <s:String x:Key="Settings_Backup_Filter">Shelf settings (*.json)|*.json|All files (*.*)|*.*</s:String>
+    <s:String x:Key="Settings_Backup_ExportOk">Settings saved to file.</s:String>
+    <s:String x:Key="Settings_Backup_ExportFail">Could not save the settings file.</s:String>
+    <s:String x:Key="Settings_Backup_ImportConfirm">Import settings from a file? All current settings, widgets and their content will be replaced, and the app will restart.</s:String>
+    <s:String x:Key="Settings_Backup_ImportOk">Settings imported. The app will now restart.</s:String>
+    <s:String x:Key="Settings_Backup_ImportFail">Could not import the file. Make sure it is a Shelf settings file.</s:String>
     <s:String x:Key="Settings_Section_Theme">THEME</s:String>
     <s:String x:Key="Settings_Theme_Label">Appearance theme</s:String>
     <s:String x:Key="Settings_Theme_Dark">Dark</s:String>
@@ -72,6 +86,7 @@
     <s:String x:Key="Menu_Unpin">Unpin</s:String>
     <s:String x:Key="Menu_WidgetSettings">Widget settings…</s:String>
     <s:String x:Key="Menu_DeleteWidget">Delete widget</s:String>
+    <s:String x:Key="Menu_HideWidget">Hide widget</s:String>
     <s:String x:Key="Menu_MoveToMonitor">Move to monitor</s:String>
     <s:String x:Key="Widget_Fallback">widget</s:String>
     <s:String x:Key="Confirm_DeleteWidget">Delete the «{0}» widget? Its content will be lost.</s:String>
@@ -256,7 +271,7 @@
     <s:String x:Key="Holidays_Month_Label">Month</s:String>
     <s:String x:Key="Holidays_Day_Label">Day</s:String>
     <s:String x:Key="Holidays_Name_Label">Name</s:String>
-    <s:String x:Key="Holidays_User_Hint">Custom dates (birthdays, anniversaries) appear alongside built-in holidays.</s:String>
+    <s:String x:Key="Holidays_User_Hint">Custom dates (birthdays, anniversaries) are shown in the widget.</s:String>
     <s:String x:Key="Holidays_NewHoliday">New date</s:String>
     <s:String x:Key="Holidays_NoName">Unnamed</s:String>
     <s:String x:Key="Holidays_Import">Import…</s:String>

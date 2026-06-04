@@ -208,6 +208,11 @@ public partial class WeatherWidget : UserControl, IWidget
 
     // ===== State / refresh =====
 
+    // Live language switch: re-render the cached snapshot so the weather description
+    // ("Snow", "Cloudy", ...) and date/number formatting follow the new language. No
+    // network fetch needed - the cached WMO code maps to a fresh localized string.
+    public void OnLanguageChanged() => TryRenderCache();
+
     private void ApplyState()
     {
         TitleText.Text = InstanceLabel;

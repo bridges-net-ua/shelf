@@ -38,6 +38,7 @@ public static class WindowChrome
         if (DefaultIcon != null) window.Icon ??= DefaultIcon;
         ApplyChromeStyle(window);
         ApplyTitleBarTheme(window);
+        HookMaximizeToWorkArea(window);
     }
 
     private static void ApplyChromeStyle(Window window)
@@ -58,6 +59,15 @@ public static class WindowChrome
         window.CommandBindings.Add(new CommandBinding(
             SystemCommands.CloseWindowCommand,
             (_, args) => { window.Close(); args.Handled = true; }));
+
+        // Maximize / restore for resizable windows (the chrome's MaxButton fires these).
+        // Like the close command they aren't auto-wired, because UseAeroCaptionButtons=False.
+        window.CommandBindings.Add(new CommandBinding(
+            SystemCommands.MaximizeWindowCommand,
+            (_, args) => { SystemCommands.MaximizeWindow(window); args.Handled = true; }));
+        window.CommandBindings.Add(new CommandBinding(
+            SystemCommands.RestoreWindowCommand,
+            (_, args) => { SystemCommands.RestoreWindow(window); args.Handled = true; }));
     }
 
     /// <summary>
@@ -109,5 +119,108 @@ public static class WindowChrome
             try { ApplyTitleBarTheme(w); }
             catch { /* one failed window must not block the rest */ }
         }
+    }
+
+    // ===== Maximize-to-work-area =====
+    // A borderless window (WindowStyle=None + shell:WindowChrome) maximizes to the FULL
+    // monitor by default, covering the taskbar and our own Shelf AppBar strip. Handling
+    // WM_GETMINMAXINFO clamps the maximized bounds to the monitor work area (rcWork),
+    // which already excludes both the taskbar and the reserved AppBar strip - so a
+    // maximized window (e.g. Settings) behaves like a normal window.
+
+    private const int WM_GETMINMAXINFO = 0x0024;
+    private const int MONITOR_DEFAULTTONEAREST = 0x00000002;
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct POINT { public int X; public int Y; }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct RECT { public int Left; public int Top; public int Right; public int Bottom; }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MONITORINFO
+    {
+        public int cbSize;
+        public RECT rcMonitor;
+        public RECT rcWork;
+        public int dwFlags;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MINMAXINFO
+    {
+        public POINT ptReserved;
+        public POINT ptMaxSize;
+        public POINT ptMaxPosition;
+        public POINT ptMinTrackSize;
+        public POINT ptMaxTrackSize;
+    }
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr MonitorFromWindow(IntPtr hwnd, int dwFlags);
+
+    [DllImport("user32.dll")]
+    private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO lpmi);
+
+    private static void HookMaximizeToWorkArea(Window window)
+    {
+        void Hook()
+        {
+            var hwnd = new WindowInteropHelper(window).Handle;
+            if (hwnd == IntPtr.Zero) return;
+            HwndSource.FromHwnd(hwnd)?.AddHook(
+                (IntPtr h, int msg, IntPtr wp, IntPtr lp, ref bool handled) =>
+                    WndProc(window, h, msg, wp, lp, ref handled));
+        }
+
+        if (new WindowInteropHelper(window).Handle != IntPtr.Zero)
+            Hook();
+        else
+            window.SourceInitialized += (_, _) => Hook();
+    }
+
+    private static IntPtr WndProc(Window window, IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (msg != WM_GETMINMAXINFO) return IntPtr.Zero;
+
+        var mmi = Marshal.PtrToStructure<MINMAXINFO>(lParam);
+
+        // Clamp the MAXIMIZED bounds to the monitor work area (excludes taskbar + AppBar).
+        var monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+        if (monitor != IntPtr.Zero)
+        {
+            var mi = new MONITORINFO { cbSize = Marshal.SizeOf<MONITORINFO>() };
+            if (GetMonitorInfo(monitor, ref mi))
+            {
+                RECT work = mi.rcWork;
+                RECT mon = mi.rcMonitor;
+                // Maximized position/size are expressed relative to the monitor's top-left.
+                mmi.ptMaxPosition.X = work.Left - mon.Left;
+                mmi.ptMaxPosition.Y = work.Top - mon.Top;
+                mmi.ptMaxSize.X = work.Right - work.Left;
+                mmi.ptMaxSize.Y = work.Bottom - work.Top;
+            }
+        }
+
+        // Re-apply the window's MinWidth/MinHeight as the minimum track size. Because we
+        // mark the message handled, WPF no longer enforces the window minimum for us -
+        // without this the window could be shrunk until the buttons, tabs and scrollbar
+        // disappear. MinWidth/MinHeight are in DIPs, so scale to physical pixels.
+        double scaleX = 1.0, scaleY = 1.0;
+        var src = HwndSource.FromHwnd(hwnd);
+        if (src?.CompositionTarget != null)
+        {
+            var m = src.CompositionTarget.TransformToDevice;
+            if (m.M11 > 0) scaleX = m.M11;
+            if (m.M22 > 0) scaleY = m.M22;
+        }
+        if (window.MinWidth > 0 && !double.IsInfinity(window.MinWidth))
+            mmi.ptMinTrackSize.X = (int)Math.Ceiling(window.MinWidth * scaleX);
+        if (window.MinHeight > 0 && !double.IsInfinity(window.MinHeight))
+            mmi.ptMinTrackSize.Y = (int)Math.Ceiling(window.MinHeight * scaleY);
+
+        Marshal.StructureToPtr(mmi, lParam, true);
+        handled = true;
+        return IntPtr.Zero;
     }
 }

@@ -13,6 +13,13 @@ public interface IWidget
     // (like Notes) override this to return the user-set title.
     string InstanceLabel => DisplayName;
 
+    // Called on the UI thread after the UI language changes at runtime (Loc.Apply).
+    // Widgets that render any text imperatively in code (dates via Loc.Culture,
+    // weather descriptions, holiday day labels, error lines, etc.) override this to
+    // re-read their strings and repaint. Content bound purely via {DynamicResource ...}
+    // in XAML updates on its own, so such widgets can leave the default no-op.
+    void OnLanguageChanged() { }
+
     UserControl CreateView();
 
     bool HasSettings { get; }

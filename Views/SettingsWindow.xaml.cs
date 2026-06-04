@@ -44,12 +44,27 @@ public partial class SettingsWindow : Window
         SetupAbout();
         _suppressThemeApply = false;
         _suppressMonitorChange = false;
+
+        // Live language switch: when Loc.Apply fires (from the language radio buttons
+        // or an imported settings file) refresh the parts of this window built in code.
+        Loc.LanguageChanged += OnLanguageChangedLocal;
+        Closed += (_, _) => Loc.LanguageChanged -= OnLanguageChangedLocal;
+    }
+
+    private void OnLanguageChangedLocal()
+    {
+        // XAML {DynamicResource ...} bindings re-resolve on their own; refresh the
+        // imperatively-built bits (width label, About inlines, widget list).
+        WidthLabelRun.Text = Loc.Get("Settings_Width");
+        WidthUnitRun.Text = Loc.Get("Settings_Px");
+        SetupAbout();
+        RebuildWidgetsList();
     }
 
     private void SetupAbout()
     {
         var version = Assembly.GetExecutingAssembly().GetName().Version;
-        var versionString = version == null ? "1.0" : $"{version.Major}.{version.Minor}";
+        var versionString = version == null ? "1.0.0" : $"{version.Major}.{version.Minor}.{version.Build}";
         AboutVersionText.Text = Loc.Format("About_Version", versionString);
 
         AboutDeveloperText.Inlines.Clear();
@@ -89,6 +104,8 @@ public partial class SettingsWindow : Window
         // Microsoft Store delivers updates). The badge is rendered from the last
         // persisted daily check, with no network call here.
         UpdatePanel.Visibility = Visibility.Visible;
+        // SetupAbout may run again on a live language switch — avoid stacking handlers.
+        BtnCheckUpdates.Click -= BtnCheckUpdates_Click;
         BtnCheckUpdates.Click += BtnCheckUpdates_Click;
 
         var current = Assembly.GetExecutingAssembly().GetName().Version ?? new Version(0, 0, 0, 0);
@@ -265,6 +282,17 @@ public partial class SettingsWindow : Window
         Theme.Apply(newTheme);
     }
 
+    private void RbLang_Click(object sender, RoutedEventArgs e)
+    {
+        // Live language switch — no restart. Mirrors the theme switch above:
+        // persist immediately and call Loc.Apply so the whole UI repaints at once.
+        var newLang = RbLangEn.IsChecked == true ? AppLanguage.En : AppLanguage.Uk;
+        if (newLang == App.Settings.Current.Language) return;
+        App.Settings.Current.Language = newLang;
+        App.Settings.Save();
+        Loc.Apply(newLang);
+    }
+
     private void CbLockOrder_Click(object sender, RoutedEventArgs e)
     {
         App.Settings.Current.WidgetOrderLocked = CbLockOrder.IsChecked == true;
@@ -294,25 +322,9 @@ public partial class SettingsWindow : Window
 
         s.AutoStart = CbAutoStart.IsChecked == true;
 
-        var oldLang = s.Language;
-        var newLang = RbLangEn.IsChecked == true ? AppLanguage.En : AppLanguage.Uk;
-        s.Language = newLang;
-
+        // Language is applied live the moment a radio button is clicked (RbLang_Click),
+        // so there is nothing language-related left to commit here.
         App.Settings.NotifyChanged();
-
-        if (oldLang != newLang)
-        {
-            var ans = DarkMessageBox.Show(this,
-                Loc.Get("Settings_Language_Hint"),
-                Loc.Get("Title_RestartNeeded"),
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
-            if (ans == MessageBoxResult.Yes)
-            {
-                RestartApp();
-                return;
-            }
-        }
 
         try { DialogResult = true; } catch { }
         Close();
@@ -340,6 +352,67 @@ public partial class SettingsWindow : Window
         }
         catch { }
         Application.Current.Shutdown();
+    }
+
+    private void BtnExportSettings_Click(object sender, RoutedEventArgs e)
+    {
+        // Flush widget states first so the export captures the latest notes/tasks/etc.
+        try { App.Widgets.SaveStates(); } catch { }
+
+        var dlg = new Microsoft.Win32.SaveFileDialog
+        {
+            Title = Loc.Get("Settings_Backup_ExportTitle"),
+            Filter = Loc.Get("Settings_Backup_Filter"),
+            FileName = "shelf-settings.json",
+            DefaultExt = ".json"
+        };
+        if (dlg.ShowDialog(this) != true) return;
+
+        bool ok = App.Settings.ExportTo(dlg.FileName);
+        DarkMessageBox.Show(this,
+            Loc.Get(ok ? "Settings_Backup_ExportOk" : "Settings_Backup_ExportFail"),
+            Loc.Get("Settings_Section_Backup"),
+            MessageBoxButton.OK,
+            ok ? MessageBoxImage.Information : MessageBoxImage.Error);
+    }
+
+    private void BtnImportSettings_Click(object sender, RoutedEventArgs e)
+    {
+        var dlg = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = Loc.Get("Settings_Backup_ImportTitle"),
+            Filter = Loc.Get("Settings_Backup_Filter"),
+            DefaultExt = ".json"
+        };
+        if (dlg.ShowDialog(this) != true) return;
+
+        // Import replaces ALL settings and restarts the app — confirm first.
+        var confirm = DarkMessageBox.Show(this,
+            Loc.Get("Settings_Backup_ImportConfirm"),
+            Loc.Get("Title_Confirm"),
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+        if (confirm != MessageBoxResult.Yes) return;
+
+        bool ok = App.Settings.ImportFrom(dlg.FileName);
+        if (!ok)
+        {
+            DarkMessageBox.Show(this,
+                Loc.Get("Settings_Backup_ImportFail"),
+                Loc.Get("Settings_Section_Backup"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            return;
+        }
+
+        DarkMessageBox.Show(this,
+            Loc.Get("Settings_Backup_ImportOk"),
+            Loc.Get("Settings_Section_Backup"),
+            MessageBoxButton.OK,
+            MessageBoxImage.Information);
+        // Don't let the old process save its stale state over the imported file on exit.
+        App.SuppressSaveOnExit = true;
+        RestartApp();
     }
 
     private void RebuildWidgetsList()

@@ -954,18 +954,54 @@
         </Setter>
     </Style>
 
+    <!-- Caption button for maximize/restore. Plain grey hover (the close button keeps its
+         own red-hover style). Shown only on resizable windows - see ChromeWindow triggers. -->
+    <Style x:Key="WindowCaptionButton" TargetType="Button">
+        <Setter Property="Width" Value="46"/>
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Arrow"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="shell:WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd"
+                            Background="{TemplateBinding Background}"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource HoverBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource AccentBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="ChromeWindow" TargetType="Window">
         <Setter Property="WindowStyle" Value="None"/>
         <Setter Property="AllowsTransparency" Value="False"/>
         <Setter Property="shell:WindowChrome.WindowChrome">
             <Setter.Value>
                 <!-- CaptionHeight=32 робить верхні 32px нативно draggable + snap-aware
-                     (Windows бачить це як caption). Усі інші 0 - бо у нас нема ресайз-бордера
-                     і нема aero glass. UseAeroCaptionButtons=False - бо ми малюємо свою X. -->
+                     (Windows бачить це як caption). ResizeBorderThickness=6 дає зону
+                     захоплення по периметру, щоб resizable-вікна (ResizeMode=CanResize,
+                     напр. Settings) можна було тягнути за край; на NoResize-вікнах Windows
+                     цю зону ігнорує. UseAeroCaptionButtons=False - бо ми малюємо свою X. -->
                 <shell:WindowChrome CaptionHeight="32"
                                     GlassFrameThickness="0"
                                     CornerRadius="0"
-                                    ResizeBorderThickness="0"
+                                    ResizeBorderThickness="6"
                                     UseAeroCaptionButtons="False"/>
             </Setter.Value>
         </Setter>
@@ -984,6 +1020,7 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <Image Grid.Column="0"
                                    Source="{TemplateBinding Icon}"
@@ -998,7 +1035,23 @@
                                        VerticalAlignment="Center"
                                        TextTrimming="CharacterEllipsis"
                                        Margin="0,0,8,0"/>
-                            <Button Grid.Column="2"
+                            <!-- Maximize / restore. Hidden unless the window allows resizing
+                                 (ResizeMode=CanResize), so message boxes and fixed dialogs
+                                 keep only the close button. -->
+                            <Button x:Name="MaxButton" Grid.Column="2"
+                                    Visibility="Collapsed"
+                                    Style="{StaticResource WindowCaptionButton}"
+                                    ToolTip="{DynamicResource Chrome_Maximize}"
+                                    Command="{x:Static sys:SystemCommands.MaximizeWindowCommand}">
+                                <Path x:Name="MaxGlyph"
+                                      Width="10" Height="10"
+                                      Stretch="Uniform"
+                                      Stroke="{DynamicResource PrimaryTextBrush}"
+                                      StrokeThickness="1"
+                                      Data="M0,0 L10,0 L10,10 L0,10 Z"
+                                      SnapsToDevicePixels="True"/>
+                            </Button>
+                            <Button Grid.Column="3"
                                     Style="{StaticResource WindowCaptionCloseButton}"
                                     Command="{x:Static sys:SystemCommands.CloseWindowCommand}"/>
                         </Grid>
@@ -1008,6 +1061,21 @@
                             <ContentPresenter/>
                         </AdornerDecorator>
                     </Grid>
+                    <ControlTemplate.Triggers>
+                        <!-- Reveal the maximize button only on resizable windows. -->
+                        <Trigger Property="ResizeMode" Value="CanResize">
+                            <Setter TargetName="MaxButton" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                        <!-- When maximized, flip to the "restore" glyph, tooltip and command. -->
+                        <Trigger Property="WindowState" Value="Maximized">
+                            <Setter TargetName="MaxButton" Property="Command"
+                                    Value="{x:Static sys:SystemCommands.RestoreWindowCommand}"/>
+                            <Setter TargetName="MaxButton" Property="ToolTip"
+                                    Value="{DynamicResource Chrome_Restore}"/>
+                            <Setter TargetName="MaxGlyph" Property="Data"
+                                    Value="M3,1 L9,1 L9,7 M1,3 L7,3 L7,9 L1,9 Z"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

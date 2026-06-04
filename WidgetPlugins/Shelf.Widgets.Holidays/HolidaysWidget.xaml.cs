@@ -158,6 +158,10 @@ public partial class HolidaysWidget : UserControl, IWidget
 
     // ===== UI =====
 
+    // Live language switch: re-render the day list (day labels like "Today"/"Yesterday"
+    // and holiday names) in the new language.
+    public void OnLanguageChanged() => RefreshDisplay(force: true);
+
     private void ApplyState()
     {
         TitleText.Text = InstanceLabel;

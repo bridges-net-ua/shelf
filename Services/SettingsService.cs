@@ -1,10 +1,12 @@
 using System;
+using System.Globalization;
 using System.IO;
 using System.Text.Json;
 #if STORE_BUILD
 using System.Runtime.InteropServices;
 #endif
 using Shelf.Models;
+using Shelf.Sdk;
 
 namespace Shelf.Services;
 
@@ -52,16 +54,41 @@ public class SettingsService
                 }
             }
 
+            bool loadedFromFile = false;
             if (File.Exists(FilePath))
             {
                 var json = File.ReadAllText(FilePath);
                 var loaded = JsonSerializer.Deserialize<AppSettings>(json);
-                if (loaded != null) Current = loaded;
+                if (loaded != null) { Current = loaded; loadedFromFile = true; }
             }
+
+            // Fresh install — no settings file and no legacy copy above produced one.
+            // Choose the UI language from the Windows display language; existing users
+            // (loadedFromFile == true) keep whatever they saved.
+            if (!loadedFromFile)
+                Current.Language = DetectSystemLanguage();
         }
         catch
         {
             // broken file — keep defaults
+        }
+    }
+
+    // Picks the UI language for a fresh install from the Windows display language:
+    // Ukrainian only if the OS UI culture is Ukrainian, English for everything else
+    // (we ship only these two). Falls back to English on any error.
+    private static AppLanguage DetectSystemLanguage()
+    {
+        try
+        {
+            return CultureInfo.CurrentUICulture.TwoLetterISOLanguageName
+                .Equals("uk", StringComparison.OrdinalIgnoreCase)
+                ? AppLanguage.Uk
+                : AppLanguage.En;
+        }
+        catch
+        {
+            return AppLanguage.En;
         }
     }
 
@@ -83,6 +110,58 @@ public class SettingsService
     {
         Save();
         Changed?.Invoke();
+    }
+
+    // ===== Full settings export / import (Settings → Backup section).
+    // Export writes the current in-memory settings (the caller should flush widget
+    // states first) to an arbitrary path. Import validates a chosen file, backs up the
+    // live settings.json to settings.json.bak, then overwrites it — the app restarts
+    // immediately afterwards so the next launch loads the imported configuration.
+
+    public bool ExportTo(string destPath)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(Current, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(destPath, json);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public bool ImportFrom(string srcPath)
+    {
+        try
+        {
+            var json = File.ReadAllText(srcPath);
+            using (var doc = JsonDocument.Parse(json))
+            {
+                // Reject anything that isn't a JSON object — guards against the user
+                // picking a random/unrelated file.
+                if (doc.RootElement.ValueKind != JsonValueKind.Object) return false;
+            }
+
+            var loaded = JsonSerializer.Deserialize<AppSettings>(json);
+            if (loaded == null) return false;
+
+            Directory.CreateDirectory(Dir);
+            try
+            {
+                if (File.Exists(FilePath))
+                    File.Copy(FilePath, FilePath + ".bak", overwrite: true);
+            }
+            catch { /* backup is best-effort */ }
+
+            File.WriteAllText(FilePath, json);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     // Returns the per-monitor panel config for the given device, falling back to

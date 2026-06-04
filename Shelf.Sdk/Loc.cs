@@ -22,12 +22,18 @@ public enum AppLanguage
 /// <c>{DynamicResource Key}</c> exactly like theme brushes, and code can resolve
 /// them via <see cref="Get"/> / <see cref="Format"/>.
 ///
-/// The language is fixed for the lifetime of the process — changing it in Settings
-/// only takes effect after an app restart.
+/// Like <see cref="Theme"/>, the language can be changed live via <see cref="Apply"/> —
+/// XAML <c>{DynamicResource ...}</c> consumers re-resolve immediately. After Apply the
+/// <see cref="LanguageChanged"/> event fires so imperative consumers (the WinForms tray
+/// menu, code-built context menus, widget content rendered in code) can re-read their
+/// strings and repaint.
 /// </summary>
 public static class Loc
 {
     public static AppLanguage Current { get; private set; } = AppLanguage.Uk;
+
+    /// <summary>Fired after <see cref="Apply"/> swaps the string dictionary.</summary>
+    public static event Action? LanguageChanged;
 
     /// <summary>Culture used for date/number formatting that follows the UI language.</summary>
     public static CultureInfo Culture =>
@@ -40,8 +46,24 @@ public static class Loc
     /// <summary>
     /// Loads the string dictionary for <paramref name="lang"/> into the application
     /// resources. Must be called once at startup, before any window is shown.
+    /// Does NOT raise <see cref="LanguageChanged"/>.
     /// </summary>
     public static void Initialize(AppLanguage lang)
+    {
+        Apply(lang, raiseChanged: false);
+    }
+
+    /// <summary>
+    /// Swaps the active string dictionary to <paramref name="lang"/> at runtime.
+    /// XAML DynamicResource references re-resolve immediately. Raises
+    /// <see cref="LanguageChanged"/> so imperative consumers can repaint.
+    /// </summary>
+    public static void Apply(AppLanguage lang)
+    {
+        Apply(lang, raiseChanged: true);
+    }
+
+    private static void Apply(AppLanguage lang, bool raiseChanged)
     {
         Current = lang;
 
@@ -60,6 +82,12 @@ public static class Loc
             app.Resources.MergedDictionaries.Remove(_strings);
         _strings = dict;
         app.Resources.MergedDictionaries.Add(dict);
+
+        if (raiseChanged)
+        {
+            try { LanguageChanged?.Invoke(); }
+            catch { /* subscribers must not crash the language switch */ }
+        }
     }
 
     /// <summary>Returns the localized string for <paramref name="key"/>, or the key itself if missing.</summary>

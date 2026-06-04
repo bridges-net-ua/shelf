@@ -90,6 +90,10 @@ public partial class ClockWidget : UserControl, IWidget
         catch { }
     }
 
+    // Live language switch: dates/day names use Loc.Culture, so re-format immediately
+    // (the per-second timer would also catch up, but this avoids a visible lag).
+    public void OnLanguageChanged() => Update();
+
     private void Update()
     {
         var now = DateTime.Now;

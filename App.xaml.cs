@@ -20,6 +20,11 @@ public partial class App : Application
     public static WidgetManager Widgets { get; private set; } = null!;
     public static MonitorService Monitors { get; private set; } = null!;
 
+    // When an imported settings file is being applied the app restarts; we must NOT let
+    // OnExit save the (now-stale) in-memory state back over the freshly imported file.
+    // SettingsWindow sets this true right before restarting after a successful import.
+    public static bool SuppressSaveOnExit { get; set; }
+
     // One MainWindow per connected monitor (keyed by Screen.DeviceName).
     // Primary is always present even if it currently has zero widgets — it's the
     // landing pad for homeless widgets and the owner of the tray/settings flow.
@@ -130,6 +135,13 @@ public partial class App : Application
             Widgets.ActiveWidgetsChanged += RebuildAllBars;
             Settings.Changed += ApplyAllBars;
 
+            // Live language switch (Settings → language radio buttons call Loc.Apply).
+            // Widgets render some text imperatively (dates via Loc.Culture, weather
+            // descriptions, holiday day labels) — ask each live instance to re-read its
+            // strings, then rebuild every bar so headers, context menus and the panel
+            // repaint in the new language. The tray self-subscribes for its own menu.
+            Loc.LanguageChanged += OnLanguageChanged;
+
 #if !STORE_BUILD
             // Portable builds: quietly check GitHub for a newer release at most once a
             // day. Result is persisted so the About-tab badge can show it without a
@@ -224,6 +236,24 @@ public partial class App : Application
         }));
     }
 
+    private static void OnLanguageChanged()
+    {
+        // Imperative widget text (dates, weather descriptions, holiday day labels)
+        // doesn't react to DynamicResource — ask each live instance to repaint.
+        try
+        {
+            foreach (var (_, widget) in Widgets.GetAllWithEntries())
+            {
+                try { widget.OnLanguageChanged(); } catch { }
+            }
+        }
+        catch { }
+
+        // Rebuild every bar so widget headers (DisplayName/InstanceLabel) and the
+        // code-built context menus pick up the new language.
+        RebuildAllBars();
+    }
+
     private static void RebuildAllBars()
     {
         foreach (var bar in _bars.Values.ToList())
@@ -279,10 +309,18 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
-        try { Widgets?.SaveStates(); } catch { }
+        // On an import-triggered restart we deliberately skip persisting state, so the
+        // freshly imported settings.json is not overwritten by the old in-memory state.
+        if (!SuppressSaveOnExit)
+        {
+            try { Widgets?.SaveStates(); } catch { }
+        }
         try { Tray?.Dispose(); } catch { }
         try { Monitors?.Dispose(); } catch { }
-        try { Settings?.Save(); } catch { }
+        if (!SuppressSaveOnExit)
+        {
+            try { Settings?.Save(); } catch { }
+        }
         try { _singleInstanceMutex?.ReleaseMutex(); } catch { }
         base.OnExit(e);
     }
