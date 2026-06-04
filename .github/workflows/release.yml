@@ -22,6 +22,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Full history + tags so "git describe" can resolve the previous tag for
+          # the changelog comparison link (shallow clone has no tags).
+          fetch-depth: 0
 
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
@@ -117,8 +121,18 @@ jobs:
             $notes = "See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details."
           }
           # Best-effort previous tag for the comparison link — append only if there is one.
-          $prevTag = git describe --tags --abbrev=0 "${{ steps.version.outputs.tag }}^" 2>$null
-          if ($LASTEXITCODE -eq 0 -and $prevTag) {
+          # Wrapped so a non-zero git exit (no prior tag, etc.) can't fail the step under
+          # PowerShell 7.4+, where native exit codes honour $ErrorActionPreference='Stop'.
+          $prevTag = $null
+          try {
+            $ErrorActionPreference = 'SilentlyContinue'
+            $prevTag = git describe --tags --abbrev=0 "${{ steps.version.outputs.tag }}^" 2>$null
+          } catch {
+            $prevTag = $null
+          } finally {
+            $ErrorActionPreference = 'Stop'
+          }
+          if ($prevTag) {
             $notes += "`n`n**Full Changelog**: https://github.com/${{ github.repository }}/compare/$prevTag...${{ steps.version.outputs.tag }}"
           }
           $delim = "EOF_" + [Guid]::NewGuid().ToString('N')
