@@ -387,6 +387,10 @@ public partial class MainWindow : Window
         ApplySettings();
         RebuildPanel();
 
+        // Win11 rounds every top-level window's corners by default; opt out so the dock
+        // panel sits flush as a straight-edged bar (no-op on Win10).
+        Shelf.Sdk.WindowChrome.ApplySquareCorners(this);
+
         var hwnd = new WindowInteropHelper(this).Handle;
 
         // Start the legacy mover first so we always have a working virtual-desktop

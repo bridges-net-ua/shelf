@@ -24,16 +24,14 @@
                 BorderThickness="0,0,0,1"
                 Visibility="Collapsed">
             <ScrollViewer x:Name="PinnedScroll"
-                          Style="{DynamicResource OverlayPanelScrollViewer}"
-                          Padding="4,0,4,0">
+                          Style="{DynamicResource OverlayPanelScrollViewer}">
                 <StackPanel x:Name="PinnedHost"/>
             </ScrollViewer>
         </Border>
 
         <ScrollViewer Grid.Row="1"
                       x:Name="PanelScroll"
-                      Style="{DynamicResource OverlayPanelScrollViewer}"
-                      Padding="4,0,4,0">
+                      Style="{DynamicResource OverlayPanelScrollViewer}">
             <StackPanel x:Name="WidgetsHost"/>
         </ScrollViewer>
         <Canvas Grid.Row="1"

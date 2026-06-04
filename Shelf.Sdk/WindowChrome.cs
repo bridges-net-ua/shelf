@@ -19,6 +19,7 @@ public static class WindowChrome
     // Windows or on windows with AllowsTransparency=True.
     private const int DWMWA_WINDOW_CORNER_PREFERENCE = 33;
     private const int DWMWCP_ROUND = 2;
+    private const int DWMWCP_DONOTROUND = 1;
 
     public static ImageSource? DefaultIcon { get; set; }
 
@@ -104,6 +105,29 @@ public static class WindowChrome
 
     /// <summary>Backwards-compatible alias.</summary>
     public static void ApplyDarkTitleBar(Window window) => ApplyTitleBarTheme(window);
+
+    /// <summary>
+    /// Forces square (non-rounded) outer corners on the window. Windows 11 rounds every
+    /// top-level window's corners by default; this opts out via DWMWCP_DONOTROUND. Used by
+    /// the borderless dock panel (MainWindow) so it sits flush as a straight-edged bar.
+    /// No-op on Windows 10 (corners are already square). Safe to call before the HWND
+    /// exists - defers to <see cref="Window.SourceInitialized"/>.
+    /// </summary>
+    public static void ApplySquareCorners(Window window)
+    {
+        void Set()
+        {
+            var hwnd = new WindowInteropHelper(window).Handle;
+            if (hwnd == IntPtr.Zero) return;
+            int pref = DWMWCP_DONOTROUND;
+            DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref pref, sizeof(int));
+        }
+
+        if (new WindowInteropHelper(window).Handle != IntPtr.Zero)
+            Set();
+        else
+            window.SourceInitialized += (_, _) => Set();
+    }
 
     /// <summary>
     /// Re-applies the title-bar theme to every currently open <see cref="Window"/>.
