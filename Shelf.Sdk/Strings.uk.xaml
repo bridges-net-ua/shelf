@@ -140,6 +140,69 @@
     <s:String x:Key="Notes_DeleteTab">Видалити вкладку</s:String>
     <s:String x:Key="Notes_Confirm_DeleteTab">Видалити вкладку «{0}»? Її вміст буде втрачено.</s:String>
 
+    <!-- ===== Віджет: Сонце і Місяць ===== -->
+    <s:String x:Key="SunMoon_Name">Сонце і Місяць</s:String>
+    <s:String x:Key="SunMoon_Desc">Схід і захід Сонця, фази Місяця.</s:String>
+    <s:String x:Key="SunMoon_Settings_Title">Налаштування - Сонце і Місяць</s:String>
+    <s:String x:Key="SunMoon_City_Label">Місто</s:String>
+    <s:String x:Key="SunMoon_City_Hint">Введіть назву міста - координати й часовий пояс визначаться автоматично.</s:String>
+    <s:String x:Key="SunMoon_Loading">Завантаження…</s:String>
+    <s:String x:Key="SunMoon_Err_City">Місто не знайдено</s:String>
+    <s:String x:Key="SunMoon_Err_NoCity">Виберіть місто</s:String>
+    <s:String x:Key="SunMoon_Err_Network">Помилка мережі</s:String>
+    <s:String x:Key="SunMoon_PolarDay">Полярний день - Сонце не заходить</s:String>
+    <s:String x:Key="SunMoon_PolarNight">Полярна ніч - Сонце не сходить</s:String>
+    <s:String x:Key="SunMoon_Sunrise">Схід</s:String>
+    <s:String x:Key="SunMoon_Sunset">Захід</s:String>
+    <s:String x:Key="SunMoon_DayLength">Тривалість дня</s:String>
+    <s:String x:Key="SunMoon_SolarNoon">Полудень</s:String>
+    <s:String x:Key="SunMoon_MinShort">хв.</s:String>
+    <s:String x:Key="SunMoon_GoldenHour">Золота година</s:String>
+    <s:String x:Key="SunMoon_BlueHour">Блакитна година</s:String>
+    <s:String x:Key="SunMoon_Morning">ранок</s:String>
+    <s:String x:Key="SunMoon_Evening">вечір</s:String>
+    <s:String x:Key="SunMoon_IllumLine">освітленість {0}%  ·  вік {1} дн</s:String>
+    <s:String x:Key="SunMoon_MoonRiseSet">Схід Місяця {0}  ·  захід {1}</s:String>
+    <s:String x:Key="SunMoon_MoonNext">Молодик {0}  ·  Повня {1}</s:String>
+    <s:String x:Key="SunMoon_Phase_0">Молодик</s:String>
+    <s:String x:Key="SunMoon_Phase_1">Зростаючий серп</s:String>
+    <s:String x:Key="SunMoon_Phase_2">Перша чверть</s:String>
+    <s:String x:Key="SunMoon_Phase_3">Зростаючий місяць</s:String>
+    <s:String x:Key="SunMoon_Phase_4">Повня</s:String>
+    <s:String x:Key="SunMoon_Phase_5">Спадний місяць</s:String>
+    <s:String x:Key="SunMoon_Phase_6">Остання чверть</s:String>
+    <s:String x:Key="SunMoon_Phase_7">Спадний серп</s:String>
+    <s:String x:Key="SunMoon_Sec_Sun">СОНЦЕ</s:String>
+    <s:String x:Key="SunMoon_Sec_Moon">МІСЯЦЬ</s:String>
+    <s:String x:Key="SunMoon_Opt_Sun">Схід і захід</s:String>
+    <s:String x:Key="SunMoon_Opt_DayLength">Тривалість дня і полудень</s:String>
+    <s:String x:Key="SunMoon_Opt_GoldenBlue">Золота й блакитна година</s:String>
+    <s:String x:Key="SunMoon_Opt_Moon">Фаза й освітленість</s:String>
+    <s:String x:Key="SunMoon_Opt_MoonExtra">Схід/захід, повня/молодик</s:String>
+
+    <!-- ===== Віджет: Курс валют ===== -->
+    <s:String x:Key="Currency_Name">Курс валют</s:String>
+    <s:String x:Key="Currency_Desc">Курси валют ПриватБанку - купівля і продаж.</s:String>
+    <s:String x:Key="Currency_Settings_Title">Налаштування - Курс валют</s:String>
+    <s:String x:Key="Currency_Buy">куп.</s:String>
+    <s:String x:Key="Currency_Sell">прод.</s:String>
+    <s:String x:Key="Currency_Section_Currencies">ВАЛЮТИ</s:String>
+    <s:String x:Key="Currency_Opt_ShowChange">Показувати зміну за день</s:String>
+    <s:String x:Key="Currency_Err_Network">Помилка мережі</s:String>
+    <s:String x:Key="Currency_Err_NoCurrency">Виберіть валюти</s:String>
+    <s:String x:Key="Currency_Ccy_USD">долар США</s:String>
+    <s:String x:Key="Currency_Ccy_EUR">євро</s:String>
+    <s:String x:Key="Currency_Ccy_GBP">фунт стерлінгів</s:String>
+    <s:String x:Key="Currency_Ccy_PLN">польський злотий</s:String>
+    <s:String x:Key="Currency_Ccy_CHF">швейцарський франк</s:String>
+    <s:String x:Key="Currency_Ccy_CZK">чеська крона</s:String>
+    <s:String x:Key="Currency_Ccy_CAD">канадський долар</s:String>
+    <s:String x:Key="Currency_Ccy_JPY">японська єна</s:String>
+    <s:String x:Key="Currency_Ccy_AUD">австралійський долар</s:String>
+    <s:String x:Key="Currency_Ccy_SEK">шведська крона</s:String>
+    <s:String x:Key="Currency_Ccy_NOK">норвезька крона</s:String>
+    <s:String x:Key="Currency_Ccy_DKK">данська крона</s:String>
+
     <!-- ===== Віджет: Задачі ===== -->
     <s:String x:Key="Todo_Name">Задачі</s:String>
     <s:String x:Key="Todo_Desc">Задачі з галочками «зроблено».</s:String>

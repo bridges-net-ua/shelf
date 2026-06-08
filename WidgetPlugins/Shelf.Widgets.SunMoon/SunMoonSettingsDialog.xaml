@@ -1,0 +1,81 @@
+<Window x:Class="Shelf.Widgets.SunMoon.SunMoonSettingsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{DynamicResource SunMoon_Settings_Title}"
+        Height="400" Width="420"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource BackgroundBrush}"
+        FontFamily="{DynamicResource UiFont}"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Foreground="{DynamicResource PrimaryTextBrush}">
+    <Grid Margin="24,20,24,16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0">
+            <TextBlock Text="{DynamicResource SunMoon_City_Label}"
+                       Foreground="{DynamicResource SecondaryTextBrush}"
+                       FontSize="13" FontWeight="SemiBold"
+                       Margin="0,0,0,6"/>
+            <TextBox x:Name="CityBox"
+                     Padding="6,4"
+                     Background="{DynamicResource ElevatedSurfaceBrush}"
+                     Foreground="{DynamicResource PrimaryTextBrush}"
+                     CaretBrush="{DynamicResource PrimaryTextBrush}"
+                     SelectionBrush="{DynamicResource AccentBrush}"
+                     BorderBrush="{DynamicResource BorderBrush}"
+                     BorderThickness="1"
+                     FontSize="13"
+                     KeyDown="CityBox_KeyDown"/>
+
+            <TextBlock Text="{DynamicResource SunMoon_City_Hint}"
+                       Foreground="{DynamicResource MutedTextBrush}"
+                       FontSize="11"
+                       TextWrapping="Wrap"
+                       Margin="0,8,0,0"/>
+
+            <TextBlock Text="{DynamicResource SunMoon_Sec_Sun}"
+                       Foreground="{DynamicResource MutedTextBrush}"
+                       FontSize="11" FontWeight="SemiBold"
+                       Margin="0,16,0,6"/>
+            <CheckBox x:Name="OptSun"
+                      Content="{DynamicResource SunMoon_Opt_Sun}"
+                      Margin="0,2,0,0"/>
+            <CheckBox x:Name="OptDayLength"
+                      Content="{DynamicResource SunMoon_Opt_DayLength}"
+                      Margin="0,4,0,0"/>
+            <CheckBox x:Name="OptGoldenBlue"
+                      Content="{DynamicResource SunMoon_Opt_GoldenBlue}"
+                      Margin="0,4,0,0"/>
+
+            <TextBlock Text="{DynamicResource SunMoon_Sec_Moon}"
+                       Foreground="{DynamicResource MutedTextBrush}"
+                       FontSize="11" FontWeight="SemiBold"
+                       Margin="0,14,0,6"/>
+            <CheckBox x:Name="OptMoon"
+                      Content="{DynamicResource SunMoon_Opt_Moon}"
+                      Margin="0,2,0,0"/>
+            <CheckBox x:Name="OptMoonExtra"
+                      Content="{DynamicResource SunMoon_Opt_MoonExtra}"
+                      Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,20,0,0">
+            <Button Content="{DynamicResource Btn_Cancel}"
+                    Click="Cancel_Click"
+                    MinWidth="90"
+                    Margin="0,0,8,0"/>
+            <Button Content="{DynamicResource Btn_OK}"
+                    Click="Ok_Click"
+                    MinWidth="90"
+                    Background="{DynamicResource AccentBrush}"
+                    BorderBrush="{DynamicResource AccentBrush}"/>
+        </StackPanel>
+    </Grid>
+</Window>

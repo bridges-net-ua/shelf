@@ -140,6 +140,69 @@
     <s:String x:Key="Notes_DeleteTab">Delete tab</s:String>
     <s:String x:Key="Notes_Confirm_DeleteTab">Delete tab "{0}"? Its content will be lost.</s:String>
 
+    <!-- ===== Widget: Sun & Moon ===== -->
+    <s:String x:Key="SunMoon_Name">Sun &amp; Moon</s:String>
+    <s:String x:Key="SunMoon_Desc">Sunrise, sunset and Moon phases.</s:String>
+    <s:String x:Key="SunMoon_Settings_Title">Settings - Sun &amp; Moon</s:String>
+    <s:String x:Key="SunMoon_City_Label">City</s:String>
+    <s:String x:Key="SunMoon_City_Hint">Enter a city name - coordinates and timezone are resolved automatically.</s:String>
+    <s:String x:Key="SunMoon_Loading">Loading…</s:String>
+    <s:String x:Key="SunMoon_Err_City">City not found</s:String>
+    <s:String x:Key="SunMoon_Err_NoCity">Set a city</s:String>
+    <s:String x:Key="SunMoon_Err_Network">Network error</s:String>
+    <s:String x:Key="SunMoon_PolarDay">Polar day - the Sun does not set</s:String>
+    <s:String x:Key="SunMoon_PolarNight">Polar night - the Sun does not rise</s:String>
+    <s:String x:Key="SunMoon_Sunrise">Sunrise</s:String>
+    <s:String x:Key="SunMoon_Sunset">Sunset</s:String>
+    <s:String x:Key="SunMoon_DayLength">Day length</s:String>
+    <s:String x:Key="SunMoon_SolarNoon">Solar noon</s:String>
+    <s:String x:Key="SunMoon_MinShort">min</s:String>
+    <s:String x:Key="SunMoon_GoldenHour">Golden hour</s:String>
+    <s:String x:Key="SunMoon_BlueHour">Blue hour</s:String>
+    <s:String x:Key="SunMoon_Morning">morning</s:String>
+    <s:String x:Key="SunMoon_Evening">evening</s:String>
+    <s:String x:Key="SunMoon_IllumLine">illumination {0}%  ·  age {1} d</s:String>
+    <s:String x:Key="SunMoon_MoonRiseSet">Moonrise {0}  ·  moonset {1}</s:String>
+    <s:String x:Key="SunMoon_MoonNext">New moon {0}  ·  Full moon {1}</s:String>
+    <s:String x:Key="SunMoon_Phase_0">New Moon</s:String>
+    <s:String x:Key="SunMoon_Phase_1">Waxing Crescent</s:String>
+    <s:String x:Key="SunMoon_Phase_2">First Quarter</s:String>
+    <s:String x:Key="SunMoon_Phase_3">Waxing Gibbous</s:String>
+    <s:String x:Key="SunMoon_Phase_4">Full Moon</s:String>
+    <s:String x:Key="SunMoon_Phase_5">Waning Gibbous</s:String>
+    <s:String x:Key="SunMoon_Phase_6">Last Quarter</s:String>
+    <s:String x:Key="SunMoon_Phase_7">Waning Crescent</s:String>
+    <s:String x:Key="SunMoon_Sec_Sun">SUN</s:String>
+    <s:String x:Key="SunMoon_Sec_Moon">MOON</s:String>
+    <s:String x:Key="SunMoon_Opt_Sun">Sunrise and sunset</s:String>
+    <s:String x:Key="SunMoon_Opt_DayLength">Day length and solar noon</s:String>
+    <s:String x:Key="SunMoon_Opt_GoldenBlue">Golden and blue hour</s:String>
+    <s:String x:Key="SunMoon_Opt_Moon">Phase and illumination</s:String>
+    <s:String x:Key="SunMoon_Opt_MoonExtra">Rise/set, new/full</s:String>
+
+    <!-- ===== Widget: Exchange Rates ===== -->
+    <s:String x:Key="Currency_Name">Exchange Rates</s:String>
+    <s:String x:Key="Currency_Desc">PrivatBank exchange rates - buy and sell.</s:String>
+    <s:String x:Key="Currency_Settings_Title">Settings - Exchange Rates</s:String>
+    <s:String x:Key="Currency_Buy">buy</s:String>
+    <s:String x:Key="Currency_Sell">sell</s:String>
+    <s:String x:Key="Currency_Section_Currencies">CURRENCIES</s:String>
+    <s:String x:Key="Currency_Opt_ShowChange">Show daily change</s:String>
+    <s:String x:Key="Currency_Err_Network">Network error</s:String>
+    <s:String x:Key="Currency_Err_NoCurrency">Select currencies</s:String>
+    <s:String x:Key="Currency_Ccy_USD">US dollar</s:String>
+    <s:String x:Key="Currency_Ccy_EUR">euro</s:String>
+    <s:String x:Key="Currency_Ccy_GBP">pound sterling</s:String>
+    <s:String x:Key="Currency_Ccy_PLN">Polish zloty</s:String>
+    <s:String x:Key="Currency_Ccy_CHF">Swiss franc</s:String>
+    <s:String x:Key="Currency_Ccy_CZK">Czech koruna</s:String>
+    <s:String x:Key="Currency_Ccy_CAD">Canadian dollar</s:String>
+    <s:String x:Key="Currency_Ccy_JPY">Japanese yen</s:String>
+    <s:String x:Key="Currency_Ccy_AUD">Australian dollar</s:String>
+    <s:String x:Key="Currency_Ccy_SEK">Swedish krona</s:String>
+    <s:String x:Key="Currency_Ccy_NOK">Norwegian krone</s:String>
+    <s:String x:Key="Currency_Ccy_DKK">Danish krone</s:String>
+
     <!-- ===== Widget: Tasks ===== -->
     <s:String x:Key="Todo_Name">Tasks</s:String>
     <s:String x:Key="Todo_Desc">Tasks with done checkboxes.</s:String>
