@@ -960,8 +960,9 @@ public partial class MainWindow : Window
         // by its per-monitor DPI to land in WPF DIPs. AutoStart toggle is global so
         // only the primary window applies it (idempotent on subsequent monitors).
         double dpiY = _monitor.DpiY <= 0 ? 1.0 : _monitor.DpiY;
-        double monitorTop = _monitor.BoundsPx.Top / dpiY;
-        double monitorHeight = _monitor.BoundsPx.Height / dpiY;
+        // Work area (not full bounds) keeps the panel above the taskbar.
+        double monitorTop = _monitor.WorkAreaPx.Top / dpiY;
+        double monitorHeight = _monitor.WorkAreaPx.Height / dpiY;
 
         if (cfg.AutoHide)
         {

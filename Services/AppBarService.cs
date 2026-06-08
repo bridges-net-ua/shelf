@@ -129,8 +129,11 @@ public class AppBarService
         // leaves the panel detached from the intended screen edge. So we issue
         // QUERYPOS for protocol compliance, then overwrite rc with our own values
         // before SETPOS.
-        int desiredLeft, desiredTop = monitor.BoundsPx.Top, desiredRight;
-        int desiredBottom = monitor.BoundsPx.Bottom;
+        // Vertical extent is the work area (not the full monitor bounds) so the
+        // panel stops at the taskbar's edge instead of overlapping it. Horizontal
+        // edges still come from BoundsPx below - the panel hugs the screen edge.
+        int desiredLeft, desiredTop = monitor.WorkAreaPx.Top, desiredRight;
+        int desiredBottom = monitor.WorkAreaPx.Bottom;
         uint desiredEdge;
         if (side == BarSide.Left)
         {
@@ -170,18 +173,22 @@ public class AppBarService
         SHAppBarMessage(ABM_SETPOS, ref data);
         Log($"    [{monitor.DeviceName}] SETPOS final:     L={data.rc.left} T={data.rc.top} R={data.rc.right} B={data.rc.bottom}");
 
-        // Position the WPF window. WPF Window.Left/Top are in DIPs of the PRIMARY
-        // monitor's DPI scaling — to translate physical pixels of an arbitrary
-        // monitor into "WPF DIPs", divide by the source HwndSource's transform,
-        // not by the target monitor's DPI. After SourceInitialized the HwndSource
-        // is on whichever monitor the window currently sits, so we use its DPI.
-        var src = HwndSource.FromHwnd(_hwnd);
-        double srcDpiX = src?.CompositionTarget?.TransformToDevice.M11 ?? dpiX;
-        double srcDpiY = src?.CompositionTarget?.TransformToDevice.M22 ?? dpiY;
-        _window.Left = data.rc.left / srcDpiX;
-        _window.Top = data.rc.top / srcDpiY;
-        _window.Width = (data.rc.right - data.rc.left) / srcDpiX;
-        _window.Height = (data.rc.bottom - data.rc.top) / srcDpiY;
+        // Position the WPF window from OUR desired physical rect (full monitor
+        // height), converted with the TARGET monitor's DPI. We deliberately ignore
+        // the ABM_SETPOS reply here for two reasons learned from real screens:
+        //   1. Windows may clip a side AppBar's rect to the work area (e.g. taskbar
+        //      shown on this monitor / vertical / auto-hide), leaving a gap above
+        //      the taskbar - using desiredBottom forces the panel to the very edge.
+        //   2. The current HwndSource's DPI is wrong when the target monitor scales
+        //      differently from where the window currently sits, which shrank the
+        //      height on mixed-DPI multi-monitor setups.
+        // This mirrors the "trust our own rect" stance used for QUERYPOS above and
+        // keeps SetPosition consistent with MainWindow.ApplySettings (which also
+        // derives the panel height from monitor.DpiY).
+        _window.Left = desiredLeft / dpiX;
+        _window.Top = desiredTop / dpiY;
+        _window.Width = (desiredRight - desiredLeft) / dpiX;
+        _window.Height = (desiredBottom - desiredTop) / dpiY;
     }
 
     private static readonly string LogPath =
