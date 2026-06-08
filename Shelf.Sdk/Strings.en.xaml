@@ -135,6 +135,10 @@
     <s:String x:Key="Notes_Desc">Quick notes with autosave.</s:String>
     <s:String x:Key="Notes_Settings_Title">Settings - Note</s:String>
     <s:String x:Key="Notes_FieldHeight">Field height: </s:String>
+    <s:String x:Key="Notes_Tab_DefaultNum">Tab {0}</s:String>
+    <s:String x:Key="Notes_AddTab">Add tab</s:String>
+    <s:String x:Key="Notes_DeleteTab">Delete tab</s:String>
+    <s:String x:Key="Notes_Confirm_DeleteTab">Delete tab "{0}"? Its content will be lost.</s:String>
 
     <!-- ===== Widget: Tasks ===== -->
     <s:String x:Key="Todo_Name">Tasks</s:String>

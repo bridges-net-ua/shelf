@@ -135,6 +135,10 @@
     <s:String x:Key="Notes_Desc">Швидкі замітки з автозбереженням.</s:String>
     <s:String x:Key="Notes_Settings_Title">Налаштування - Замітка</s:String>
     <s:String x:Key="Notes_FieldHeight">Висота поля: </s:String>
+    <s:String x:Key="Notes_Tab_DefaultNum">Вкладка {0}</s:String>
+    <s:String x:Key="Notes_AddTab">Додати вкладку</s:String>
+    <s:String x:Key="Notes_DeleteTab">Видалити вкладку</s:String>
+    <s:String x:Key="Notes_Confirm_DeleteTab">Видалити вкладку «{0}»? Її вміст буде втрачено.</s:String>
 
     <!-- ===== Віджет: Задачі ===== -->
     <s:String x:Key="Todo_Name">Задачі</s:String>
