@@ -43,6 +43,7 @@ public partial class RadioWidget : UserControl, IWidget
     private WidgetState _state = new();
     private readonly MediaPlayer _player = new();
     private bool _isPlaying;
+    private bool _quietWasPlaying;
     private bool _isLoaded;
     private bool _suppressSelectionChanged;
     private bool _suppressVolumeEvents;
@@ -306,6 +307,21 @@ public partial class RadioWidget : UserControl, IWidget
         catch { }
         UpdatePlayState();
         SetError(null);
+    }
+
+    // Minute of silence: stop on enter, restart the same station on exit.
+    public void SetQuietMode(bool quiet)
+    {
+        if (quiet)
+        {
+            _quietWasPlaying = _isPlaying;
+            if (_isPlaying) StopPlayback();
+        }
+        else
+        {
+            if (_quietWasPlaying) StartPlayback(CurrentStation());
+            _quietWasPlaying = false;
+        }
     }
 
     // Resolves a .pls / .m3u playlist to the first direct stream URL inside it.

@@ -99,6 +99,15 @@
                                    TextWrapping="Wrap"
                                    FontSize="12"
                                    Foreground="{DynamicResource MutedTextBrush}"
+                                   Margin="24,0,0,16"/>
+
+                        <CheckBox x:Name="CbMinuteOfSilence"
+                                  Content="{DynamicResource Settings_MinuteSilence}"
+                                  Margin="0,0,0,6"/>
+                        <TextBlock Text="{DynamicResource Settings_MinuteSilence_Hint}"
+                                   TextWrapping="Wrap"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource MutedTextBrush}"
                                    Margin="24,0,0,20"/>
 
                         <Border Height="1"

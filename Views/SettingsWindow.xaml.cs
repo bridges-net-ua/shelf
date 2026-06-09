@@ -221,6 +221,7 @@ public partial class SettingsWindow : Window
         // Global (non-per-monitor) controls.
         CbAutoStart.IsChecked = s.AutoStart;
         CbLockOrder.IsChecked = s.WidgetOrderLocked;
+        CbMinuteOfSilence.IsChecked = s.MinuteOfSilenceEnabled;
         CbTheme.SelectedIndex = s.Theme == AppTheme.Light ? 1 : 0;
         RbLangUk.IsChecked = s.Language == AppLanguage.Uk;
         RbLangEn.IsChecked = s.Language == AppLanguage.En;
@@ -321,6 +322,7 @@ public partial class SettingsWindow : Window
             s.MonitorPanels[kv.Key] = kv.Value;
 
         s.AutoStart = CbAutoStart.IsChecked == true;
+        s.MinuteOfSilenceEnabled = CbMinuteOfSilence.IsChecked == true;
 
         // Language is applied live the moment a radio button is clicked (RbLang_Click),
         // so there is nothing language-related left to commit here.

@@ -203,6 +203,12 @@
     <s:String x:Key="Currency_Ccy_NOK">Norwegian krone</s:String>
     <s:String x:Key="Currency_Ccy_DKK">Danish krone</s:String>
 
+    <!-- ===== Minute of silence ===== -->
+    <s:String x:Key="Silence_Title">Minute of silence</s:String>
+    <s:String x:Key="Settings_MinuteSilence">Minute of silence at 9:00</s:String>
+    <s:String x:Key="Settings_MinuteSilence_Hint">Every day at 9:00 the panel dims, audio widgets fall silent and a metronome plays for 60 seconds.</s:String>
+    <s:String x:Key="Tray_TestSilence">Test minute of silence</s:String>
+
     <!-- ===== Widget: Tasks ===== -->
     <s:String x:Key="Todo_Name">Tasks</s:String>
     <s:String x:Key="Todo_Desc">Tasks with done checkboxes.</s:String>

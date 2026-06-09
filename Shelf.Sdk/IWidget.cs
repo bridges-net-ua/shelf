@@ -20,6 +20,11 @@ public interface IWidget
     // in XAML updates on its own, so such widgets can leave the default no-op.
     void OnLanguageChanged() { }
 
+    // Called when the app enters (quiet=true) or leaves (quiet=false) the daily
+    // "minute of silence" at 9:00. Widgets that emit sound override this to pause
+    // and later restore their audio. Default no-op for silent widgets.
+    void SetQuietMode(bool quiet) { }
+
     UserControl CreateView();
 
     bool HasSettings { get; }

@@ -203,6 +203,12 @@
     <s:String x:Key="Currency_Ccy_NOK">норвезька крона</s:String>
     <s:String x:Key="Currency_Ccy_DKK">данська крона</s:String>
 
+    <!-- ===== Хвилина мовчання ===== -->
+    <s:String x:Key="Silence_Title">Хвилина мовчання</s:String>
+    <s:String x:Key="Settings_MinuteSilence">Хвилина мовчання о 9:00</s:String>
+    <s:String x:Key="Settings_MinuteSilence_Hint">Щодня о 9:00 панель затемнюється, звукові віджети стихають і 60 секунд грає метроном.</s:String>
+    <s:String x:Key="Tray_TestSilence">Тест хвилини мовчання</s:String>
+
     <!-- ===== Віджет: Задачі ===== -->
     <s:String x:Key="Todo_Name">Задачі</s:String>
     <s:String x:Key="Todo_Desc">Задачі з галочками «зроблено».</s:String>

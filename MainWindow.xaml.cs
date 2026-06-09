@@ -993,6 +993,24 @@ public partial class MainWindow : Window
         if (_monitor.IsPrimary) AutoStartService.Set(s.AutoStart);
     }
 
+    // ===== Minute of silence overlay =====
+
+    public void ShowSilenceOverlay(int seconds)
+    {
+        SilenceCountdown.Text = seconds.ToString();
+        SilenceOverlay.Visibility = Visibility.Visible;
+    }
+
+    public void UpdateSilenceCountdown(int seconds)
+    {
+        SilenceCountdown.Text = seconds.ToString();
+    }
+
+    public void HideSilenceOverlay()
+    {
+        SilenceOverlay.Visibility = Visibility.Collapsed;
+    }
+
     private static double VisibleLeft(MonitorPanelConfig cfg, MonitorInfo monitor)
     {
         double dpiX = monitor.DpiX <= 0 ? 1.0 : monitor.DpiX;

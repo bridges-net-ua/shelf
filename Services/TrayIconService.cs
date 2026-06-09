@@ -84,6 +84,7 @@ public class TrayIconService : IDisposable
 
         AddItem(menu, palette, Loc.Get("Tray_ShowHide"), () => ToggleBar());
         AddItem(menu, palette, Loc.Get("Tray_Settings"), () => OpenSettings());
+        AddItem(menu, palette, Loc.Get("Tray_TestSilence"), () => App.MinuteOfSilence?.Start());
         menu.Items.Add(BuildSeparator(palette));
         AddItem(menu, palette, Loc.Get("Tray_Exit"), () => System.Windows.Application.Current.Shutdown());
 

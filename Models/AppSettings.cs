@@ -61,6 +61,10 @@ public class AppSettings
     public bool WidgetOrderLocked { get; set; } = false;
     public bool InitializedWithDefaults { get; set; } = false;
 
+    // Daily "minute of silence" at 9:00 - dims every panel, shows a 60s countdown,
+    // plays a metronome and silences audio widgets. On by default (national custom).
+    public bool MinuteOfSilenceEnabled { get; set; } = true;
+
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public AppLanguage Language { get; set; } = AppLanguage.Uk;
 

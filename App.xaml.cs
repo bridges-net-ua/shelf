@@ -19,6 +19,7 @@ public partial class App : Application
     public static TrayIconService Tray { get; private set; } = null!;
     public static WidgetManager Widgets { get; private set; } = null!;
     public static MonitorService Monitors { get; private set; } = null!;
+    public static MinuteOfSilenceService MinuteOfSilence { get; private set; } = null!;
 
     // When an imported settings file is being applied the app restarts; we must NOT let
     // OnExit save the (now-stale) in-memory state back over the freshly imported file.
@@ -127,6 +128,9 @@ public partial class App : Application
             // automatically points at the new primary's window.
             Tray = new TrayIconService();
             Tray.Show();
+
+            // Daily 9:00 minute of silence (scheduler runs for the whole session).
+            MinuteOfSilence = new MinuteOfSilenceService();
 
             // Subscribe to widget list changes so EVERY bar rebuilds simultaneously.
             // Without this, moving a widget from monitor 1 to monitor 2 would update
@@ -315,6 +319,7 @@ public partial class App : Application
         {
             try { Widgets?.SaveStates(); } catch { }
         }
+        try { MinuteOfSilence?.Dispose(); } catch { }
         try { Tray?.Dispose(); } catch { }
         try { Monitors?.Dispose(); } catch { }
         if (!SuppressSaveOnExit)
