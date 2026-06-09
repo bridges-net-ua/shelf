@@ -71,7 +71,6 @@ public partial class CurrencyWidget : UserControl, IWidget
         InitializeComponent();
         Loaded += (_, _) => ApplyState();
         Unloaded += (_, _) => _refreshTimer?.Stop();
-        SizeChanged += Widget_SizeChanged;
     }
 
     public UserControl CreateView() => this;
@@ -206,97 +205,58 @@ public partial class CurrencyWidget : UserControl, IWidget
         UpdatedText.Text = DateTime.Now.ToString("HH:mm");
     }
 
-    // ===== Row building (adaptive grid) =====
+    // ===== Row building (single column) =====
 
-    // Below this width the grid collapses to a single column.
-    private const double TwoColumnMinWidth = 210;
-
-    private List<CachedRate> _lastRows = new();
-    private int _currentColumns;
-
-    private static int ColumnsForWidth(double width) => width >= TwoColumnMinWidth ? 2 : 1;
-
+    // One grid for the whole list so code / buy / sale / change line up in shared
+    // columns. Row 0 holds the single "куп. / прод." caption header; one row per
+    // currency below it.
     private void BuildRows(List<CachedRate> rows)
-    {
-        _lastRows = rows;
-        _currentColumns = ColumnsForWidth(ActualWidth);
-        BuildGrid(rows, _currentColumns);
-    }
-
-    private void Widget_SizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        int cols = ColumnsForWidth(ActualWidth);
-        if (cols != _currentColumns)
-        {
-            _currentColumns = cols;
-            BuildGrid(_lastRows, cols);
-        }
-    }
-
-    // Builds an N-column grid of currency cells filling left-to-right, top-to-bottom.
-    // A lone trailing cell in 2-column mode spans both columns, centered.
-    private void BuildGrid(List<CachedRate> rows, int columns)
     {
         RatesHost.Children.Clear();
         if (rows.Count == 0) return;
 
-        var grid = new Grid();
-        for (int c = 0; c < columns; c++)
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-
-        int dataRows = (int)Math.Ceiling(rows.Count / (double)columns);
-        for (int r = 0; r < dataRows; r++)
-            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-
-        for (int i = 0; i < rows.Count; i++)
-        {
-            var cell = BuildCell(rows[i]);
-            Grid.SetRow(cell, i / columns);
-            Grid.SetColumn(cell, i % columns);
-            bool loneLast = columns == 2 && i == rows.Count - 1 && rows.Count % 2 == 1;
-            if (loneLast) Grid.SetColumnSpan(cell, 2);
-            grid.Children.Add(cell);
-        }
-
-        RatesHost.Children.Add(grid);
-    }
-
-    // One currency cell: code + buy/sale, each rate captioned with куп./прод. above it.
-    // Layout columns: code | buy | spacer | sale | change; rows: captions / values.
-    private UIElement BuildCell(CachedRate r)
-    {
-        var grid = new Grid
-        {
-            HorizontalAlignment = HorizontalAlignment.Center,
-            Margin = new Thickness(0, 4, 0, 4)
-        };
+        var grid = new Grid { HorizontalAlignment = HorizontalAlignment.Center };
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });        // code
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });        // buy
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(16) });     // spacer
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });        // sale
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });        // change
-        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });             // captions
-        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });             // values
+
+        for (int r = 0; r <= rows.Count; r++)
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
         AddCell(grid, Caption(Loc.Get("Currency_Buy")), 0, 1);
         AddCell(grid, Caption(Loc.Get("Currency_Sell")), 0, 3);
 
-        var code = Value(r.Ccy, FontWeights.SemiBold, "PrimaryTextBrush");
-        code.Margin = new Thickness(0, 0, 10, 0);
-        AddCell(grid, code, 1, 0);
-        AddCell(grid, Value(FmtRate(r.Buy), FontWeights.Normal, "PrimaryTextBrush"), 1, 1);
-        AddCell(grid, Value(FmtRate(r.Sale), FontWeights.Normal, "PrimaryTextBrush"), 1, 3);
-
-        var changeText = FormatChange(r);
-        if (!string.IsNullOrEmpty(changeText))
+        for (int i = 0; i < rows.Count; i++)
         {
-            var ch = Value(changeText, FontWeights.Normal, "MutedTextBrush");
-            ch.FontSize = 12;
-            ch.Margin = new Thickness(8, 0, 0, 0);
-            AddCell(grid, ch, 1, 4);
+            int row = i + 1;
+            var r = rows[i];
+
+            var code = Value(r.Ccy, FontWeights.SemiBold, "PrimaryTextBrush");
+            code.HorizontalAlignment = HorizontalAlignment.Left;
+            code.Margin = new Thickness(0, 2, 12, 2);
+            AddCell(grid, code, row, 0);
+
+            var buy = Value(FmtRate(r.Buy), FontWeights.Normal, "PrimaryTextBrush");
+            buy.Margin = new Thickness(0, 2, 0, 2);
+            AddCell(grid, buy, row, 1);
+
+            var sale = Value(FmtRate(r.Sale), FontWeights.Normal, "PrimaryTextBrush");
+            sale.Margin = new Thickness(0, 2, 0, 2);
+            AddCell(grid, sale, row, 3);
+
+            var changeText = FormatChange(r);
+            if (!string.IsNullOrEmpty(changeText))
+            {
+                var ch = Value(changeText, FontWeights.Normal, "MutedTextBrush");
+                ch.FontSize = 12;
+                ch.Margin = new Thickness(8, 2, 0, 2);
+                AddCell(grid, ch, row, 4);
+            }
         }
 
-        return grid;
+        RatesHost.Children.Add(grid);
     }
 
     private static void AddCell(Grid grid, UIElement el, int row, int col)
