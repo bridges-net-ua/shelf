@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Threading;
 using Shelf.Models;
 
 namespace Shelf.Services;
@@ -34,6 +35,16 @@ public class AppBarService
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     private static extern uint RegisterWindowMessage(string lpString);
 
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter,
+        int x, int y, int cx, int cy, uint uFlags);
+
+    [DllImport("user32.dll")]
+    private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+    private const uint SWP_NOZORDER = 0x0004;
+    private const uint SWP_NOACTIVATE = 0x0010;
+
     private const uint ABM_NEW = 0x00;
     private const uint ABM_REMOVE = 0x01;
     private const uint ABM_QUERYPOS = 0x02;
@@ -56,6 +67,13 @@ public class AppBarService
     private MonitorInfo? _lastMonitor;
     private BarSide _lastSide;
     private int _lastWidthDip;
+
+    // The physical-pixel rect the panel must occupy while registered. The guard
+    // timer re-asserts it when the shell moves the window behind our back (see
+    // the position-guard section below).
+    private RECT _desiredRect;
+    private bool _hasDesiredRect;
+    private DispatcherTimer? _guardTimer;
 
     public AppBarService(Window window)
     {
@@ -105,6 +123,8 @@ public class AppBarService
         src?.RemoveHook(WndProc);
 
         _registered = false;
+        _hasDesiredRect = false;
+        StopGuard();
     }
 
     public void SetPosition(MonitorInfo monitor, BarSide side, int widthDip)
@@ -173,22 +193,64 @@ public class AppBarService
         SHAppBarMessage(ABM_SETPOS, ref data);
         Log($"    [{monitor.DeviceName}] SETPOS final:     L={data.rc.left} T={data.rc.top} R={data.rc.right} B={data.rc.bottom}");
 
-        // Position the WPF window from OUR desired physical rect (full monitor
-        // height), converted with the TARGET monitor's DPI. We deliberately ignore
-        // the ABM_SETPOS reply here for two reasons learned from real screens:
-        //   1. Windows may clip a side AppBar's rect to the work area (e.g. taskbar
-        //      shown on this monitor / vertical / auto-hide), leaving a gap above
-        //      the taskbar - using desiredBottom forces the panel to the very edge.
-        //   2. The current HwndSource's DPI is wrong when the target monitor scales
-        //      differently from where the window currently sits, which shrank the
-        //      height on mixed-DPI multi-monitor setups.
-        // This mirrors the "trust our own rect" stance used for QUERYPOS above and
-        // keeps SetPosition consistent with MainWindow.ApplySettings (which also
-        // derives the panel height from monitor.DpiY).
-        _window.Left = desiredLeft / dpiX;
-        _window.Top = desiredTop / dpiY;
-        _window.Width = (desiredRight - desiredLeft) / dpiX;
-        _window.Height = (desiredBottom - desiredTop) / dpiY;
+        // Place the HWND directly in physical pixels via SetWindowPos - NOT through
+        // WPF Window.Left/Top. Lessons from real screens:
+        //   1. We deliberately ignore the ABM_SETPOS reply (Windows may clip a side
+        //      AppBar's rect to the work area) and any HwndSource DPI conversion
+        //      (wrong on mixed-DPI setups) - our desired rect needs no DIP math.
+        //   2. WPF dependency properties no-op when the value looks unchanged. After
+        //      the shell moves the HWND, Window.Left can still read the old value,
+        //      so re-assigning it does nothing. SetWindowPos always takes effect.
+        // WPF picks the move up via WM_WINDOWPOSCHANGED and syncs its own state.
+        _desiredRect = new RECT
+        {
+            left = desiredLeft, top = desiredTop,
+            right = desiredRight, bottom = desiredBottom
+        };
+        _hasDesiredRect = true;
+        SetWindowPos(_hwnd, IntPtr.Zero, desiredLeft, desiredTop,
+            desiredRight - desiredLeft, desiredBottom - desiredTop,
+            SWP_NOZORDER | SWP_NOACTIVATE);
+
+        StartGuard();
+    }
+
+    // ===== Position guard =====
+    //
+    // The shell can move an appbar window AFTER we placed it - observed live when
+    // panels re-register while a widget is being deleted: a transient double strip
+    // reservation makes Windows shove the bar one slot sideways a few seconds after
+    // our final SETPOS (vd.log showed perfect coords, yet the window sat shifted).
+    // While registered, a cheap once-a-second GetWindowRect compares the actual
+    // window rect with the desired one and snaps the window back on any drift.
+
+    private void StartGuard()
+    {
+        if (_guardTimer == null)
+        {
+            _guardTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            _guardTimer.Tick += (_, _) => GuardTick();
+        }
+        _guardTimer.Start();
+    }
+
+    private void StopGuard() => _guardTimer?.Stop();
+
+    private void GuardTick()
+    {
+        if (!_registered || !_hasDesiredRect || _hwnd == IntPtr.Zero) return;
+        if (!GetWindowRect(_hwnd, out var rc)) return;
+
+        if (rc.left != _desiredRect.left || rc.top != _desiredRect.top
+            || rc.right != _desiredRect.right || rc.bottom != _desiredRect.bottom)
+        {
+            Log($"    [{_lastMonitor?.DeviceName}] Guard: drift L={rc.left} T={rc.top} " +
+                $"R={rc.right} B={rc.bottom} -> snap back to L={_desiredRect.left} " +
+                $"T={_desiredRect.top} R={_desiredRect.right} B={_desiredRect.bottom}");
+            SetWindowPos(_hwnd, IntPtr.Zero, _desiredRect.left, _desiredRect.top,
+                _desiredRect.right - _desiredRect.left, _desiredRect.bottom - _desiredRect.top,
+                SWP_NOZORDER | SWP_NOACTIVATE);
+        }
     }
 
     private static readonly string LogPath =
