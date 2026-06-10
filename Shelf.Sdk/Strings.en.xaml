@@ -209,6 +209,16 @@
     <s:String x:Key="Settings_MinuteSilence_Hint">Every day at 9:00 the panel dims, audio widgets fall silent and a metronome plays for 60 seconds.</s:String>
     <s:String x:Key="Tray_TestSilence">Test minute of silence</s:String>
 
+    <!-- ===== Widget: HTML Widget ===== -->
+    <s:String x:Key="Html_Name">HTML Widget</s:String>
+    <s:String x:Key="Html_Desc">Runs your own HTML, CSS and JS code.</s:String>
+    <s:String x:Key="Html_Settings_Title">Settings - HTML Widget</s:String>
+    <s:String x:Key="Html_Code_Label">Code (HTML, CSS, JS)</s:String>
+    <s:String x:Key="Html_Code_Hint">Paste only code you trust. It runs in a browser sandbox with no access to your files. Links open in your default browser.</s:String>
+    <s:String x:Key="Html_FieldHeight">Widget height: </s:String>
+    <s:String x:Key="Html_Tip_Reload">Restart the code</s:String>
+    <s:String x:Key="Html_Err_Runtime">WebView2 Runtime not found. Install the Microsoft Edge WebView2 Runtime and restart the app.</s:String>
+
     <!-- ===== Widget: Tasks ===== -->
     <s:String x:Key="Todo_Name">Tasks</s:String>
     <s:String x:Key="Todo_Desc">Tasks with done checkboxes.</s:String>

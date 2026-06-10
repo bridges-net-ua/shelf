@@ -88,6 +88,7 @@
     <ProjectReference Include="WidgetPlugins\Shelf.Widgets.Nba\Shelf.Widgets.Nba.csproj"/>
     <ProjectReference Include="WidgetPlugins\Shelf.Widgets.SunMoon\Shelf.Widgets.SunMoon.csproj"/>
     <ProjectReference Include="WidgetPlugins\Shelf.Widgets.Currency\Shelf.Widgets.Currency.csproj"/>
+    <ProjectReference Include="WidgetPlugins\Shelf.Widgets.Html\Shelf.Widgets.Html.csproj"/>
   </ItemGroup>
 
 </Project>

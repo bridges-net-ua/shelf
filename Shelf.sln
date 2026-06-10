@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shelf.Widgets.SunMoon", "Wi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shelf.Widgets.Currency", "WidgetPlugins\Shelf.Widgets.Currency\Shelf.Widgets.Currency.csproj", "{D6AF6CE1-8DD3-472D-8FAF-6EA2266E605A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shelf.Widgets.Html", "WidgetPlugins\Shelf.Widgets.Html\Shelf.Widgets.Html.csproj", "{431B6DCB-F23E-41A6-97A3-08361BC83480}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,10 @@ Global
 		{D6AF6CE1-8DD3-472D-8FAF-6EA2266E605A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6AF6CE1-8DD3-472D-8FAF-6EA2266E605A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6AF6CE1-8DD3-472D-8FAF-6EA2266E605A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{431B6DCB-F23E-41A6-97A3-08361BC83480}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{431B6DCB-F23E-41A6-97A3-08361BC83480}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{431B6DCB-F23E-41A6-97A3-08361BC83480}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{431B6DCB-F23E-41A6-97A3-08361BC83480}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,5 +106,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{63887886-5B1F-43FE-90AD-EDBCBA9FF6D5} = {0DD2F775-87B6-480B-8241-A791D8152798}
 		{D6AF6CE1-8DD3-472D-8FAF-6EA2266E605A} = {0DD2F775-87B6-480B-8241-A791D8152798}
+		{431B6DCB-F23E-41A6-97A3-08361BC83480} = {0DD2F775-87B6-480B-8241-A791D8152798}
 	EndGlobalSection
 EndGlobal

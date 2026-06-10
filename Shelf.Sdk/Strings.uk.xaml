@@ -209,6 +209,16 @@
     <s:String x:Key="Settings_MinuteSilence_Hint">Щодня о 9:00 панель затемнюється, звукові віджети стихають і 60 секунд грає метроном.</s:String>
     <s:String x:Key="Tray_TestSilence">Тест хвилини мовчання</s:String>
 
+    <!-- ===== Віджет: HTML-віджет ===== -->
+    <s:String x:Key="Html_Name">HTML-віджет</s:String>
+    <s:String x:Key="Html_Desc">Виконує власний код HTML, CSS та JS.</s:String>
+    <s:String x:Key="Html_Settings_Title">Налаштування - HTML-віджет</s:String>
+    <s:String x:Key="Html_Code_Label">Код (HTML, CSS, JS)</s:String>
+    <s:String x:Key="Html_Code_Hint">Вставляйте лише код, якому довіряєте. Код виконується в пісочниці браузера і не має доступу до ваших файлів. Посилання відкриваються у звичайному браузері.</s:String>
+    <s:String x:Key="Html_FieldHeight">Висота віджета: </s:String>
+    <s:String x:Key="Html_Tip_Reload">Перезапустити код</s:String>
+    <s:String x:Key="Html_Err_Runtime">WebView2 Runtime не знайдено. Встановіть Microsoft Edge WebView2 Runtime і перезапустіть програму.</s:String>
+
     <!-- ===== Віджет: Задачі ===== -->
     <s:String x:Key="Todo_Name">Задачі</s:String>
     <s:String x:Key="Todo_Desc">Задачі з галочками «зроблено».</s:String>
